@@ -1,5 +1,24 @@
 /* ============ REGOLE — testi della guida ============ */
 
+const RULES_STORY = `
+<h3>📱 Dove siete</h3>
+<p>Sotto il palazzo di <b>Daniele</b>, di sera, tutti e cinque: <b>Gaetano, Natalino, Claudia, Federico, Emanuela</b>. Nessuno aveva programmato di essere qui stasera.</p>
+<p>Daniele è il gemello di Federico — stessa faccia, idee opposte su tutto, trent'anni di litigi ininterrotti e nessuno dei due che molla mai una discussione a metà. È il più casalingo del gruppo: divano, libri, Switch, Coca Zero in quantità industriale. Nella chat siete sei. Da tre giorni, di quei sei, uno non scrive più.</p>
+<p>Non è che sia sparito all'improvviso. È peggio: nelle ultime settimane <i>diminuiva</i>. Messaggi più corti, poi emoji, poi il solo "visualizzato". Poi niente. Claudia ha gli screenshot di tutto, perché Claudia ha sempre gli screenshot di tutto.</p>
+
+<h3>🚪 Cosa sta succedendo</h3>
+<p>Federico ha le chiavi di scorta — Daniele glieli diede "per le emergenze", pensando alle piante da innaffiare. La cassetta della posta trabocca di pacchi mai ritirati. Dalla finestra, la luce della TV pulsa a un ritmo troppo regolare per essere una TV.</p>
+<p>Entrate. E la porta, dietro di voi, <b>non c'è più</b>: al suo posto un muro liscio, senza cornice, come se non ci fosse mai stata. Il corridoio dell'ingresso, che in un bilocale è lungo tre metri, adesso ne misura trentaquattro.</p>
+<p>Qualcosa si è installato in casa di Daniele. Qualcosa che ha preso in prestito la sua faccia, che sa parlare meglio di voi, e che colleziona persone come si collezionano soprammobili: spente, comode, sedute.</p>
+
+<h3>🩶 Cosa vi aspetta</h3>
+<p>Una casa che non finisce: stanze che si aprono su ricordi vostri messi in grigio, tre strade da esplorare in libertà, e un padrone di casa che non alza mai la voce perché non gliene serve — combatte con le parole, e ha imparato la retorica dal migliore della vostra compagnia.</p>
+<p>Daniele è dentro, da tre giorni, e non si è arreso: sta sabotando quello che può. Andate a riprendervelo. Da un certo punto in poi, <b>si gioca anche lui</b> — e l'ultima parola, se ve la giocate bene, spetta a lui.</p>
+
+<h3>🎲 Cosa serve al tavolo</h3>
+<p>Da uno a cinque giocatori (più uno da salvare), un solo schermo, zero preparazione: uno legge ad alta voce, si discute, si sceglie insieme, e quando serve si tira il dado. Salvataggio automatico: una partita dura diverse ore, si interrompe e si riprende quando volete.</p>
+<p><i>⚠️ Gioco per adulti: gore esplicito, linguaggio pesante, e in alcuni momenti — sempre annunciati prima — si può <b>morire davvero</b>. Chi muore resta con voi come spirito, e riportarlo indietro costa carissimo. Scegliete con calma: qui le scelte pesano.</i></p>`;
+
 const RULES_HOWTO = `
 <h3>🚪 Che gioco è questo?</h3>
 <p>Un'avventura horror interattiva in stile D&amp;D, con un Narratore automatico. Si gioca <b>insieme, sullo stesso schermo</b>: si legge ad alta voce, si discute, si sceglie, e quando serve si tira un dado virtuale. Nessuna preparazione: il gioco vi guida sempre.</p>
