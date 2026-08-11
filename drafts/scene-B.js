@@ -32,6 +32,7 @@ E poi un libretto sottile, in fondo, sussurra a nessuno: *"...il portellone si c
     choices: [
       { text: '🚶 Inoltrarsi tra gli scaffali, un passo dopo l\'altro', next: 'b2' },
       { text: '🙉 Tapparsi le orecchie e CORRERE oltre il corridoio dei sussurri', tag: 'Prova di Costituzione — CD 11', check: { stat: 'COS', dc: 11, success: 'b3', fail: 'b2b' } },
+      { text: '🐭 Un fruscìo fitto di zampette dagli scaffali bassi. Natalino diventa bianco: seguire il rumore', once: true, next: 'b15' },
     ],
   },
 
@@ -110,6 +111,7 @@ Federico prende il Cialdini e lo apre a caso. A margine, la grafia fitta del gem
     choices: [
       { text: '📖 Fermarsi a leggere le note con calma: mezz\'ora di Daniele puro', next: 'b3b' },
       { text: '🚶 Non c\'è tempo: proseguire verso la sala di lettura', next: 'b5' },
+      { text: '📚 Da dietro lo scaffale, un coro sottile di carta che striscia: "...finiscimi..." — andare a vedere', once: true, next: 'b14' },
     ],
   },
 
@@ -188,6 +190,7 @@ Sul fondo della sala, uno scaffale girevole cigola piano, mezzo aperto su un van
       { text: '🤫 Attraversare la sala in silenzio assoluto, tra i tavoli', tag: 'Prova di Destrezza — CD 12', check: { stat: 'DES', dc: 12, success: 'b7', fail: 'b6b' } },
       { text: '👀 Fermarsi a osservarli: capire COSA leggono', tag: 'Prova di Saggezza — CD 12', check: { stat: 'SAG', dc: 12, success: 'b5b', fail: 'b6b' } },
       { text: '🌈 Lo scaffale girevole che odora di crêpes: guardarci dentro', once: true, next: 'b12' },
+      { text: '🗄 Una porticina bassa, targa d\'ottone: "ARCHIVIO — DIARI IN CONSULTAZIONE"', once: true, next: 'b13' },
     ],
   },
 
@@ -323,6 +326,7 @@ Accanto allo scaffale, buttato lì come dopo un trasloco, un oggetto assurdo: un
       { text: '📕 Strappare la catena e aprire la biografia di Eleinad', next: 'b8' },
       { text: '🗣 Un fruscìo alle vostre spalle: il Bibliotecario vi ha seguiti. Affrontarlo a parole', requires: { notFlag: 'bibliotecario_morto' }, next: 'b10' },
       { text: '🎲 Tra la frana di libri, un tintinnare di plastica: cercare cosa custodiva il Bibliotecario', requires: { flag: 'bibliotecario_morto' }, once: true, tag: 'Prova di Saggezza — CD 13', check: { stat: 'SAG', dc: 13, success: 'b7b', fail: 'b8' } },
+      { text: '🗃 Sotto lo scaffale proibito, una scatola da scarpe piena di tessere della biblioteca', once: true, next: 'b17' },
     ],
   },
 
@@ -546,6 +550,322 @@ Uscite nel Salotto-Cattedrale con un manuale, un segreto, e i nomi giusti in boc
     gold: 1,
     choices: [
       { text: '🏛 Tornare al Salotto-Cattedrale', next: 'h1' },
+    ],
+  },
+
+  /* ============ SECONDA ONDATA — ESPANSIONE DEL BLOCCO B ============ */
+
+  /* ---------- b13 / b13b — L'ARCHIVIO DEI DIARI ALTRUI ---------- */
+
+  b13: {
+    location: 'biblioteca',
+    caption: 'L\'Archivio dei Diari Altrui',
+    stinger: 'penna',
+    text: `L'archivio è una stanza stretta e altissima, foderata di cassetti da catalogo fino al soffitto. Su ogni cassetto, una targhetta scritta a mano. Non titoli. **Indirizzi.** Via Roma 12, Torino. Vico Sartoria 3, Napoli. Un casale in provincia di Latina.
+
+> Claudia: "Non sono libri. Sono case. Sono TUTTE le case dove è entrato."
+
+Aprite un cassetto a caso. Dentro, diari. Impilati con cura, con addosso la polvere di chi non torna a riprenderli. Ne leggete tre, e vi bastano per il resto della vita:
+
+*"Papà ha smesso di fischiettare mentre si rade. Poi ha smesso di radersi. Poi io ho smesso di chiederglielo."*
+
+*"Il gatto non entra più in salotto. Fissa il divano e soffia. Sul divano non c'è nessuno. Sul divano c'è la nonna."*
+
+*"Giorno 40. Abbiamo tinteggiato tre volte. Il grigio non è sui muri. Ci ho messo quaranta giorni a capirlo: il grigio non è SUI muri."*
+
+Emanuela richiude il cassetto piano, come si richiude una bara piccola.
+
+> Emanuela: "Quante case, porca puttana. Quante. E noi che pensavamo fosse solo la nostra."
+
+> Gaetano: "Aspettate. Guardate in fondo."
+
+In fondo alla stanza c'è un cassetto diverso. Più piccolo, senza polvere, con la targhetta lucidata di fresco. Non è un indirizzo: dice **"RESTITUITI"**. Ed è quasi vuoto — dentro, dal rumore, UNA cosa sola che scivola avanti e indietro.
+
+> Natalino: "Restituiti. Cioè... gente che è USCITA?"`,
+    choices: [
+      { text: '📔 Aprire il cassetto dei RESTITUITI', next: 'b13b' },
+      { text: '🚪 Chiudere tutto e tornare nella sala di lettura', next: 'b5' },
+    ],
+  },
+
+  b13b: {
+    location: 'biblioteca',
+    caption: 'Il diario restituito — qualcuno ce l\'ha fatta',
+    stinger: 'item',
+    text: `Nel cassetto c'è un diario solo. Copertina a fiori, sbiadita ai bordi ma **a colori** nel mezzo, come una cosa strappata al grigio all'ultimo momento. Prima pagina: *"Diario di Rosa. Se lo trovate, il trucco funziona anche per altri."*
+
+Leggete. Rosa è rimasta sul divano di una casa come questa per — dice lei — "un tempo che non si conta in giorni". E poi:
+
+*"Mia sorella veniva tutti i giorni. Non mi ha mai detto 'alzati'. Si sedeva ACCANTO, sul bracciolo, e mi raccontava le cose a colori: il mercato, la figlia, il mare mosso. La casa la odiava, perché non riusciva a stancarla. Il grigio conta su una cosa sola: che chi è fuori, prima o poi, smetta di tornare. Davanti a una che torna, e torna, e torna... non sa che fare."*
+
+E l'ultima pagina, scritta di corsa, in salita:
+
+*"Oggi mi sono alzata A METÀ PAGINA. Non ho finito il capitolo, non ho spento la TV, non ho messo a posto. Ho lasciato tutto a metà e sono uscita, e nessuna regola del mondo ha potuto fermarmi — perché non esiste nessuna regola che dice che devi finire. Il divano ha urlato. Ve lo giuro: ha urlato. Vuol dire che funziona."*
+
+Sotto il diario, una boccetta piccola col tappo dorato, piena di qualcosa che si muove come un tramonto.
+
+> Claudia: *(foto mentale, occhi lucidi)* "Daniele ha qualcuno che torna, e torna, e torna. Ha NOI. Segnatevi tutto quanto."
+
+**(Ottenete una BOCCATA DI COLORE. 🎨 +1. E un'idea che vale più della boccetta: si può uscire a metà pagina.)**`,
+    item: 'boccata_colore',
+    gold: 1,
+    sets: { pagina_del_salvato: true },
+    choices: [
+      { text: '🚶 Tornare alla sala di lettura, col diario di Rosa in mente', next: 'b5' },
+    ],
+  },
+
+  /* ---------- b14 / b14b / b14c — LA SALA DEI LIBRI MAI FINITI ---------- */
+
+  b14: {
+    location: 'biblioteca',
+    caption: 'La Sala dei Libri Mai Finiti',
+    text: `Lo scaffale ruota e vi sputa in una sala che sa di inchiostro andato a male. Il pavimento è vivo: **manoscritti a metà** che si trascinano come animali investiti, ognuno dietro il suo segnalibro a nastro — rosso, floscio, che striscia sul parquet come una cosa che dovrebbe stare DENTRO.
+
+E implorano. Cristo, se implorano.
+
+> *(un giallo, fermo al capitolo 13 da sessant'anni)* "...l'assassino... stavo per DIRLO... sei parole ancora, sei parole..."
+
+> *(un romanzo rosa, congelato a un centimetro da un bacio)* "...le nostre labbra... dal 1974... vi prego, ho i CRAMPI..."
+
+> *(un ricettario, aperto su una riga sola)* "...sale quanto basta... QUANTO? QUANTO BASTA?!"
+
+Un dattiloscritto vi abbranca una caviglia con le pagine, e non tira: **supplica**, con la forza precisa e oscena di una mano d'ospedale.
+
+> Federico: "Levatemelo! Levatemelo di dosso, cazzo!"
+
+> Natalino: "Non vogliono farci male. Vogliono un FINALE. Sono rimasti a metà così a lungo che la ferita gli si è infettata."
+
+> Emanuela: "E allora il finale glielo diamo. Siamo cinque persone con una fantasia decente e una paura fottuta: si lavora anche peggio, di solito."
+
+> Gaetano: "O improvvisiamo col cuore, o lo facciamo col metodo. Ma qualcosa gli diamo, o questi non ci mollano più."`,
+    choices: [
+      { text: '🎭 Improvvisare i finali ad alta voce, uno a testa, col cuore', tag: 'Prova di gruppo di Carisma — CD 12', check: { stat: 'CAR', dc: 12, success: 'b14b', fail: 'b14c' } },
+      { text: '🧠 Metodo Gaetano: arco narrativo, matrice dei finali, colpevoli distribuiti', tag: 'Prova di gruppo di Intelligenza — CD 12', check: { stat: 'INT', dc: 12, success: 'b14b', fail: 'b14c' } },
+      { text: '🚪 Scusarsi coi manoscritti e sgattaiolare verso la sala di lettura', next: 'b5' },
+    ],
+  },
+
+  b14b: {
+    location: 'biblioteca',
+    caption: 'I finali regalati — funziona',
+    text: `Funziona. Dio santo, funziona.
+
+Claudia chiude il romanzo rosa con un bacio e un "e vissero stanchi ma contenti", e il manoscritto **sospira** — un sospiro di cinquant'anni, che sa di polvere e di sollievo — poi si chiude da solo, piano, e non si muove più. Sereno.
+
+Il ricettario riceve da Emanuela un "due pizzichi, amore, e assaggia" e muore felice come un cliente sotto il casco.
+
+Poi il giallo. Tocca a Federico.
+
+> Federico: "L'assassino... è IL DENTISTA."
+
+> *(il giallo, fremendo)* "...nel romanzo non compare nessun dentista..."
+
+> Federico: "Appunto. Nessuno sospetta di chi non compare. Il movente è il TARTARO. Fine."
+
+Silenzio. Il giallo ci pensa. Poi le pagine fanno una cosa che nessun libro dovrebbe fare: **applaudono** — e si chiudono con un ultimo fruscìo che somiglia troppo a una risata per essere altro.
+
+Restano lì, i libri finiti: fermi, in pace, in fila sul parquet come sassi al sole. E — dettaglio che non vi lascerà mai più — da ognuno cola un filo sottile di inchiostro nero, dall'ultima pagina, come sangue da una ferita che finalmente si è chiusa. Qui dentro, morire finiti è il lieto fine.
+
+**(🎨 +2 Colore: i finali regalati tornano indietro coi colori addosso.)**
+
+Poi il pavimento **trema**. In fondo alla sala, una cosa grande come un armadio si solleva: un manoscritto di quattromila pagine, rilegato in corda e unghie. Il Capobranco.
+
+E lui non vuole un finale. Lui vuole VOI.`,
+    gold: 2,
+    choices: [
+      { text: '🗣 Il Manoscritto-Capobranco vi si para davanti', next: 'b16' },
+    ],
+  },
+
+  b14c: {
+    location: 'biblioteca',
+    caption: 'La frase proibita — i manoscritti urlano',
+    text: `Partite pieni di buona volontà, e la buona volontà, qui dentro, non basta un cazzo.
+
+Federico chiude il giallo con "e poi si svegliò: era stato tutto un sogno" — e il giallo **URLA**. Un urlo di carta, verticale, che vi entra nei denti. Tutti i manoscritti della sala si irrigidiscono insieme: avete detto la frase proibita, la fine peggiore di tutte le fini, l'insulto supremo.
+
+> *(il giallo, tra singhiozzi di pagine)* "...sessant'anni... sessant'anni ad aspettare... PER UN SOGNO?..."
+
+> Claudia: "Federico, PORCA PUTTANA—"
+
+> Federico: "Era la prima cosa che mi è venuta! Funziona sempre, nei film!"
+
+> Natalino: "Non funziona MAI, nemmeno nei film! È il motivo per cui la gente TIRA COSE allo schermo!"
+
+I manoscritti vi si stringono addosso, feriti, e il loro dolore è contagioso come uno sbadiglio: vi sale in gola tutta la stanchezza di tutte le cose lasciate a metà — le VOSTRE. La palestra di gennaio. Il corso d'inglese. Le scuse mai fatte. Pesa da piegarvi le ginocchia.
+
+**(-2 PV a tutti: il rimorso di carta taglia sottile.)**
+
+E il peggio arriva adesso: dal fondo della sala, svegliato dall'urlo, si alza il **Capobranco** — un manoscritto di quattromila pagine, rilegato in corda e unghie, con l'aria paziente di chi ha sentito TUTTO.`,
+    damage: 2,
+    choices: [
+      { text: '🗣 Affrontare il Manoscritto-Capobranco', next: 'b16' },
+    ],
+  },
+
+  /* ---------- b16 / b16v / b16k — DUELLO DI PAROLE: IL CAPOBRANCO ---------- */
+
+  b16: {
+    location: 'biblioteca',
+    caption: '🗣 Duello di Parole — il Manoscritto-Capobranco',
+    text: `**🗣 DUELLO DI PAROLE**
+
+Il Capobranco non striscia: **incombe**. Quattromila pagine mai finite, rilegate in corda e unghie, e una voce che esce da tutte le righe insieme — calda, ragionevole, terribilmente dalla vostra parte.
+
+> Il Capobranco: "Vi ho guardati. Siete gente che FINISCE le cose. Avete dato un finale al rosa, al giallo, al ricettario — che gesto splendido, che gente SERIA. Ed è per questo che lo sapete già da soli: chi comincia, finisce. È quello che siete. L'avete appena dimostrato, qui, davanti a testimoni. Fermarvi adesso sarebbe... incoerente. Sarebbe tradire non me — figuriamoci, io sono solo carta — ma quello che VOI avete appena scelto di essere. Perciò sedetevi. Cominciate da pagina uno. Sono lungo, sì. Ma voi siete gente che finisce. Vero?"
+
+Le pagine si aprono come braccia spalancate. E il ragionamento vi si chiude addosso come una porta: ha ragione, no? Avete cominciato. Sarebbe da vigliacchi fermarsi, da incoerenti, da gente-che-molla...
+
+*(vi torna in mente una nota a margine di Daniele, intravista nella sua sezione: "La fregatura più elegante non ti chiede di credere a LEI: ti chiede di restare fedele a quello che hai già fatto. Come se tu fossi un contratto, e non una persona.")*
+
+Dov'è il trucco?`,
+    choices: [
+      { text: '😢 RICATTO EMOTIVO: "Piangi pure tutte le tue pagine: non firmeremo il tuo finale per pietà."', once: true, next: 'b16k' },
+      { text: '⛓ IMPEGNO/COERENZA: "Aver cominciato non è una promessa. Non siamo TENUTI a finire niente: si può cambiare idea a metà pagina."', next: 'b16v' },
+      { text: '⏳ SCARSITÀ: "Ultima occasione un corno: sei qui da sessant\'anni, puoi aspettare."', once: true, next: 'b16k' },
+      { text: '📔 Fare come Rosa: alzarsi a metà pagina e andarsene, senza spiegazioni', requires: { flag: 'pagina_del_salvato' }, next: 'b16v' },
+    ],
+  },
+
+  b16k: {
+    location: 'biblioteca',
+    caption: 'Il contraccolpo — state già leggendo',
+    text: `Il colpo rimbalza. Il Capobranco nemmeno si scompone: **annuisce**, con tutta la copertina, come un professore paziente davanti a un errore prevedibile.
+
+> Il Capobranco: "Vedete? State discutendo con me. State INVESTENDO. Ogni parola che spendete qui è un'altra pagina che avete cominciato — e chi comincia, finisce. Vi state rilegando da soli, punto dopo punto, ed è bellissimo da leggere."
+
+E ha ragione, ecco l'orrore: più parlate, più il pavimento vi sembra comodo, più andarsene adesso sembra "buttare via tutto il lavoro fatto". Le ginocchia vi si piegano da sole, in cerca della seduta. Qualcuno di voi si accorge di aver già letto TRE righe della sua prima pagina, senza volerlo, e di volere — un pochino, orribilmente — sapere come continua.
+
+> Emanuela: "Ragazzi. RAGAZZI. È il monologhista della spiaggia. È identico al monologhista della spiaggia: più gli rispondi, più resti."
+
+> Claudia: "Allora il punto non è COSA gli rispondiamo. È che ci sentiamo in debito perché abbiamo cominciato. Chi l'ha deciso? DOVE sta scritto?"
+
+> Gaetano: "Da nessuna parte. Non c'è nessun contratto. C'è solo lui che ci ricorda in continuazione quello che 'siamo'..."
+
+**(-3 PV a tutti: le ginocchia cercano il pavimento. Ma il trucco, adesso, ha un contorno preciso.)**`,
+    damage: 3,
+    choices: [
+      { text: '🗣 Riprendere il duello — e stavolta niente pagina uno', next: 'b16' },
+    ],
+  },
+
+  b16v: {
+    location: 'biblioteca',
+    caption: 'Il Capobranco si chiude a metà',
+    stinger: 'gold',
+    text: `**Impegno e coerenza.** Lo dite ad alta voce — *non siamo tenuti a finire niente* — e il Capobranco si INCEPPA.
+
+> Il Capobranco: "Ma... avete cominciato. Chi comincia fin— chi comincia f-f—" *(le pagine sfarfallano, perdono il segno, la corda della rilegatura vibra)* "—si può... cambiare idea... a metà pagina?"
+
+Silenzio enorme. Quattromila pagine che ci pensano.
+
+> Il Capobranco: *(piano, da una riga sola, piccolissima)* "Allora posso smettere anch'io."
+
+E davanti a voi, il manoscritto più ostinato della biblioteca fa la cosa che nessuno gli aveva mai concesso: **si chiude a metà**. A pagina 1987 di 4000. Senza finale, senza scuse. La corda si allenta. Le unghie della rilegatura si aprono come una mano che smette di stringere. E dal dorso esce un suono che non è un lamento — è il sospiro di uno che posa uno zaino portato per sessant'anni.
+
+Sull'ultima pagina scritta, davanti ai vostri occhi, compaiono tre parole nuove, in una grafia stanca e finalmente libera:
+
+*"FINE. (Più o meno.)"*
+
+> Natalino: "Ha mollato a metà ED È FELICE. Lo racconto a mia madre, che me lo rinfaccia dal duemilaquattro con la storia del conservatorio."
+
+> Federico: "Frena, frena. Questo NON vale per la palestra."
+
+> Emanuela: "Vale ANCHE per la palestra, amore. Vale per tutto." *(pausa)* "Tranne che per Daniele."
+
+Già. Per Daniele si finisce.
+
+**(🎨 +2 Colore: l'incantesimo della coerenza si spezza — a metà, che è il modo giusto.)**`,
+    gold: 2,
+    choices: [
+      { text: '🚶 La sala si riapre: tornare verso la sala di lettura', next: 'b5' },
+    ],
+  },
+
+  /* ---------- b15 / b15b — I TOPI TRA GLI SCAFFALI ---------- */
+
+  b15: {
+    location: 'biblioteca',
+    caption: 'Gli scaffali bassi — i topi di carta',
+    stinger: 'jumpscare',
+    text: `Il fruscìo viene dagli scaffali bassi, quelli dei libri per bambini — perché questa casa di merda ha il senso dell'umorismo di un becchino.
+
+Natalino lo dice piano, con la voce di uno che spera ancora di sbagliarsi:
+
+> Natalino: "Ditemi che è il vento. Ditemi che in questo posto c'è il VENTO."
+
+Non è il vento. Dal buio tra i dorsi colano fuori i **topi**: grigi, sì, ma non di pelo — di **carta masticata e polvere feltrata**, con le code di segnalibro e gli occhi come punti fermi, neri e senza fondo. Rosicchiano i libri da dentro: dai dorsi sventrati esce segatura di parole, e le pagine superstiti hanno buchi a forma di frase mangiata.
+
+Uno si ferma. Vi guarda. E fa una cosa che i topi veri non fanno: **si alza sulle zampe posteriori e legge Natalino ad alta voce**, con una vocina di carta strappata:
+
+> *(il topo)* "...zampette sotto il letto... l'ultimo tronello che si sbriciola tra le dita..."
+
+> Natalino: "NO. No no no. La mia paura NON LA RECITI, brutto figlio di—"
+
+Lo sciame parte. Tre, dieci, trenta — dai ripiani, dalle scale a chiocciola, giù dal soffitto come pigne marce. Claudia afferra un atlante e lo impugna come una racchetta. Gaetano le si mette schiena contro schiena, per puro istinto da racchettoni.
+
+> Gaetano: "Come al mare, amore. Sassata e copertura!"
+
+**(Non serve sterminarli: serve spezzare lo sciame.)**`,
+    combat: { enemies: ['topo_grigio', 'topo_grigio', 'topo_grigio'], victory: 'b15b', defeat: 'b_ko', loot: { gold: 1, items: ['taralli'] } },
+  },
+
+  b15b: {
+    location: 'biblioteca',
+    caption: 'Natalino, professionista — la seconda ondata',
+    text: `L'ultimo topo dello sciame esplode in coriandoli grigi sotto l'atlante di Claudia. Silenzio. Respiri.
+
+Poi li vedete: dagli scaffali in alto, **altri occhi**. Decine. Una seconda ondata, più grossa, e in testa un topo di carta grande come un gatto, con la coda fatta di segnalibri intrecciati in una treccia.
+
+E qui succede la cosa che vi racconterete per anni.
+
+Natalino — Natalino che i topi li teme da prima di saper camminare — fa un passo AVANTI. Tira fuori le forbici giapponesi con la mano che trema. Poi la mano smette di tremare, perché le mani di Natalino, sul lavoro, non tremano mai. Pettine nell'altra. Postura da salone.
+
+> Natalino: "Allora. Chi è il primo?" *(due colpi di forbice a vuoto, TAC TAC — il suono più professionale del mondo)* "Vedo doppie punte. Vedo trascuratezza. Vedo una treccia che definire criminale è un complimento. Ho l'agenda piena, ma per voi... mi libero."
+
+Il topo grande fa mezzo passo avanti. Le forbici scattano UNA volta, precise come un giudizio: la punta della treccia-coda cade sul parquet, recisa netta.
+
+Lo sciame si FERMA. Il topo grande guarda la propria coda. Guarda Natalino. E l'ondata intera rifluisce negli scaffali, in silenzio, come una marea che ha capito con chi ha a che fare.
+
+> Natalino: *(riponendo le forbici, voce ferma e gambe no)* "Reggetemi. Reggetemi ADESSO, per favore. Davanti a loro non potevo."
+
+Nella tana, tra pagine rosicchiate, il bottino: i topi la carta la mangiano, ma i **taralli** non li sanno apprezzare.`,
+    choices: [
+      { text: '📚 Rimettersi in marcia: più avanti, tra gli scaffali, qualcosa di GROSSO sta catalogando', next: 'b2' },
+    ],
+  },
+
+  /* ---------- b17 — LE TESSERE DEI LETTORI (cuore/lore) ---------- */
+
+  b17: {
+    location: 'biblioteca',
+    caption: 'Le tessere dei lettori — il prestito di Daniele',
+    stinger: 'item',
+    text: `La scatola è una scatola da scarpe, e dentro ci sono le **tessere dei lettori**. Cartoncini timbrati, uno per persona: nome, prestiti, data di rientro. Le sfogliate e capite che state tenendo in mano i Lettori Grigi — chi erano PRIMA della vestaglia.
+
+*"MARTA C. — ultimi prestiti: manuali di vela. Nota: chiedeva sempre libri sul mare. Poi ha smesso di chiedere."*
+
+*"L'UOMO DEL TAVOLO 9 — ultimo prestito: 'Favole della buonanotte'. MAI RESTITUITO. Nota della direzione: irrecuperabile."*
+
+> Claudia: "Il tavolo 9... è quello col segnalibro. Il sole giallo, la casa rossa. Capite? Sotto le pagine bianche sta ancora leggendo le favole a qualcuno. Per questo non affonda."
+
+Nessuno parla per un po'. Poi Gaetano trova l'ultima tessera. Cartoncino nuovo, timbro fresco: **tre giorni fa**.
+
+*"DANIELE — prestiti: Cialdini (rientrato), 'Logica del primo ordine' (rientrato), 'Le fallacie: riconoscerle e smontarle' (rientrato, con annotazioni NON autorizzate e francamente migliorative). RICHIESTO, IN ARRIVO: 'Organizzare la prima campagna di D&D per un gruppo di principianti assoluti'."*
+
+> Federico: *(la legge due volte)* "In arrivo. Ha ordinato un libro. Da QUI DENTRO, mentre quella cosa gli scimmiotta la faccia, mio fratello ha ordinato un libro per il DOPO."
+
+Accanto alla scatola, in equilibrio su una mensola, una **lattina di Coca Zero** usata come fermacarte. Sotto, un post-it con una freccia verso l'uscita e due parole: *"Vi aspetto."*
+
+> Emanuela: "La lattina prendetela. È sua. Si restituisce a mano."
+
+**(Ottenete una LATTINA ZERO — fredda, chissà come. 🎨 +1 Colore: il dopo esiste, ed è già ordinato.)**`,
+    item: 'lattina_zero',
+    gold: 1,
+    choices: [
+      { text: '📕 Tornare allo scaffale proibito, alla biografia', next: 'b8' },
+      { text: '🚪 Dritti verso l\'uscita, con la lattina in tasca', next: 'b11' },
     ],
   },
 

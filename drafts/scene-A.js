@@ -253,6 +253,79 @@ Emanuela le sistema nella borsa, nella tasca imbottita, quella dei flaconi che n
     sets: { gocce_trovate: true },
     choices: [
       { text: '📺 Al salotto — la TV pulsa ancora', next: 'a5' },
+      { text: '🪞 Lo specchio grande, dietro la porta: c\'è qualcosa che non va', once: true, next: 's7' },
+    ],
+  },
+
+  s7: {
+    location: 'appartamento',
+    caption: 'Il bagno — lo specchio in ritardo',
+    text: `Lo specchio grande, dietro la porta, è il motivo per cui nessuno lo aveva ancora degnato di un'occhiata: perché adesso, guardandolo, la stanza dentro il vetro non è più esattamente la vostra.
+
+È in **ritardo**. Un secondo, forse un secondo e mezzo: alzate una mano, e la mano nello specchio si alza dopo, con uno scatto che l'occhio nota subito, come un video appena sbloccato dal buffering. Federico si sposta di lato per provare, e il suo riflesso resta fermo un istante di troppo — poi si sposta, ma non ESATTAMENTE come lui: un centimetro più in là, come chi ha copiato il compito da un vicino distratto.
+
+> Natalino: "Fa questo coso apposta, o siamo tutti un filo ciucchi di paura?"
+
+> Claudia: "Non siamo ciucchi. Guardate ME." *(sventola una mano, aspetta)* Il suo riflesso alza la mano un secondo dopo — e nel ritardo, per una frazione, **fa qualcosa in più**. Un movimento minuscolo, in coda, che il vetro si affretta a riassorbire prima che voi lo notiate bene.
+
+> Gaetano: "Rifallo. Piano. Sto contando i fotogrammi."
+
+Il riflesso di Gaetano, quando lui si sposta, resta un attimo indietro — e in quell'attimo, da solo, **inclina la testa**. Verso di voi. Come chi controlla se qualcuno lo sta guardando, prima di fare una cosa che non dovrebbe.
+
+Non è un difetto dello specchio. È un difetto di chi ci vive dentro.`,
+    choices: [
+      { text: '🪞 Guardare bene, cercare il trucco', tag: 'Prova di Saggezza — CD 12', check: { stat: 'SAG', dc: 12, success: 's7b', fail: 's7c' } },
+    ],
+  },
+
+  s7b: {
+    location: 'appartamento',
+    caption: 'Il trucco dello specchio',
+    text: `Gaetano conta i fotogrammi ad alta voce, e la matematica — la sua unica preghiera — funziona anche qui.
+
+> Gaetano: "Un secondo e quattro decimi. Sempre uguale. Non è un ritardo casuale: è un CICLO. E i cicli, per definizione, si possono anticipare."
+
+Prova la cosa più semplice e più coraggiosa: si volta di scatto, e guarda lo specchio DI TRAVERSO, dall'angolo, un istante prima che il suo riflesso finisca di copiarlo. E per un lampo — solo un lampo — vede il vero meccanismo: non è un riflesso che lo imita in ritardo. È un riflesso che sta guardando ALTROVE finché non deve fingere di essere lui, e quando viene sorpreso si affretta a rimettersi in posa.
+
+> Gaetano: "Non ci imita. Ci SORVEGLIA. Il ritardo è il tempo che gli serve per rimettersi la maschera ogni volta che lo becchiamo a guardare da un'altra parte."
+
+> Emanuela: "Quindi quella cosa nello specchio non è nostra. È SUA. Ci usa come... webcam?"
+
+> Gaetano: "Come specchietto retrovisore. Ci controlla per sapere cosa stiamo facendo qua dentro."
+
+Non è una buona notizia. Ma è un NOME, e le cose col nome fanno un po' meno paura — Gaetano l'ha già dimostrato una volta stasera, coi trentaquattro metri, e funziona di nuovo.
+
+> Natalino: "Bene. Allora sorvegliaci pure, stronzo. Tanto usciamo di qua PRIMA che tu finisca di scrivere il rapporto."
+
+**(🎨 Colore +1: capire il trucco è già un pezzetto di libertà.)**`,
+    gold: 1,
+    choices: [
+      { text: '📺 Al salotto — la TV pulsa ancora', next: 'a5' },
+    ],
+  },
+
+  s7c: {
+    location: 'appartamento',
+    caption: 'Il sorriso di troppo',
+    text: `Nessuno controlla i fotogrammi. Ci si guarda, semplicemente, come si guarda sempre uno specchio: un secondo di vanità involontaria, per controllare di essere ancora vivi e in ordine.
+
+Ed è in quel secondo che succede.
+
+Il riflesso di chi si è fermato a guardarsi un po' più a lungo degli altri completa il movimento con un secondo di ritardo, come sempre. Solo che stavolta, DOPO, ne fa un altro. Un movimento che voi non avete fatto: le labbra si aprono in un sorriso. Lento. Troppo largo. Con dentro qualcosa che non è gioia, e nemmeno la finge bene.
+
+> Chi ha guardato: *(un passo indietro, la voce sottile)* "Ha... ha sorriso. Io non ho sorriso."
+
+Il sorriso, nel vetro, resta. Resta anche quando la faccia vera, quella davanti allo specchio, è già bianca e ferma di terrore. Come se il riflesso avesse deciso, per suo conto, che quella era l'espressione giusta per l'occasione.
+
+Poi il grigio entra. Non dagli occhi: dal RICORDO di quel sorriso, che si struscia dentro come un dito freddo lungo la spina dorsale. Chi ha guardato si stringe le braccia, e le braccia, sotto le dita, hanno perso un grado di calore che nessuna coperta restituisce.
+
+> Emanuela: *(prendendolo per un braccio, gelida di paura professionale)* "Sei INGRIGITO. Te lo vedo dagli occhi, si sono spenti due tacche. Tienimi la mano, andiamo via da questo specchio di merda."
+
+**(-2 PV: chi ha guardato è INGRIGITO. Lo specchio si è preso un pezzo del suo colore.)**`,
+    damage: 2,
+    poisonRoller: true,
+    choices: [
+      { text: '📺 Al salotto — la TV pulsa ancora', next: 'a5' },
     ],
   },
 
@@ -308,6 +381,7 @@ Vi voltate. Il corridoio **continua**. La porta della cucina è ancora lì, a si
 > Gaetano: "L'orrore cosmico non ha mai conosciuto un ingegnere di satelliti incazzato."`,
     choices: [
       { text: '📐 Misurare il corridoio. Con metodo.', tag: 'Prova di Intelligenza — CD 11', check: { stat: 'INT', dc: 11, success: 'a6b', fail: 'a6c' } },
+      { text: '🚪 In fondo al corridoio nuovo: una porta VERDE. La vostra.', once: true, next: 'a9' },
     ],
   },
 
@@ -369,6 +443,31 @@ Silenzio. Poi il muro **rutta**. Non c'è un'altra parola: è un rutto, sordo e 
     damage: 2,
     choices: [
       { text: '🚶 Nel corridoio. Lontani dalle pareti.', next: 'a7' },
+    ],
+  },
+
+  a9: {
+    location: 'pianerottolo',
+    caption: 'Il pianerottolo impossibile',
+    text: `In fondo al corridoio infinito, dove per logica non dovrebbe esserci niente — un corridoio inventato non ha bisogno di finire da nessuna parte — c'è una porta. VERDE. Verniciata come quella di Daniele, con lo zerbino sotto ("NON SIETE I BENVENUTI, MA ENTRATE") anche se lo zerbino vero, quello reale, è rimasto ai piedi del muro nel salotto, un corridoio e un'eternità fa.
+
+> Federico: "È la nostra. È LA PORTA DI CASA. Come cazzo è arrivata qua in fondo?"
+
+> Claudia: "Non chiedertelo con quella voce, ti si sente la crepa."
+
+La apre. E dietro, invece del salotto da cui siete usciti — c'è il **pianerottolo**. Il vostro pianerottolo, quello vero, di sotto: la porta di Daniele verde-condominio, il citofono, la lampadina fioca che scatta a vuoto due volte prima di accendersi. Tutto identico. Tutto al suo posto.
+
+Solo che il pianerottolo, adesso, **è dentro una stanza**. Ha pareti tutt'intorno — la stessa carta da parati del corridoio da cui siete arrivati — e il soffitto è basso, il soffitto di un bilocale, non l'altezza vera di una tromba delle scale. Il rettangolo di cielo che dovrebbe vedersi dal lucernaio, tre piani più in su, è un lucernaio finto, dipinto, con tre stelle sempre nella stessa identica posizione.
+
+> Gaetano: *(la voce sottile di chi sta ricalcolando tutto da capo)* "Il fuori è finito dentro il dentro. Non c'è più un fuori da tornare a cercare. C'è solo... altra casa."
+
+Un rumore di unghie, da qualche parte oltre la nuova parete. Familiare, adesso.
+
+> Natalino: "Rimettiamoci in marcia. Prima che decida di incorniciare pure noi."
+
+Richiudono la porta verde dietro di sé. Non serve più tenerla aperta: la casa l'ha già digerita.`,
+    choices: [
+      { text: '🚶 Nel corridoio che non c\'era.', next: 'a7' },
     ],
   },
 
@@ -510,6 +609,31 @@ Lo schermo muore. L'ultima parola arriva dal buio, solo audio, con dentro un sor
     sets: { daniele_vivo: true },
     choices: [
       { text: '🚶 E adesso troviamolo. Da dove si—', next: 's3' },
+      { text: '📱 Claudia: "Un attimo. Prima, dovete vedere una cosa. TUTTA."', once: true, next: 's8' },
+    ],
+  },
+
+  s8: {
+    location: 'salotto',
+    caption: 'La chat dei tre giorni',
+    text: `Claudia si è già impossessata del telecomando smart — deformazione professionale, non sa restare tre secondi vicino a uno schermo senza controllarci sopra — e con due tocchi proietta sulla parete accanto alla TV la chat di Daniele. Gli ultimi mesi, tutti, di fila.
+
+> Claudia: "Prima di andare oltre voglio farvi vedere una cosa. TUTTA, non un frammento. Fidatevi di chi fa scrolling per lavoro."
+
+Scorre lenta. All'inizio è Daniele normalissimo: messaggi lunghi, pieni di virgole, le sue tirate su Cialdini, le prese in giro a Federico condite di note a piè di pagina immaginarie. Poi, mese dopo mese, le righe si accorciano. Le battute si fanno più corte. Le risposte, che erano paragrafi, diventano frasi. Poi parole singole. Poi solo emoji — un pollice, una faccina, sempre la stessa, sempre più tardi nella giornata. Infine, per settimane, sotto ogni messaggio del gruppo: **solo "Visualizzato".** Niente altro. Una spunta blu, unica prova che dall'altra parte c'è ancora qualcuno.
+
+> Federico: *(la voce che si incrina, per la prima volta stanotte davvero)* "L'ho vista, questa roba. L'ho vista succedere IN TEMPO REALE e ho pensato che fosse pigrizia. Che gli girasse. Che—"
+
+> Emanuela: "Fede. Non era pigrizia. Guarda le date: coincidono con quelle delle Gocce. Qualcosa gli stava mangiando le parole una alla volta, e lui ha resistito FINO ALL'ULTIMA. 'Visualizzato' non è arrendersi. È restare, con quel poco di fiato che gli lasciavano."
+
+> Gaetano: "Un uomo che scrive romanzi in chat e manda un pollice in su non ha smesso di parlare. Gli hanno tolto le parole di bocca, una a una."
+
+Il gelo nella stanza, per un secondo, lascia il posto a qualcos'altro: la certezza tenera e furiosa che Daniele, fino all'ultimo respiro utile, non ha ceduto un centimetro.
+
+**(🎨 Colore +1: avere visto il diminuire, e capito che non era resa.)**`,
+    gold: 1,
+    choices: [
+      { text: '🚶 Adesso troviamolo.', next: 's3' },
     ],
   },
 
@@ -774,12 +898,17 @@ La casa non finisce. Ma nemmeno voi.`,
    - duello_tutorial_vinto → s4b → IMPRESE / scelte future (primo trucco nominato: Riprova Sociale)
    - casa_aperta         → s5   → snodo strutturale: apre l'hub h1 (consumato dal blocco HUB)
 
+   [scene mancanti completate — aggancio alle scelte già presenti in a6/a4/s2, mai flag nuovi:
+    s7/s7b/s7c → bagno degli specchi (aggancio da s6), a5; nessun flag nuovo, solo gold/damage/poisonRoller
+    s8 → la chat dei tre giorni (aggancio da s2), s3; nessun flag nuovo
+    a9 → il pianerottolo impossibile (aggancio da a6), a7; nessun flag nuovo]
+
    ITEM DATI:
    - chiavi_scorta (a1) · lattina_zero x2 (a4) · gocce_dottore (s6) ·
      spray_kerastase + taralli (a8)
 
-   ORO/COLORE: +1 a0b, +1 a4b, +1 a6b, +2 loot a7, +1 s2, +2 s3c, +1 s3e,
-   +2 s4b · perdite: -2 a7_ko (goldLoss), -1 scelta di fuga in a7_ko
+   ORO/COLORE: +1 a0b, +1 a4b, +1 a6b, +2 loot a7, +1 s2, +1 s8, +2 s3c, +1 s3e,
+   +2 s4b, +1 s7b · perdite: -2 a7_ko (goldLoss), -1 scelta di fuga in a7_ko, -2 s7c (damage)
 
    STINGER USATI: jumpscare (a5) · risata (s3d)
 

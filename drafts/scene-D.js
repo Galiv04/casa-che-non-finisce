@@ -36,6 +36,7 @@ Da qualche parte, in fondo alla cucina, un citofono comincia a suonare. In una c
       { text: '🥤 Seguire la freccia di lattine fino alla dispensa', next: 'k3' },
       { text: '🧊 Frugare il frigo fino in fondo — se lui lascia segnali, magari ne ha lasciati altri', tag: 'Prova di Costituzione — CD 12', check: { stat: 'COS', dc: 12, success: 'k1b', fail: 'k1c' } },
       { text: '📞 Il citofono. Rispondere al citofono che non può esistere.', next: 'k2' },
+      { text: '❄️ Il congelatore a pozzetto, in fondo alla cucina. Ronza. E nessuno vuole guardarci dentro.', tag: 'Prova di Costituzione — CD 13', check: { stat: 'COS', dc: 13, success: 'k15', fail: 'k15b' } },
     ],
   },
 
@@ -192,6 +193,7 @@ E poi Emanuela sposta un sacco di patate grigie, e sotto c'è una **borsa frigo 
     choices: [
       { text: '🍺 Prendere anche le birre al limone dalla borsa frigo di Federico', once: true, item: 'birra_limone', sets: { birre_ritrovate: true }, next: 'k4' },
       { text: '🚪 C\'è un tappeto, in fondo alla dispensa. E sotto il tappeto c\'è uno spigolo.', next: 'k4' },
+      { text: '🍳 Fermarsi. Accendere i fuochi. Cucinare qualcosa di VERO, adesso, con le scorte di Daniele.', once: true, next: 'k17' },
     ],
   },
 
@@ -296,6 +298,8 @@ Avanti, tra le canne d'organo di tubi, la lucina da campeggio adesso è vicina. 
 > La voce dal banco: "Clienti! Finalmente. Venite, venite: qui sotto il Colore lo trattiamo IO SOLO."`,
     choices: [
       { text: '🏮 Avvicinarsi al banco con la lampada da campeggio', next: 'k6' },
+      { text: '🌀 Seguire un rumore di centrifughe, oltre le canne d\'organo dei tubi', next: 'k11' },
+      { text: '📋 Una bacheca condominiale, avvitata tra due tubi-vena. E qualcuno la sta aggiornando.', next: 'k16' },
     ],
   },
 
@@ -322,7 +326,9 @@ Sul banco, sotto una campana di vetro, una cosa che pulsa piano di tutti i color
       { text: '🧨 Lattina agitata — "arma da lancio. Non chiedete." (2🎨)', requiresGold: 2, gold: -2, item: 'lattina_agitata' },
       { text: '🔊 Cassa bluetooth con la playlist dell\'estate — "le cose grigie la ODIANO" (4🎨)', requiresGold: 4, gold: -4, item: 'cassa_bluetooth' },
       { text: '💗 ⚠️ CUORE DI COLORE — 12🎨 E il tronello di Natalino. Una vita intera.', requires: { item: 'tronello' }, requiresGold: 12, gold: -12, removeItem: 'tronello', item: 'cuore_colore', once: true },
+      { text: '💗 CUORE DI COLORE, prezzo da colleghi — 8🎨 E il tronello. "Lo sconto è sconto." ', once: true, requires: { flag: 'sconto_mercante', item: 'tronello' }, requiresGold: 8, gold: -8, removeItem: 'tronello', item: 'cuore_colore' },
       { text: '🗣 "Il Divano-Trono. Cosa sai del Trono?" — pagare con una storia vera', next: 'k7' },
+      { text: '🧰 "Cercate manodopera?" — il Mercante ha l\'aria di uno coi crediti in sospeso', once: true, next: 'k12' },
       { text: '🕶 Fregarlo. Una boccata sparisce dal banco mentre Claudia lo distrae.', once: true, tag: 'Prova di Destrezza — CD 13', check: { stat: 'DES', dc: 13, success: 'k7b', fail: 'k7b_fail' } },
       { text: '🚶 Lasciare il banco: più avanti l\'intercapedine si allarga in una sala', next: 'k8' },
     ],
@@ -617,6 +623,297 @@ Sdraiati sul pavimento della cucina fredda, a pancia in su, ansimando. La botola
     sets: { via_cucina: true },
     choices: [
       { text: '🏛 Tornare al Salotto-Cattedrale', next: 'h1' },
+    ],
+  },
+
+  /* ============ LA LAVANDERIA DEI GIORNI UGUALI ============ */
+
+  k11: {
+    location: 'sottoscala',
+    caption: 'La Lavanderia dei Giorni Uguali',
+    text: `Il rumore di centrifughe vi porta in una rientranza dell'intercapedine dove qualcuno — qualcosa — ha allestito una **lavanderia condominiale**. Otto lavatrici contro la parete di mattoni vivi, allacciate ai tubi-vena con raccordi che pulsano. Girano tutte. Girano da SEMPRE: il pavimento sotto ognuna è consumato a conca, come i gradini delle chiese.
+
+Vi avvicinate agli oblò, e capite. Dentro non ci sono panni.
+
+Dentro girano **giornate.** Nell'oblò della prima: una scrivania, un monitor, una tazza — che ruotano nell'acqua grigia, si afflosciano, si distendono, ricominciano. Nella seconda: un divano e una TV accesa, piegati e ripiegati come lenzuola. Nella terza una sveglia che suona, si spegne, suona, si spegne. Sono i giorni di qualcuno. **Lo stesso giorno**, di qualcuno, lavato e rilavato finché non stinge.
+
+> Claudia: "È qui che li fa diventare grigi. Non gli ruba i giorni: glieli LAVA. A novanta gradi, finché non escono tutti uguali."
+
+> Gaetano: *(leggendo la targhetta di una lavatrice)* "'Ciclo: QUOTIDIANO. Durata: —'. Non c'è la durata. Non finisce."
+
+> Natalino: "Ho passato la vita a dire 'io una routine così me la sogno'. Ritiro tutto. RITIRO TUTTO."
+
+Sulla parete, un cartello scritto a mano: *"NON APRIRE DURANTE IL CICLO. Il ciclo è sempre."*
+
+> Federico: "Quindi o non si apre mai, o quel cartello è una supercazzola. Tertium non datur."`,
+    choices: [
+      { text: '🌀 Aprire un oblò durante il ciclo. Il cartello non è la vostra mamma.', next: 'k11b' },
+      { text: '🔌 Gaetano studia i raccordi: fermarle TUTTE, in sequenza, senza far scoppiare le vene', tag: 'Prova di Intelligenza — CD 13', check: { stat: 'INT', dc: 13, success: 'k11c', fail: 'k11b' } },
+      { text: '💪 Al diavolo la sequenza: strappare i raccordi a mano, tutti e otto', tag: 'Prova di Forza — CD 13', check: { stat: 'FOR', dc: 13, success: 'k11c', fail: 'k11b' } },
+      { text: '🚶 Lasciar girare. Tornare alle canne d\'organo.', next: 'k5' },
+    ],
+  },
+
+  k11b: {
+    location: 'sottoscala',
+    caption: 'L\'oblò aperto — il giorno esce a vedere chi è',
+    stinger: 'jumpscare',
+    text: `L'oblò si apre. Che l'abbiate forzato voi o che sia scattato da solo per punire le mani sui raccordi, non fa differenza: la lavatrice **finisce il ciclo in anticipo**, e il ciclo non l'ha presa bene.
+
+L'acqua grigia esce sul pavimento, ma non si allarga come acqua: si allarga come una GIORNATA. Sul bagnato prendono forma le otto di mattina — una radio che parla di traffico, l'odore di caffè fatto senza voglia — poi mezzogiorno, poi le sei di sera, tutto in dieci secondi, tutto addosso a voi. Vivete un giorno intero di qualcun altro, un giorno grigio e identico a se stesso, e lo vivete IN LOOP: tre giri, quattro, e a ogni giro vi pesa di più alzarvi dal punto in cui siete, e a ogni giro la radio dice le stesse identiche parole sul traffico in tangenziale.
+
+Poi dall'oblò esce una **mano** — molle, stirata, coi segni della centrifuga — e vi tasta la faccia. Non per farvi male. Per vedere se siete NUOVI. Se siete da lavare.
+
+Ve la staccate di dosso urlando, e Emanuela richiude l'oblò con una ginocchiata da buttafuori di Ibiza.
+
+> Emanuela: "NO. Lui NO. Noi i giorni ce li sporchiamo DA SOLI, grazie."
+
+> Natalino: *(seduto per terra, bianco)* "Ho sentito la tangenziale, ragazzi. Ho sentito la tangenziale DENTRO."
+
+**(-3 PV a tutto il gruppo. Il giorno di qualcun altro vi resta appiccicato come bagnato.)**`,
+    damage: 3,
+    choices: [
+      { text: '🔌 Adesso basta: fermarle tutte, con metodo', tag: 'Prova di Intelligenza — CD 13', check: { stat: 'INT', dc: 13, success: 'k11c', fail: 'k11b' } },
+      { text: '💪 Adesso basta: fermarle tutte, a strappo', tag: 'Prova di Forza — CD 13', check: { stat: 'FOR', dc: 13, success: 'k11c', fail: 'k11b' } },
+      { text: '🚶 Indietreggiare e tornare alle canne d\'organo', next: 'k5' },
+    ],
+  },
+
+  k11c: {
+    location: 'sottoscala',
+    caption: 'Fine ciclo — il silenzio che non sentivano da anni',
+    stinger: 'gold',
+    text: `L'ultimo raccordo si stacca con un sospiro di vapore, e le otto lavatrici **si fermano insieme.**
+
+Il silenzio che segue è un oggetto fisico. Le centrifughe giravano da così tanto che il rumore era diventato parete, pavimento, aria — e adesso che non c'è più, il sottoscala sembra più grande e molto più freddo. Le vostre orecchie fischiano. Il fiato torna a uscire bianco, come di sopra, come se il tepore da stomaco di questo posto fosse — anche lui — solo un ciclo che qualcuno aveva dimenticato acceso.
+
+Dentro gli oblò, i giorni si **depositano.** La scrivania smette di girare. Il divano si affloscia sul fondo. La sveglia suona un'ultima volta, piano, e nessuno la spegne, e va bene così. L'acqua grigia scola via nei tubi-vena, e per un momento — un momento solo — dai tubi arriva un suono che nessuno di voi dimenticherà: come cento persone, lontanissime, che si girano nel letto **dall'altra parte.**
+
+> Claudia: "Non li abbiamo svegliati. Però... gli abbiamo spento la lavatrice. Da domani i giorni se li sporcano di nuovo da soli."
+
+> Gaetano: "In termini tecnici: abbiamo tolto il ricircolo. Il Grigiore qui sotto adesso gira a vuoto."
+
+> Federico: *(alzando una birra al limone immaginaria)* "Alla fine del ciclo. Che è la cosa più bella che si possa dire in una lavanderia."
+
+Fa freddo. È il freddo giusto: quello dei posti dove non si lava più niente per forza.
+
+**(🎨 +2 Colore. Otto giorni uguali, restituiti ai legittimi proprietari.)**`,
+    gold: 2,
+    choices: [
+      { text: '🚶 Tornare alle canne d\'organo dei tubi', next: 'k5' },
+    ],
+  },
+
+  /* ============ IL LAVORETTO DEL MERCANTE ============ */
+
+  k12: {
+    location: 'mercante',
+    caption: 'Il pegno insoluto — un lavoretto pulito',
+    text: `Il Mercante Grigio smette di lucidare la bilancia. Tutta la faccia — ogni sua parte, distribuita male — vi guarda con l'interesse improvviso di un datore di lavoro davanti a manodopera gratis.
+
+> Il Mercante: "Manodopera. MANODOPERA, dice. Sedetevi— no, non c'è dove. Restate in piedi con entusiasmo." *(fruga in una taschina del gilet, tira fuori una ricevuta gialla, antica)* "Un cliente, anni fa. Comprò a credito e lasciò in pegno la cosa più preziosa che aveva: **il ricordo della sua prima casa.** Odore di pittura fresca, la moglie che ride nelle stanze vuote, tutto in un barattolo. Poi il cliente sparì — la casa se lo mangiò, capita — e la CASA, quella grande, quella di sopra, mi ha SEQUESTRATO il pegno. Confiscato. A me. Per 'morosità del debitore'. Capite l'affronto?"
+
+> Gaetano: "E dove lo tiene, la casa, la roba confiscata?"
+
+> Il Mercante: "In Galleria. Ultima fila. Una teca senza sonnambulo dentro — solo il mio barattolo, e davanti alla teca **l'Ufficiale**: il riscossore DELLA CASA. Quello abusivo. Quello che riscuote senza partita IVA." *(tutte le mani si stringono a pugno, una dopo l'altra)* "Riportatemi il pegno. Il barattolo non apritelo — il ricordo non è vostro e i ricordi altrui danno la nausea. Pagamento alla consegna. Pago BENE. Per i miei standard. Che sono standard."
+
+> Natalino: "Stiamo per fare un recupero crediti per conto di una cosa con sei mani. Lo dico ad alta voce così domani non potrò dire che non lo sapevo."`,
+    choices: [
+      { text: '🧰 Accettare il lavoretto: ultima fila della Galleria, teca sorvegliata', next: 'k13' },
+      { text: '↩️ "Ci pensiamo." Tornare al banco.', next: 'k6' },
+    ],
+  },
+
+  k13: {
+    location: 'galleria',
+    caption: 'La teca confiscata — l\'Ufficiale della casa',
+    text: `Ultima fila della Galleria, dove le luci delle teche si diradano e il vetro è più sporco. Eccola: una teca **senza poltrona e senza TV**, e dentro, su un cuscinetto da gioielleria, un barattolo da conserva. Dentro il barattolo, una luce piccola e calda che si muove come una casa vista da fuori, la sera, quando dentro c'è qualcuno che ami.
+
+Davanti alla teca c'è **l'Ufficiale.**
+
+È come il Riscossore del Mercante, ma peggio: più alto, più giunture, e al posto del blocchetto di ricevute ha un **timbro** cucito nel petto, che sale e scende da solo — TUNK, TUNK — timbrando l'aria, per tenersi in esercizio. Addosso ha una fascia da ufficiale giudiziario fatta con la stoffa di una vestaglia. Accanto a lui, di guardia, un sonnambulo in ciabatte con gli occhi pieni di programma grigio.
+
+> L'Ufficiale: *(senza voltarsi)* "Bene confiscato. Articolo undici. Chi tocca, viene messo agli atti." *(TUNK)* "Voi avete la faccia di chi sta per farsi mettere agli atti."
+
+> Emanuela: "Senti, bello: il barattolo non è tuo, non è della casa, ed era di un signore che voi vi siete MANGIATI. Questo non è un pignoramento, è sciacallaggio col timbro."
+
+> L'Ufficiale: *(si volta, tutto insieme, con troppe giunture)* "Resistenza a pubblico ufficiale." *(TUNK)* "Aggravata." *(TUNK)* "Da FACCIA." *(TUNK)*
+
+> Federico: "Menatelo. Menatelo e basta, ho la partita IVA e questo mi offende personalmente."
+
+**(Combattimento! L'Ufficiale timbra a distanza, il sonnambulo difende il vetro. Il barattolo, dentro la teca, fa una luce piccola e tifa per voi.)**`,
+    combat: { enemies: ['mercante_guardia', 'sonnambulo'], victory: 'k14', defeat: 'k_ko' },
+    choices: [],
+  },
+
+  k14: {
+    location: 'mercante',
+    caption: 'Pagamento alla consegna',
+    stinger: 'campana',
+    text: `L'Ufficiale giace smontato in ordine alfabetico, il sonnambulo dorme accoccolato contro la sua teca — l'avete ADAGIATO, mica siete bestie — e il barattolo adesso ce l'ha in mano Claudia, tenuto con due mani, come si tengono i pulcini e le cose di valore altrui.
+
+Al banco, il Mercante Grigio lo prende e fa una cosa che non vi aspettavate: **non lo mette via.** Lo tiene un momento contro quello che dovrebbe essere il petto, e tutta la faccia — ogni parte, distribuita male — si chiude come una serranda a fine giornata.
+
+> Il Mercante: "Trent'anni che il mio cliente non c'è più, e io il suo pegno lo custodivo LO STESSO. Perché un pegno è una promessa: 'torno a riprendermelo'. Finché il pegno è al suo posto, il cliente può ancora tornare." *(lo posa sotto il banco, piano)* "Non tornerà. Ma adesso la promessa è di nuovo a casa MIA, non in una teca di quel padrone ladro. È diverso. Nel mio mestiere è TUTTO."
+
+Poi batte una mano sul banco — una a caso, ne ha — e torna Mercante.
+
+> Il Mercante: "Pagamento alla consegna, come da accordi. Scegliete: una **Boccata di Colore**, omaggio della ditta — oppure ve lo segno come CREDITO: **sconto vero sul pezzo grosso in vetrina.** Il Cuore. Da dodici a otto, più l'oggetto d'amore. Non fatemelo ripetere che mi sanguina il gilet."
+
+> Gaetano: "Un demone ci offre il welfare aziendale. Comunque vada stanotte, questo posto mi mancherà."`,
+    choices: [
+      { text: '🎨 La Boccata di Colore, subito: un sorso d\'estate in tasca', once: true, requires: { notFlag: 'sconto_mercante' }, item: 'boccata_colore', sets: { ricompensa_ritirata: true }, next: 'k6' },
+      { text: '💗 Il credito: lo sconto sul Cuore di Colore. Le vite prima dei sorsi.', once: true, requires: { notFlag: 'ricompensa_ritirata' }, sets: { sconto_mercante: true }, next: 'k6' },
+      { text: '↩️ Tornare al banco senza decidere ancora', next: 'k6' },
+    ],
+  },
+
+  /* ============ IL CONGELATORE A POZZETTO ============ */
+
+  k15: {
+    location: 'cucina_fredda',
+    caption: 'Il pozzetto — guardare fino in fondo',
+    stinger: 'item',
+    text: `Il congelatore a pozzetto ronza in fondo alla cucina come una cosa che finge di dormire. Il coperchio si solleva con un risucchio di guarnizione, e il fiato del pozzetto vi sale in faccia: freddo VECCHIO, freddo di anni.
+
+Dentro, sotto il primo strato di brina, c'è **la cosa che nessuno voleva guardare.** È stata una spesa, una volta: si riconoscono le forme — polli, braciole, un polpo intero — ma il gelo l'ha fusa in un blocco unico, e il blocco ha fatto quello che fa la carne in questa casa quando nessuno la guarda: si è **riorganizzata.** Ali dove non vanno ali. Una fila di ventose lungo una costata, che si stringono piano nel ghiaccio. E in mezzo al blocco, un occhio di pesce, grande come un piatto, che vi segue senza sciogliersi.
+
+Chi sta guardando NON distoglie lo sguardo. È l'unico modo: la carne riorganizzata odia i testimoni. Sotto il vostro sguardo fisso smette di stringersi, si ritira, si finge di nuovo spesa — e sul fondo del pozzetto, incastonata nel ghiaccio pulito, appare la sorpresa.
+
+Una confezione di **IPA**. A colori. Con un post-it congelato: *"Scorta d'emergenza di Gaetano. Se Gaetano sta leggendo: te l'avevo detto che le nascondevo bene. — D."*
+
+> Gaetano: *(tirandola fuori dal ghiaccio, la voce non proprio ferma)* "Le ha nascoste SOTTO il mostro. Perché sapeva che io fino in fondo al pozzetto non ci sarei mai andato."
+
+> Emanuela: "E invece ci sei andato. Salute, ingegnere."
+
+**(Trovata: l'IPA di Gaetano, gelata al punto giusto. 🎨 +1 Colore: avete guardato in fondo e il fondo ha ceduto per primo.)**`,
+    item: 'ipa_gaetano',
+    gold: 1,
+    choices: [
+      { text: '↩️ Richiudere il coperchio, piano, e tornare al centro della cucina', next: 'k1' },
+    ],
+  },
+
+  k15b: {
+    location: 'cucina_fredda',
+    caption: 'Il pozzetto — la carne conta i testimoni',
+    stinger: 'jumpscare',
+    text: `Il coperchio si solleva, il fiato del pozzetto vi sale in faccia — e chi sta guardando **sbatte le palpebre.**
+
+Basta quello.
+
+Il blocco di carne sotto la brina si muove TUTTO INSIEME, con lo scricchiolio di un iceberg che cambia idea. Le ventose lungo la costata si aprono come bocche di neonato, l'occhio di pesce grande come un piatto ruota nel ghiaccio e vi mette A FUOCO, e dal fondo del pozzetto sale una zampa — era un pollo, si vede ancora l'etichetta del prezzo attaccata, 4,90 al chilo — che afferra il bordo con le dita che i polli non hanno.
+
+Il pozzetto **prova a inghiottirvi.** Il coperchio vi si abbatte sulla schiena come una mandibola, la brina vi morde i polsi, e per un secondo vedete il fondo: il fondo è molto, molto più in basso del fondo, e laggiù la carne di tutte le spese dimenticate del mondo aspetta compagnia.
+
+Vi strappate indietro in un groviglio, e il coperchio si richiude da solo con uno sbuffo di guarnizione, offeso.
+
+> Natalino: "IL POLLO AVEVA ANCORA IL PREZZO. Quattro e novanta. Io questa cosa la sogno per DIECI ANNI."
+
+> Claudia: *(ansimando, la schiena contro il frigo)* "Ho visto una cosa in fondo. Una cosa A COLORI. C'è qualcosa di VERO là sotto, ragazzi. Sotto tutta quella... spesa."
+
+> Federico: "Ovvio che c'è. È questa casa: le cose belle le mette sempre SOTTO le cose orrende. È il suo modello di business."
+
+**(-3 PV, tra il morso del coperchio e il freddo vecchio.)**`,
+    damage: 3,
+    choices: [
+      { text: '❄️ Riaprire. Stavolta senza battere le palpebre.', tag: 'Prova di Costituzione — CD 13', check: { stat: 'COS', dc: 13, success: 'k15', fail: 'k15b' } },
+      { text: '↩️ Il pozzetto ha vinto questo round. Tornare al centro della cucina.', next: 'k1' },
+    ],
+  },
+
+  /* ============ DUELLO DI PAROLE: L'AMMINISTRATORE ============ */
+
+  k16: {
+    location: 'sottoscala',
+    caption: 'La bacheca condominiale — l\'Amministratore',
+    text: `La bacheca è vera, di quelle col vetro e la chiavetta, avvitata tra due tubi-vena. Dentro, avvisi ingialliti: *"Si ricorda ai condomini che il COLORE va conferito negli appositi contenitori"*, *"L'assemblea del 12 u.s. ha deliberato il SILENZIO"*. E davanti alla bacheca, di spalle, c'è una cosa in giacca e cravatta che appende un avviso nuovo con quattro puntine e sei dita per mano.
+
+Si volta. Ha una faccia da fototessera: piatta, grigia, valida per tutti gli usi di legge.
+
+**🗣 DUELLO DI PAROLE**
+
+> L'Amministratore: "Ah. I condomini nuovi. Arrivate a proposito: c'è un avviso che vi riguarda." *(indica il foglio appena appeso, timbrato tre volte)* "**Regolamento condominiale, articolo 9: è fatto divieto ai condomini di abbandonare l'immobile.** Approvato dall'assemblea, ratificato dal proprietario, timbrato dall'ufficio competente. Vedete i timbri? TRE. Non sono io a dirlo, capite: è il REGOLAMENTO. Io sono solo l'amministratore: io le regole le applico, mica le discuto. Nessuno le discute. Sarebbe come discutere la gravità, o l'IMU. Firmate qui la presa visione, e accomodatevi ai vostri posti: il programma sta per ricominciare."
+
+E la penna che vi porge è già intinta di grigio.
+
+*(Vi torna in mente una cosa che Daniele diceva sempre, dal divano, senza alzare gli occhi dalla Switch: "Un timbro non è un argomento. Quando ti sventolano una firma, chiedi sempre CHI ha firmato, e perché ne saprebbe più di te.")*`,
+    choices: [
+      { text: '⚖️ "FALSA DICOTOMIA! Non è vero che o firmiamo o siamo fuorilegge!"', once: true, next: 'k16c' },
+      { text: '📜 "AUTORITÀ! Un timbro non è un argomento: chi ha firmato quel regolamento non ha NESSUN potere su di noi!"', next: 'k16b' },
+      { text: '👥 "RIPROVA SOCIALE! Non firmiamo solo perché tutti i condomini hanno firmato!"', once: true, next: 'k16c' },
+    ],
+  },
+
+  k16b: {
+    location: 'sottoscala',
+    caption: 'La ratifica mancante',
+    stinger: 'risata',
+    text: `> Voi: "Autorità. È l'argomento dell'AUTORITÀ, e non ce l'hai. Tre timbri, dici? E CHI li ha messi? 'L'ufficio competente'? Competente su cosa? 'L'assemblea'? Convocata quando, con quali firme? Quel regolamento non ha nessun potere su di noi: noi non l'abbiamo mai firmato, non siamo condomini, e un timbro non è un argomento — è un TIMBRO. Inchiostro a forma di cerchio. La gravità funziona anche senza ratifica. Il tuo articolo 9 no."
+
+L'Amministratore apre la bocca. La richiude. Riapre la bocca e — **si inceppa.** Le sei dita per mano corrono agli avvisi in bacheca, girano i fogli, cercano la pagina con la risposta, e la pagina non c'è: sotto i timbri non c'è NIENTE, gli avvisi sono ingialliti perché sono VUOTI, sempre stati vuoti, e adesso lo vedete tutti e lo vede anche lui.
+
+> L'Amministratore: "L'assemblea... l'assemblea del 12 u.s. ha... l'assemblea..." *(la faccia da fototessera comincia a scollarsi a un angolo, come un bollo mal messo)* "...non c'è mai stata un'assemblea. Amministro un condominio che non ha... nessuno mi ha mai... **chi mi ha assunto?**"
+
+Ed è questa domanda che lo smonta: si affloscia dentro la giacca come un ombrello chiuso, e la giacca resta lì, appesa al nulla, davanti alla sua bacheca di fogli vuoti.
+
+> Federico: "Trent'anni di riunioni di condominio mi hanno preparato ESATTAMENTE a questo momento. Ne è valsa la pena."
+
+> Claudia: *(staccando l'avviso dell'articolo 9, piegandolo, intascandolo)* "Souvenir. E ricordatevi tutti la regola di Daniele: un timbro non è un argomento."
+
+**(🎨 +2 Colore: l'incantesimo dell'Autorità si spezza con una domanda sola — "chi l'ha detto?")**`,
+    gold: 2,
+    choices: [
+      { text: '🚶 Tornare alle canne d\'organo dei tubi', next: 'k5' },
+    ],
+  },
+
+  k16c: {
+    location: 'sottoscala',
+    caption: 'La penna grigia — presa visione',
+    text: `Il nome della fallacia esce, e l'Amministratore **sorride.** È il sorriso di chi ha visto respingere il ricorso.
+
+> L'Amministratore: "Interessante obiezione. Verbalizzo: 'il condomino solleva eccezione infondata'. Respinta." *(TUNK: da qualche parte, un timbro)* "Vede, l'eccezione va sollevata CONTRO L'ARTICOLO GIUSTO. Lei ha bussato alla porta sbagliata del regolamento, e il regolamento... lo APPREZZA. Firmi qui."
+
+E la penna vi è già in mano. Non ricordate di averla presa. È fredda, pesa come una chiave, e mentre la fissate la punta scende DA SOLA verso il foglio della presa visione — e voi con lei, la schiena che si piega centimetro dopo centimetro nella postura esatta di chi firma cose che non ha letto, da una vita, perché tanto le firmano tutti, perché tanto è il regolamento, perché tanto.
+
+La mano di qualcuno — di chi, resta tra voi e il sottoscala — vi afferra il polso e STRAPPA via la penna, e la penna urla come un citofono. La scagliate contro la bacheca; il vetro si crepa; l'Amministratore la raccoglie con calma e la rimette nel taschino, paziente come le pratiche giacenti.
+
+> L'Amministratore: "Riproviamo con comodo. Il regolamento non ha fretta: il regolamento ha PROTOCOLLO."
+
+> Emanuela: *(scrollandovi per le spalle)* "Ragazzi. RAGIONATE. Il trucco è tutto in quei tre timbri: chi è che ce li ha messi? In nome di CHE COSA?"
+
+**(-3 PV: la presa visione morde. Ma il duello non è chiuso.)**`,
+    damage: 3,
+    choices: [
+      { text: '🗣 Tornare davanti alla bacheca e rispondere di nuovo', next: 'k16' },
+    ],
+  },
+
+  /* ============ LA CUCINA VIVA (momento di cuore) ============ */
+
+  k17: {
+    location: 'cucina_fredda',
+    caption: 'La cucina accesa — lo stendardo',
+    text: `L'idea è di Emanuela, ed è un'idea da generale: *"Questa cucina è morta perché nessuno ci cucina. E allora noi adesso CI CUCINIAMO."*
+
+I fornelli, sotto il grigio, funzionano: la fiamma esce grigia, poi Gaetano la tocca con l'accendino lungo del barbecue e la fiamma **si ricorda di essere arancione.** Da lì è una battaglia, e la combattete come si combatte una battaglia: Claudia al taglio, Federico che apre i barattoli della dispensa e li annusa da sommelier ("questo è pomodoro VERO, si sente che ha sofferto"), Natalino che gestisce le padelle come le forbici giapponesi, Emanuela che comanda, e la ricetta è una sola, ovvia, l'unica possibile: **la parmigiana di Daniele.** Fatta a memoria, a occhio, a sbagli — la vostra versione, quella che lui domani avrà il DOVERE di assaggiare e stroncare.
+
+E la cucina si arrende un centimetro alla volta. Il vapore scioglie il freddo. L'odore di frittura invade i ripiani grigi come una truppa di liberazione. Il frigo industriale ronza più piano, quasi imbarazzato. Perfino la cosa nel cassetto delle verdure smette di respirare per annusare.
+
+> Natalino: "Guardate le piastrelle. GUARDATE. Vicino ai fornelli stanno tornando bianche."
+
+> Claudia: *(fotografando tutto, per la prima volta stanotte non come prova: come ricordo)* "La casa digerisce le case. Ma una cucina accesa non la digerisce nessuno."
+
+Mangiate in piedi, dalle teglie, ustionandovi, ridendo. Non è buona come la sua. È buona come la vostra. Contro il Grigiore, stanotte, è la stessa identica arma.
+
+> Federico: "Quando esce, gliela facciamo assaggiare. Dirà che la mozzarella andava asciugata meglio." *(pausa)* "Non vedo l'ora, cazzo."
+
+**(+4 PV a tutto il gruppo. 🎨 +1 Colore. La parmigiana è uno stendardo, e voi l'avete issato.)**`,
+    heal: 4,
+    gold: 1,
+    choices: [
+      { text: '↩️ Spegnere i fuochi con rispetto e tornare al centro della cucina', next: 'k1' },
     ],
   },
 

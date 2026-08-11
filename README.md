@@ -26,8 +26,13 @@ Gioco **per adulti**: paura vera, gore esplicito, linguaggio molto forte. E si p
   Riconosci il trucco, nominalo, e l'incantesimo si spezza.
 - **Daniele si sblocca giocando**: liberatelo dal bozzolo, e il Dialettico è vostro.
   Il colpo di grazia spetta a lui.
-- **5 finali**, oltre 30 imprese collezionabili, diario della notte, cronache, capitoli
-  rigiocabili ("Rientra nella Casa"), difficoltà Tranquilla/Normale/Incubo.
+- **5 finali**, oltre 30 imprese collezionabili, diario della notte, cronache, difficoltà
+  Tranquilla/Normale/Incubo.
+- **Oltre 180 scene e più di 40.000 parole**: una partita esplorativa dura ~5-7 ore, con
+  salvataggio automatico.
+- **Il gioco ti dice cosa ti manca**: a fine partita elenca i capitoli con stanze e imprese
+  ancora da scoprire — solo i titoli, nessuno spoiler — e con **🗝 Rientra nella Casa** salti
+  direttamente al capitolo giusto, con zaino e conoscenze già pronti. Niente rigiocate da zero.
 
 ## Sviluppo
 

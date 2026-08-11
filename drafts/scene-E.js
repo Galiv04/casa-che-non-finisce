@@ -261,6 +261,69 @@ Silenzio.
 > Daniele: "Casa mia è finita tre giorni fa. Sessanta metri quadri, finivano eccome. Guardatevi intorno: la moquette respira. I cavi sono vene. Il divano è un trono perché è il CUORE." *(vi guarda, uno a uno)* "Siamo DENTRO di lui. E lui lo sa, che l'abbiamo capito. Sta arrivando."`,
     choices: [
       { text: '⚔ Che venga.', next: 'm8' },
+      { text: '👬 Concedere ai gemelli cinque minuti, da soli, prima di combattere', once: true, next: 'm7g1' },
+    ],
+  },
+
+  m7g1: {
+    location: 'sala_switch',
+    caption: 'Cinque minuti dei gemelli',
+    text: `Daniele si stacca dal gruppo di un passo, giusto uno, e guarda Federico con la faccia di chi sta per chiedere una cosa che gli costa più di quanto costerebbe ammazzare un mostro.
+
+> Daniele: "Cinque minuti. Prima che arrivi quello con la mia faccia peggio pettinata. Cinque minuti, e poi si combatte."
+
+Gli altri si dividono con un tempismo che sembra casuale e non lo è per niente: Gaetano si china sui cavi che escono dalla parete, con un'urgenza tecnica improvvisamente fondamentale; Emanuela apre la borsa Kerastase e la rovescia intera sul pavimento come se contarne il contenuto fosse la priorità della serata; Claudia fotografa il soffitto; Natalino si accende un tronello guardando altrove con una dedizione sospetta. Nessuno controlla davvero niente. Tutti fanno finta benissimo.
+
+I gemelli restano da soli, in mezzo alla moquette che respira più piano, come se anche la casa avesse deciso di dare loro un po' di privacy.
+
+> Federico: "Allora."
+
+> Daniele: "Allora."
+
+Silenzio. Il tipo di silenzio che tra due che si conoscono da trentadue anni pesa uguale a un discorso intero.
+
+> Federico: "Ti ho detto 'sfigato' al matrimonio di Marco. Davanti a tutti. Non me lo sono mai perdonato, e non te l'ho mai detto, perché chiederti scusa mi sembrava... peggio del reato."
+
+> Daniele: "Lo so. L'ho saputo il giorno stesso. Non serviva che me lo dicessi: ti si vedeva in faccia che ti girava le palle di averlo detto ad alta voce."
+
+> Federico: "E allora perché diavolo non hai mai reagito?"
+
+> Daniele: "Perché avevi ragione, coglione. Ero sfigato. Lo sono ancora un po'. La differenza è che io lo so, e mi ci diverto."
+
+Ridono, piano, il tipo di risata che non vuole farsi sentire dagli altri.`,
+    choices: [
+      { text: '🗣 Continuare — c\'è ancora una cosa da dirsi', next: 'm7g2' },
+    ],
+  },
+
+  m7g2: {
+    location: 'sala_switch',
+    caption: 'La cosa non detta',
+    text: `Federico si passa una mano sulla faccia — la stessa faccia di Daniele, un po' più tirata dal fumo dello svapo e da vent'anni di call con clienti impossibili — e quando riparla, la voce è quella vera, quella senza pubblico.
+
+> Federico: "Ho sempre pensato che tu mi guardassi dall'alto. I soldi, la carriera, le dieci birre al giorno che tu chiami 'autodistruzione con ghiaccio'. Pensavo mi giudicassi."
+
+> Daniele: "Ti ho giudicato SEMPRE. Ma non per quello. Ti giudico perché fai sconti sulle tariffe a clienti che ti trattano di merda, e perché a Natale spendi più per gli altri che per te, e non lo dici a nessuno. Ti giudico perché sei un coglione BUONO, Federico. È il genere di giudizio che uno si tiene per sé, di solito."
+
+Federico non risponde subito. Quando lo fa, ha gli occhi lucidi e la voce che finge di non tremare.
+
+> Federico: "Tu da quel divano hai letto più libri di quanti io ne abbia comprati per arredamento. Non sei fermo. Sei l'unico di noi due che non ha mai avuto bisogno di correre per sapere chi cazzo è."
+
+> Daniele: "Fede."
+
+> Federico: "Non chiamarmi Fede, mi fai impazzire."
+
+> Daniele: "Lo so. Fede."
+
+Si abbracciano — un abbraccio brutto, a scatti, con troppe pacche sulla schiena, esattamente come si abbracciano due che hanno passato trent'anni a fingersi più duri di quanto sono. Dall'altra parte della sala, quattro persone continuano a controllare con grandissima attenzione dei cavi che non richiedono nessuna attenzione.
+
+> Emanuela: *(senza voltarsi, la voce che trema un po')* "Questo cavo qui è FASCINOSO. Non lo tocco per altri dieci minuti buoni."
+
+**(+3 PV a tutti, 🎨 Colore +1: certe paci curano più delle Gocce.)**`,
+    heal: 3,
+    gold: 1,
+    choices: [
+      { text: '⚔ Adesso sì: che venga.', next: 'm8' },
     ],
   },
 
@@ -355,6 +418,78 @@ Non seduto: DEPOSTO, come una cosa in un espositore. Il buco a forma di persona,
 Il buco si accorge di voi. E la sigla, dall'organo, si ferma a metà nota.`,
     choices: [
       { text: '🚶 Percorrere la navata, fino all\'altare', next: 'z2' },
+      { text: '🏆 Prima: cosa c\'è in quella navata laterale illuminata?', once: true, next: 'z1t1' },
+      { text: '👂 Ascoltarlo raccontarsi, un momento, prima del duello', once: true, next: 'z1mono' },
+    ],
+  },
+
+  z1t1: {
+    location: 'cattedrale',
+    caption: 'La Sala dei Trofei di Eleinad',
+    text: `Prima dell'altare, la cattedrale offre una deviazione che nessuno ha chiesto: una navata laterale, più piccola, illuminata come una boutique di lusso. Dentro, vetrinette. DECINE di vetrinette, illuminate da dentro, ognuna con un cuscinetto di velluto grigio e un trofeo sopra.
+
+Un telecomando, l'ultimo tasto consumato fino al bianco. Un paio di ciabatte da salotto, sfondate sul tallone dalla stessa identica curva di piede, anno dopo anno. Un fascio di ricevute — abbonamenti in palestra mai disdetti, streaming mai cancellati, tredici euro al mese per sempre — impilate come medaglie. Ogni vetrinetta ha una targhetta d'ottone, con un nome e una data. Sono nomi che non conoscete. Sono TUTTI i nomi che non conoscete, e sono moltissimi.
+
+> Natalino: "È un museo. Un museo delle piccole rese. Guarda quella: 'Marco, 34 anni, non ha più cambiato canale dal 2019.'"
+
+> Claudia: "Non è raccapricciante. È PEGGIO: è ORDINATO. Ha un sistema di catalogazione migliore del mio archivio foto."
+
+In fondo alla navata, un'ultima vetrinetta, più grande delle altre, illuminata meglio, con un piedistallo di velluto ancora VUOTO. La targhetta, però, è già pronta, già lucidata, già incisa:
+
+**I SEI.**
+
+> Emanuela: "Ci ha già fatto il posto. Prima ancora di conoscerci per bene."
+
+> Gaetano: *(la voce piatta di chi sta trattenendo qualcosa)* "Ci aspettava da prima che entrassimo in casa sua."
+
+La teca vuota luccica, silenziosa, sotto la sua luce da vetrina. Aspetta.`,
+    choices: [
+      { text: '💥 Spaccare il vetro della teca vuota, prendersi la targhetta', once: true, gold: 2, sets: { teca_profanata: true }, next: 'z1t2' },
+      { text: '↩ Non toccarla. Tornare dal gruppo.', next: 'z2' },
+    ],
+  },
+
+  z1t2: {
+    location: 'cattedrale',
+    caption: 'Il vetro che cede',
+    text: `Il pugno di Federico entra nel vetro senza che nessuno decida chi dovesse farlo — è semplicemente il primo a muoversi, e il vetro, per essere il vetro di un demone di plastica smorta, cede come vetro qualunque: crepa a stella, poi crolla in scaglie che tintinnano sul marmo con un suono quasi ALLEGRO.
+
+Nessun allarme, nessun ruggito. Solo, da qualche parte molto lontano nella cattedrale, un fruscio — come se ogni singola vetrinetta della navata avesse trattenuto il fiato nello stesso istante.
+
+> Federico: *(scuotendo la mano, le nocche che sanguinano appena)* "Levati la targhetta, coso. NOI non siamo un trofeo tuo. Siamo la gente che viene a riprendersi la roba."
+
+Prende la targhetta — "I SEI", ottone freddo, ancora lucido — e se la mette in tasca come una prova da tribunale. Il piedistallo vuoto, senza la targhetta, sembra improvvisamente patetico: un trono senza re, una vetrina senza vanto.
+
+> Claudia: "Foto. SEMPRE la foto." *(scatta)* "Un giorno la mettiamo in un museo vero. Sotto: 'Sei coglioni che gli hanno rovinato la collezione.'"
+
+> Natalino: "Targa più bella della sua, comunque. La nostra ce la scriviamo noi."
+
+Da qualche parte oltre l'altare, la voce di Eleinad — ancora non vi vede, ma vi SENTE — fa una cosa nuova, per la prima volta stanotte: non ride, non minaccia. **Tace.**
+
+E il silenzio di un demone che di solito non chiude mai la bocca è, di tutta la serata, la cosa che vi mette più paura.`,
+    choices: [
+      { text: '🚶 Tornare dal gruppo, la targhetta ancora in pugno', requires: { flag: 'teca_profanata' }, next: 'z2' },
+    ],
+  },
+
+  z1mono: {
+    location: 'cattedrale',
+    caption: 'Il monologo di Eleinad',
+    text: `Eleinad non aspetta il vostro passo per parlare. Comincia da solo, alla navata vuota, come chi prova un discorso prima del pubblico vero — e vi lascia ascoltare, perché farvi ascoltare è già un modo di nutrirsi.
+
+> Eleinad: "Sapete da dove vengo? Da NESSUNA parte, ed è la parte più elegante della mia storia. Non sono nato: mi sono ACCUMULATO. Un pomeriggio di pioggia rimandato qui, una serie vista due volte per non decidere cosa guardare dopo lì, un 'ci penso domani' lasciato cadere in un angolo trent'anni fa da qualcun altro, in un'altra casa, molto lontano da questa. Il tempo che la gente non voleva più spendere si è incollato, un briciolo alla volta, finché non ha avuto la forma per alzarsi in piedi. Io sono FATTO di rinvii, tesori. Sono l'interesse composto della pigrizia altrui."
+
+Passeggia lungo la navata, e dove passa i televisori si affievoliscono, rispettosi, come luci di sala prima di un monologo teatrale.
+
+> Eleinad: "Mangio colore. Non anime, che parola volgare — il COLORE: la voglia che una cosa ti faccia venire voglia di un'altra cosa. E Daniele—" *(la voce, per un attimo, quasi si commuove di sé stessa)* "—Daniele era un BANCHETTO. Un uomo che pensa così tanto, che sente così forte, che tiene tutto dentro con quella disciplina da monaco... il colore, in uno così, non si consuma mai. Si ACCUMULA. Aspetta solo un inquilino con più appetito di lui."
+
+Si volta, e per un istante — solo un istante — la faccia rubata sembra quasi sincera.
+
+> Eleinad: "Non sono il suo lato oscuro. Non fate quell'errore da filosofi della domenica. Sono un parassita con buon gusto, che ha scelto la casa più ricca del palazzo. Tutto qui. Nessuna poesia. Solo fame, e un contratto d'affitto che ho scritto io."
+
+**(🎨 Colore +1: guardarlo in faccia senza abboccare vale un pezzo di voi che lui non avrà.)**`,
+    choices: [
+      { text: '🗣 Basta ascoltare. È ora del duello.', gold: 1, next: 'z2' },
     ],
   },
 
@@ -831,12 +966,20 @@ FLAG IMPOSTATI → CONSUMATORE:
 - eleinad_distrutto (z8)      → cronaca "Il Guscio Blu" (blocco meta)
 - scambiato (z9, sacrificeSets) → e_scambio + HERO_EPILOGUES per tipo di finale (blocco meta)
 - finale_parola / finale_gemelli / finale_colori / finale_scambio / finale_grigio → CRONACA + HERO_EPILOGUES + sblocco "Rivivi la Notte"
+- teca_profanata (z1t1, scelta 💥) → consumato dalla scelta di uscita di z1t2 (requires.flag)
 
 FLAG CONSUMATI (impostati altrove): via_biblioteca/via_porte/via_cucina (porta h1→m1, non in questo blocco),
 foto_ricomposta + segreto_gemelli (z2 scelta b), manuale_annotato_letto / daniele_sabota / sonnambuli_svegli (echi in z7).
 
 ITEM: nessun item dato in questo blocco. Item consumati: joycon_sinistro (richiesto in m3, non rimosso),
 lattina_zero (rimossa in m6), manuale_annotato (richiesto in z2a).
+
+SCENE AGGIUNTE (completamento incarico — deviazioni facoltative, once:true, tornano al filo principale):
+- z1t1/z1t2 → "La Sala dei Trofei di Eleinad" (aggancio da z1, scelta 🏆): vetrine di piccole rese e la teca
+  vuota "I SEI"; profanarla vale gold:2 e imposta teca_profanata, consumato subito dopo. Torna a z2.
+- z1mono → "Il monologo di Eleinad" (aggancio da z1, scelta 👂): il demone si racconta, gold:1. Torna a z2.
+- m7g1/m7g2 → "Cinque minuti dei gemelli" (aggancio da m7, scelta 👬): Federico e Daniele da soli, il momento
+  di cuore mancante nello snodo; m7g2 dà heal:3 e gold:1. Torna a m8.
 
 MORTI POSSIBILI:
 - m5_sacrificio (sacrifice esplicito → entrato_bozzolo)

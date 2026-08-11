@@ -197,11 +197,24 @@ const Scenes = (() => {
     }
   }
 
-  // Alone luminoso morbido (fasce concentriche): evita il rettangolo squadrato
+  // Ellisse a pixel (come pixelDisc, ma con raggi indipendenti)
+  function pixelEllipse(ctx, cx, cy, rx, ry, px = 4) {
+    const CX = Math.round(cx / px) * px, CY = Math.round(cy / px) * px;
+    const RY = Math.max(px, Math.round(ry / px) * px);
+    for (let dy = -RY; dy < RY; dy += px) {
+      const t = (dy + px / 2) / RY;
+      const hw = rx * Math.sqrt(Math.max(0, 1 - t * t));
+      const w = Math.max(px, Math.round(hw / px) * px);
+      ctx.fillRect(CX - w, CY + dy, w * 2, px);
+    }
+  }
+
+  // Alone luminoso morbido: dischi pixelati concentrici, MAI rettangoli
+  // (i rettangoli annidati creavano aloni squadrati attorno a ogni luce)
   function glow(ctx, x, y, w, h, rgb) {
     for (let i = 4; i >= 1; i--) {
       ctx.fillStyle = `rgba(${rgb},${0.022 * i})`;
-      ctx.fillRect(x - w * i / 2, y - h * i / 2, w * i, h * i);
+      pixelEllipse(ctx, x, y, w * (5 - i) / 2, h * (5 - i) / 2, 4);
     }
   }
 
@@ -430,8 +443,15 @@ const Scenes = (() => {
       ctx.fillStyle = '#3a3a42'; ctx.fillRect(W * 0.47, 12, W * 0.06, 8);
       glow(ctx, W * 0.5, 26, 46, 22, '210,214,200');
       ctx.fillStyle = '#c2c6b6'; ctx.fillRect(W * 0.475, 18, W * 0.05, 5);
+      // cono di luce debole: si ALLARGA scendendo, con ellissi morbide sovrapposte (niente rettangolo netto)
       ctx.fillStyle = 'rgba(210,214,200,.05)';
-      ctx.fillRect(W * 0.30, 24, W * 0.40, H * 0.5); // cono di luce debole
+      for (let i = 0; i < 5; i++) {
+        const t = i / 4;
+        const cy2 = 24 + t * H * 0.5;
+        const rx = W * (0.05 + t * 0.14);
+        const ry = H * 0.09;
+        pixelEllipse(ctx, W * 0.5, cy2, rx, ry, 4);
+      }
       // LA PORTA DI DANIELE, al centro
       door(ctx, W * 0.42, floorY, W * 0.16, 128, '#4a4038', '#33302c');
       // spioncino e targhetta col nome
@@ -1126,7 +1146,11 @@ const Scenes = (() => {
       blocks(ctx, bx + bw + 6, floorY - 26, 34, 26, '#332e28', 8, r, 0.16);
       ctx.fillStyle = '#55505a'; ctx.fillRect(bx + bw + 12, floorY - 32, 14, 6);
       // il buio fitto alle spalle del banco: il Mercante ci vive dentro
-      ctx.fillStyle = 'rgba(6,5,8,.55)'; ctx.fillRect(W * 0.30, H * 0.16, W * 0.40, H * 0.22);
+      // (cornici concentriche: niente rettangolo netto sospeso sul muro)
+      for (let i = 0; i < 3; i++) {
+        ctx.fillStyle = 'rgba(6,5,8,.20)';
+        ctx.fillRect(W * (0.30 + i * 0.035), H * (0.16 + i * 0.03), W * (0.40 - i * 0.07), H * (0.22 - i * 0.055));
+      }
     },
 
     galleria(ctx, W, H) {
@@ -1192,9 +1216,11 @@ const Scenes = (() => {
       ctx.fillRect(sx + sw * 0.16, sy2 + sh2 * 0.14, 34, 8); ctx.fillRect(sx + sw * 0.22, sy2 + sh2 * 0.10, 20, 8);
       ctx.fillRect(sx + sw * 0.50, sy2 + sh2 * 0.22, 28, 8);
       // la casetta finta e l'omino finto: la vita che Eleinad gli proietta
-      ctx.fillStyle = '#a08468'; ctx.fillRect(sx + sw * 0.30, sy2 + sh2 * 0.42, 44, 30);
-      ctx.fillStyle = '#7a5a46'; for (let i = 0; i < 3; i++) ctx.fillRect(sx + sw * 0.30 - 6 + i * 6, sy2 + sh2 * 0.42 - 8 + 0, 56 - i * 12, 5);
-      ctx.fillStyle = '#5a5a62'; ctx.fillRect(sx + sw * 0.345, sy2 + sh2 * 0.50, 10, 14);
+      // (piantata SUL prato finto, non a mezz'aria nel cielo)
+      const hy2 = sy2 + sh2 * 0.55 - 26;
+      ctx.fillStyle = '#a08468'; ctx.fillRect(sx + sw * 0.30, hy2, 44, 30);
+      ctx.fillStyle = '#7a5a46'; for (let i = 0; i < 3; i++) ctx.fillRect(sx + sw * 0.30 - 6 + i * 6, hy2 - 6 - i * 5, 56 - i * 12, 5);
+      ctx.fillStyle = '#5a5a62'; ctx.fillRect(sx + sw * 0.345, hy2 + 16, 10, 14);
       // l'omino: fermo a metà passo, DA SEMPRE
       ctx.fillStyle = '#4a4a52';
       ctx.fillRect(sx + sw * 0.58, sy2 + sh2 * 0.62, 10, 18); ctx.fillRect(sx + sw * 0.585, sy2 + sh2 * 0.56, 8, 8);
@@ -1310,8 +1336,10 @@ const Scenes = (() => {
         ctx.fillStyle = '#2a2a32';
         ctx.fillRect(vx2, vy2 + vh2 * 0.5, vw2, 3); ctx.fillRect(vx2 + vw2 / 2 - 1, vy2, 3, vh2);
         ctx.fillStyle = '#94b0c2'; ctx.fillRect(vx2 + 2, vy2 + 2, vw2 / 2 - 4, vh2 / 2 - 4);
-        // ogni vetrata poggia su una lesena che scende fino a terra
-        blocks(ctx, vx2 + vw2 / 2 - 5, vy2 + vh2 + 4, 12, floorY - vy2 - vh2 - 4, '#232329', 8, r, 0.12);
+        // ogni vetrata poggia su una lesena LARGA quanto lei, che scende fino a terra
+        const lw3 = Math.max(14, Math.round(vw2 * 0.8));
+        blocks(ctx, vx2 + vw2 / 2 - lw3 / 2, vy2 + vh2 + 4, lw3, floorY - vy2 - vh2 - 4, '#2a2a31', 8, r, 0.12);
+        ctx.fillStyle = '#34343c'; ctx.fillRect(vx2 - 2, vy2 + vh2 + 4, vw2 + 4, 5); // il davanzale che li unisce
       }
       // LA NAVATA: file di divani-panche fusi, in prospettiva verso il fondo
       for (let row = 4; row >= 0; row--) {
