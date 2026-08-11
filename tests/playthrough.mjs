@@ -832,6 +832,259 @@ scenarios.push(scenario(
     },
   }));
 
+/* ==================== SECONDA ONDATA — NUOVI SCENARI (137 → 184 scene) ====================
+   La campagna è passata da 137 a 184 scene: i contenuti nuovi sono agganciati come scelte
+   IN CODA agli array `choices` di scene esistenti (spesso `once: true`), quindi gli scenari
+   1-7 sopra — verdi ma scritti per la prima ondata — non li attraversano mai. I 5 scenari
+   che seguono vanno a caccia esplicitamente di quei rami: biblioteca a fondo, porte a fondo,
+   cucina a fondo, e i bivi minori di prologo/soglia/duelli lasciati indietro dal caso. */
+
+/* ---- 8. BIBLIOTECA a fondo (percorso pacifico) — Archivio, Sala dei Libri Mai Finiti,
+   topi tra gli scaffali, Duello Impegno/Coerenza, Libro delle Cose Belle ---- */
+scenarios.push(scenario(
+  'Biblioteca a fondo — Archivio dei Diari, Libri Mai Finiti, topi, Duello Coerenza, Cose Belle',
+  ['natalino', 'claudia', 'federico'],
+  {
+    a2: 'Bussare',
+    s3: 'Firmare',
+    b1: 'rumore',      // "seguire il rumore" (once) -> b15, i topi tra gli scaffali
+    b2: 'sezione',     // "Portaci alla sezione" -> b3
+    b3: 'coro sottile', // once -> b14, la Sala dei Libri Mai Finiti
+    b14: 'Improvvisare', // prova di gruppo CAR 12 -> b14b se riuscita
+    b7: 'scatola da scarpe', // once -> b17, le tessere dei lettori
+    b17: 'scaffale proibito', // -> b8
+    b8b: 'Riprovare',
+    b9: 'segreto fuori', // -> b11 (bibliotecario ancora vivo qui: non lo riaffrontiamo a parole)
+    m3: 'Accoppiare il joy-con',
+    m6: 'Dargli la Zero',
+    m7: 'Che venga',
+    z2: 'Basta parlare',
+  },
+  {
+    difficulty: 'facile',
+    forceLossAt: 'a7', // primo sangue nel corridoio: si perde, ci si rialza, si rivince — a7_ko
+    sequences: {
+      b16: ['RICATTO EMOTIVO', 'IMPEGNO'], // prima il colpo sbagliato (b16k), poi la risposta giusta (b16v)
+      b5: ['girevole', 'Archivio', 'silenzio assoluto'], // scaffale girevole(b12) → Archivio(b13/b13b) → poi FALLIRE il silenzio → b6b
+    },
+    checkOutcomes: {
+      b14: 'success',
+      b5: 'fail',              // la 3ª visita (attraversare in silenzio) fallisce apposta: sveglia i Lettori Grigi (b6b)
+      b8: ['fail', 'success'], // prima la nausea grigia (b8b), poi si rilegge bene (b9)
+    },
+    verify: (r, expect) => {
+      expect(r.log.ending, `nessun finale raggiunto (${r.log.ending})`);
+      const mustSee = ['b15', 'b15b', 'b14', 'b14b', 'b16', 'b16k', 'b16v', 'b12', 'b13', 'b13b', 'b6b', 'b17', 'b8b', 'a7_ko'];
+      for (const s of mustSee) expect(r.log.scenes.includes(s), `scena "${s}" della seconda ondata non attraversata`);
+      expect(r.log.flags.libro_cose_belle, 'flag libro_cose_belle non impostato (b12)');
+      expect(r.log.flags.pagina_del_salvato, 'flag pagina_del_salvato non impostato (b13b, il diario di Rosa)');
+      expect(r.log.itemsEverOwned.includes('boccata_colore'), 'boccata_colore (b13b) mai ottenuta');
+      expect(r.log.itemsEverOwned.includes('lattina_zero'), 'lattina_zero (b17) mai ottenuta');
+      expect(r.log.everMorto.length === 0, `morti inattesi: ${r.log.everMorto.join(', ')}`);
+      expect(r.log.flags.daniele_in_squadra, 'Daniele non è entrato in squadra a m6');
+    },
+  }));
+
+/* ---- 9. BIBLIOTECA — il Bibliotecario ostile: combattimento, sconfitta (b_ko), rivincita,
+   la frana (b6b_vinto) e il d20 custodito (b7b) — e la liberazione col SACRIFICIO (m5/m6_sacrificio) ---- */
+scenarios.push(scenario(
+  'Biblioteca — Bibliotecario in combattimento (b_ko + rivincita), b7b, liberazione col sacrificio',
+  ['claudia', 'gaetano'],
+  {
+    a2: 'Aprire con le chiavi',
+    s3: 'Rifiutare con stile',
+    b1: 'Inoltrarsi',
+    b2: 'Basta chiacchiere', // attaccare -> b6 (combattimento)
+    b7: 'tintinnare',        // once, prova SAG 13 -> b7b (richiede bibliotecario_morto)
+    b8: 'riflesso',
+    m3: 'filamenti',         // "Qualcuno entra nei filamenti" -> m5_sacrificio
+    m6: 'Dargli la Zero',
+    m7: 'Che venga',
+    z2: 'Basta parlare',
+  },
+  {
+    difficulty: 'facile',
+    forceLossAt: 'b6', // il Bibliotecario vince il primo scontro: b_ko, poi RIVINCITA (default) e vittoria
+    sacrificeHero: 'Claudia',
+    checkOutcomes: { s3: 'fail', b7: 'success' },
+    sequences: { h1: ['La porta dei libri', 'Il corridoio delle porte', 'La porta fredda', 'Seguire il suono'] },
+    verify: (r, expect) => {
+      expect(r.log.ending, `nessun finale raggiunto (${r.log.ending})`);
+      const mustSee = ['b6', 'b_ko', 'b6b_vinto', 'b7b', 's3d', 'm5_sacrificio', 'm6_sacrificio'];
+      for (const s of mustSee) expect(r.log.scenes.includes(s), `scena "${s}" non attraversata`);
+      expect(r.log.flags.bibliotecario_morto, 'flag bibliotecario_morto non impostato (b6b_vinto)');
+      expect(r.log.itemsEverOwned.includes('d20_daniele'), 'd20_daniele (b7b) mai ottenuto');
+      expect(r.log.everMorto.includes('claudia'), 'Claudia non risulta mai morta davvero (sacrificio nel bozzolo)');
+      expect(r.log.flags.daniele_in_squadra, 'Daniele non è entrato in squadra a m6 dopo il sacrificio');
+      expect(r.log.flags['tornato_claudia'] === undefined, 'Claudia non dovrebbe essere già stata resuscitata in questa run');
+    },
+  }));
+
+/* ---- 10. BIBLIOTECA — Duello di Parole col Bibliotecario VIVO (b10/b10c/b10b), b2b,
+   il duello finale con i colpi sbagliati (z3_colpo/z5_colpo) e la vittoria e_parola ---- */
+scenarios.push(scenario(
+  'Biblioteca — Duello col Bibliotecario vivo, b2b, contraccolpi nel duello finale, e_parola',
+  ['gaetano', 'natalino', 'emanuela'],
+  {
+    a2: 'Aprire con le chiavi',
+    b1: 'CORRERE',          // prova di COS forzata a fallire -> b2b (la voce sbagliata... i sussurri troppo lenti)
+    b2: 'sezione',
+    b3: 'sala di lettura',   // "Non c'è tempo" -> b5
+    b5: 'silenzio assoluto', // prova DES forzata a riuscire -> b7 (bibliotecario ancora vivo)
+    b7: 'Bibliotecario vi ha seguiti', // -> b10, il Duello di Parole
+    b10b: 'Prima, se non',   // -> b8, leggere la biografia
+    b8: 'riflesso',
+    b9: 'segreto fuori',
+    m3: 'Accoppiare il joy-con',
+    m6: 'Dargli la Zero',
+    m7: 'Che venga',
+    z2: 'Smontiamolo',
+    z4: 'FALSA DICOTOMIA',
+  },
+  {
+    difficulty: 'facile',
+    checkOutcomes: { s3: 'success', b1: 'fail', b5: 'success', b8: 'success' },
+    sequences: {
+      s4: ['AUTORITÀ', 'RIPROVA SOCIALE'],           // prima il colpo sbagliato (s4c), poi quello giusto
+      b10: ['RIPROVA SOCIALE', 'AUTORITÀ'],          // prima il contraccolpo (b10c), poi la vittoria (b10b)
+      z3: ['AD HOMINEM', 'STRAWMAN'],                // z3_colpo, poi la risposta giusta
+      z5: ['IMPEGNO E COERENZA', 'RICATTO EMOTIVO'], // z5_colpo, poi la risposta giusta
+    },
+    verify: (r, expect) => {
+      expect(r.log.ending === 'e_parola', `finale atteso e_parola, trovato ${r.log.ending}`);
+      const mustSee = ['b2b', 'b10', 'b10c', 'b10b', 's3c', 's4c', 'z3_colpo', 'z5_colpo'];
+      for (const s of mustSee) expect(r.log.scenes.includes(s), `scena "${s}" non attraversata`);
+      expect(r.log.flags.bibliotecario_amico, 'flag bibliotecario_amico non impostato (b10b)');
+      expect(r.log.itemsEverOwned.includes('d20_daniele'), 'd20_daniele (b10b) mai ottenuto');
+      expect(r.log.flags.rifiuto_stile, 'flag rifiuto_stile non impostato (s3c)');
+      expect(r.log.flags.segreto_specchio, 'flag segreto_specchio non impostato (b9)');
+    },
+  }));
+
+/* ---- 11. PORTE a fondo — SALA CONTROLLO (l'incubo di Gaetano), IBIZA (Emanuela),
+   IL SALONE (manichini, e la sconfitta u_ko), AGOSTO 2019, il Duello ad hominem, e la
+   liberazione senza joy-con (m4c) ---- */
+scenarios.push(scenario(
+  'Porte a fondo — Sala Controllo, Ibiza, il Salone (u_ko), Agosto 2019, Duello Obiezione',
+  ['gaetano', 'emanuela', 'natalino', 'federico'],
+  {
+    a2: 'Aprire con le chiavi',
+    b1: 'Inoltrarsi',
+    b2: 'sezione',
+    b3: 'sala di lettura',
+    b5: 'silenzio assoluto',
+    b7: 'catena e aprire',
+    b8: 'riflesso',
+    b9: 'segreto fuori',
+    m6: 'Dargli la Zero',
+    m7: 'Che venga',
+    z2: 'Smontiamolo',
+    z3: 'STRAWMAN',
+    z4: 'FALSA DICOTOMIA',
+    z5: 'RICATTO EMOTIVO',
+  },
+  {
+    difficulty: 'facile',
+    forceLossAt: 'u12', // il Salone: prima sconfitta (u_ko), poi la rivincita
+    checkOutcomes: {
+      b5: 'success', b8: 'success',
+      u10: ['fail', 'success'], // il ticket del satellite: prima si riapre (u10c), poi si chiude per sempre
+      u11: ['fail', 'success'], // Ibiza: prima abbassa gli occhi (u11c, Ingrigito), poi attraversa a testa alta
+      m3: 'fail',                // "cercare un'altra via" fallisce apposta -> m4c, il Guardiano anticipato
+    },
+    sequences: {
+      u1: ['SALA CONTROLLO', 'IBIZA', 'IL SALONE', 'AGOSTO 2019', 'NON APRIRE', 'OBIEZIONE', 'Chiudere col corridoio'],
+      u10: ['chiudere il ticket', 'chiudere il ticket'],
+      u11: ['testa alta', 'testa alta'],
+      u14: ['AUTORITÀ', 'AD HOMINEM'], // prima il colpo sbagliato (u14c), poi quello giusto (u14b)
+      m3: ['altra via'],
+    },
+    verify: (r, expect) => {
+      expect(r.log.ending === 'e_parola', `finale atteso e_parola, trovato ${r.log.ending}`);
+      const mustSee = [
+        'u10', 'u10b', 'u10c', 'u11', 'u11b', 'u11c', 'u12', 'u12b', 'u12c',
+        'u13', 'u13b', 'u14', 'u14b', 'u14c', 'u6c', 'u_ko', 'm4c',
+      ];
+      for (const s of mustSee) expect(r.log.scenes.includes(s), `scena "${s}" della porte non attraversata`);
+      expect(r.log.itemsEverOwned.includes('spray_kerastase'), 'spray_kerastase (u11b, Ibiza) mai ottenuto');
+      expect(r.log.flags.via_porte, 'flag via_porte non impostato');
+      expect(r.log.flags.daniele_in_squadra, 'Daniele non è entrato in squadra dopo m4c/m5');
+    },
+  }));
+
+/* ---- 12. CUCINA a fondo — congelatore a pozzetto, la calata mortale (k4_morte), il
+   montavivande (k4b), la Cucina Viva, il lavoretto e il furto al Mercante, la Galleria
+   (k8_prendi), lo sconto (sconto_mercante) sul Cuore di Colore, e_gemelli con z6b ---- */
+scenarios.push(scenario(
+  'Cucina a fondo — congelatore, calata mortale, quest e furto al Mercante, sconto sul Cuore',
+  ['federico', 'claudia', 'gaetano'],
+  {
+    a2: 'Aprire con le chiavi',
+    m6: 'Dargli la Zero',
+    m7: 'Che venga',
+    z2: 'La foto',
+  },
+  {
+    difficulty: 'facile',
+    sequences: {
+      h1: ['Il corridoio delle porte', 'La porta fredda', 'Seguire il suono'],
+      k1: ['congelatore', 'Frugare il frigo'],
+      k15b: ['Riaprire'],
+      k3: ['Accendere i fuochi', 'spigolo', 'spigolo'],
+      k4: ['cordata', 'altra via', 'cordata'],
+      k4_morte: ['Risalire'],
+      k6: ['manodopera', 'Fregarlo', 'prezzo da colleghi', 'Lasciare il banco'],
+      k9: ['tenta la sequenza'],
+      z6: ['Fare scudo'],
+    },
+    checkOutcomes: {
+      k1: ['fail', 'fail'],       // congelatore fallito (k15b), poi frigo fallito (k1c)
+      k15b: 'success',
+      k4: ['fail', 'fail', 'success'], // calata fallita (k4_morte), montavivande fallito (k4b), calata riuscita
+      k6: ['fail'],                    // Fregarlo il Mercante fallisce (k7b_fail)
+      k9: 'fail',                      // sveglia generale fallita (k9c)
+      z6: ['fail', 'success'],         // prima l'onda (z6b), poi lo scudo riuscito
+    },
+    verify: (r, expect) => {
+      expect(r.log.ending === 'e_gemelli', `finale atteso e_gemelli, trovato ${r.log.ending}`);
+      const mustSee = [
+        'k1c', 'k4_morte', 'k4b', 'k15', 'k15b', 'k17',
+        'k7b_fail', 'k7c', 'k12', 'k13', 'k14', 'k8_prendi', 'k9c', 'k_ko', 'z6b',
+      ];
+      for (const s of mustSee) expect(r.log.scenes.includes(s), `scena "${s}" della cucina non attraversata`);
+      expect(r.log.everMorto.length >= 1, 'la calata mortale (k4_morte) non ha ucciso nessuno davvero');
+      expect(r.log.flags.sconto_mercante, 'flag sconto_mercante non impostato (k14, il credito)');
+      expect(r.log.itemsEverOwned.includes('cuore_colore'), 'cuore_colore mai ottenuto (né alla Galleria né dal Mercante)');
+      expect(r.log.itemsEverOwned.includes('ipa_gaetano'), 'ipa_gaetano (k15, il pozzetto) mai ottenuta');
+      expect(r.log.flags.gemelli_pace, 'flag gemelli_pace non impostato (z6)');
+      expect(r.log.gold >= 0, 'Colore negativo dopo la spesa dal Mercante');
+    },
+  }));
+
+/* ==================== VERIFICA DIRETTA — b4, il nome proibito (Eleinad costa Colore) ====================
+   b4 è raggiungibile SOLO scegliendo "Parlaci di ELEINAD" a b2, il che esclude — nella stessa
+   visita — sia "Portaci alla sezione" (b3, il manuale) sia l'attacco diretto (b6): non esiste
+   un percorso narrativo che passi per b4 E per uno degli altri due rami di b2. Copriamolo con
+   una chiamata diretta, come le altre "verifiche dirette" di questo file. */
+(function testNomeProibitoB4() {
+  section('Verifica diretta: b4, il nome proibito — Eleinad costa Colore alla biblioteca');
+  const game = buildGame(8765);
+  game.act(() => game.api.Engine.newGame([{ heroId: 'claudia', player: '' }, { heroId: 'federico', player: '' }]));
+  const G = game.getG();
+  G.gold = 5;
+  game.act(() => game.api.Engine.gotoScene('b2'));
+  const btn = matchButton(buttons(game.doc.getElementById('choices')), 'ELEINAD');
+  if (!btn) { fail('nomeProibitoB4: bottone "Parlaci di ELEINAD" assente/disabilitato a b2'); return; }
+  game.act(() => btn.onclick());
+  if (G.sceneId !== 'b4') { fail(`nomeProibitoB4: attesa scena b4, trovata ${G.sceneId}`); return; }
+  if (G.gold !== 4) fail(`nomeProibitoB4: Colore atteso 4 dopo il costo del nome, trovato ${G.gold}`);
+  const goBtn = buttons(game.doc.getElementById('choices'))[0];
+  if (!goBtn) { fail('nomeProibitoB4: nessun bottone per proseguire verso la biografia (b8)'); return; }
+  game.act(() => goBtn.onclick());
+  if (G.sceneId !== 'b8') fail(`nomeProibitoB4: attesa scena b8 dopo b4, trovata ${G.sceneId}`);
+  else console.log('  ✅ b4 (il nome proibito) raggiunto: costa 1🎨, apre lo scaffale proibito (b8) senza passare dal manuale');
+})();
+
 /* ==================== ESECUZIONE ==================== */
 
 section('Simulazione di partite complete (headless)');
@@ -1153,6 +1406,15 @@ if (!EXPECTED_ENDINGS.every(e => allEndings.has(e))) {
 })();
 
 /* ==================== ESITO FINALE ==================== */
+
+section('Copertura totale della campagna');
+{
+  const probe = buildGame(999999);
+  const allCampaignIds = Object.keys(probe.api.CAMPAIGN);
+  const unseen = allCampaignIds.filter(id => !allScenesSeen.has(id));
+  console.log(`  Scene distinte visitate: ${allScenesSeen.size} / ${allCampaignIds.length}`);
+  console.log(`  Scene MAI visitate (${unseen.length}): ${unseen.join(', ') || '(nessuna)'}`);
+}
 
 console.log('\n' + '═'.repeat(60));
 if (failures === 0) {

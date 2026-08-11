@@ -33,6 +33,21 @@ nella metafora del Grigiore; MAI riferimenti ad autolesionismo o termini clinici
 Dottore (la terapia) sono SEMPRE alleate; ritratto di Daniele sempre eroico e affettuoso.
 Dettagli completi in [docs/DESIGN.md](docs/DESIGN.md).
 
+## Numeri (si ricalcolano DAL MOTORE, mai a memoria: `node tests/validate.mjs` li stampa)
+
+Oltre 180 scene e più di 40.000 parole · 5 finali · 34 imprese · 21 ambientazioni · 8 Duelli di
+Parole · una partita esplorativa dura ~5-7 ore. Le simulazioni headless tagliano corto (~85 scene
+per run): la stima di durata si fa su 110-130 scene visitate, che è quello che fa un gruppo vero.
+
+## "Cosa manca e dove" (rigiocabilità servita)
+
+`seenScenes`/`markSeen` in engine.js tracciano le scene viste CUMULATIVE per profilo;
+`chapterProgress()` calcola per capitolo la % di stanze viste (dai `prefixes` dei CHAPTERS) e le
+imprese mancanti, dedotte automaticamente dalla scena che imposta il flag. Il menu "🗝 Rientra
+nella Casa" mostra lo stato capitolo per capitolo; la schermata del finale mostra "Quello che la
+Casa non vi ha mostrato" (solo TITOLI: nessuno spoiler) col salto diretto al capitolo giusto.
+**Se si aggiungono scene o capitoli, aggiornare i `prefixes` dei CHAPTERS.**
+
 ## Comandi
 
 ```bash
