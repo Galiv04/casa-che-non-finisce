@@ -851,6 +851,7 @@ scenarios.push(scenario(
     b2: 'sezione',     // "Portaci alla sezione" -> b3
     b3: 'coro sottile', // once -> b14, la Sala dei Libri Mai Finiti
     b14: 'Improvvisare', // prova di gruppo CAR 12 -> b14b se riuscita
+    b13: 'RESTITUITI',   // -> b13b, il diario di Rosa
     b7: 'scatola da scarpe', // once -> b17, le tessere dei lettori
     b17: 'scaffale proibito', // -> b8
     b8b: 'Riprovare',
@@ -865,7 +866,7 @@ scenarios.push(scenario(
     forceLossAt: 'a7', // primo sangue nel corridoio: si perde, ci si rialza, si rivince — a7_ko
     sequences: {
       b16: ['RICATTO EMOTIVO', 'IMPEGNO'], // prima il colpo sbagliato (b16k), poi la risposta giusta (b16v)
-      b5: ['girevole', 'Archivio', 'silenzio assoluto'], // scaffale girevole(b12) → Archivio(b13/b13b) → poi FALLIRE il silenzio → b6b
+      b5: ['girevole', 'porticina', 'silenzio assoluto'], // scaffale girevole(b12) → Archivio(b13/b13b) → poi FALLIRE il silenzio → b6b
     },
     checkOutcomes: {
       b14: 'success',
@@ -897,7 +898,7 @@ scenarios.push(scenario(
     b2: 'Basta chiacchiere', // attaccare -> b6 (combattimento)
     b7: 'tintinnare',        // once, prova SAG 13 -> b7b (richiede bibliotecario_morto)
     b8: 'riflesso',
-    m3: 'filamenti',         // "Qualcuno entra nei filamenti" -> m5_sacrificio
+    m3: 'Tagliare il bozzolo', // -> m5_sacrificio
     m6: 'Dargli la Zero',
     m7: 'Che venga',
     z2: 'Basta parlare',
@@ -927,6 +928,7 @@ scenarios.push(scenario(
   ['gaetano', 'natalino', 'emanuela'],
   {
     a2: 'Aprire con le chiavi',
+    s3: 'Rifiutare con stile',
     b1: 'CORRERE',          // prova di COS forzata a fallire -> b2b (la voce sbagliata... i sussurri troppo lenti)
     b2: 'sezione',
     b3: 'sala di lettura',   // "Non c'è tempo" -> b5
@@ -978,6 +980,8 @@ scenarios.push(scenario(
     b9: 'segreto fuori',
     m6: 'Dargli la Zero',
     m7: 'Che venga',
+    u6: 'Ingegnarsi da riva',
+    u12b: 'Rimettere in ordine',
     z2: 'Smontiamolo',
     z3: 'STRAWMAN',
     z4: 'FALSA DICOTOMIA',
@@ -990,6 +994,7 @@ scenarios.push(scenario(
       b5: 'success', b8: 'success',
       u10: ['fail', 'success'], // il ticket del satellite: prima si riapre (u10c), poi si chiude per sempre
       u11: ['fail', 'success'], // Ibiza: prima abbassa gli occhi (u11c, Ingrigito), poi attraversa a testa alta
+      u6: 'success',             // "Ingegnarsi da riva" riesce -> u6c
       m3: 'fail',                // "cercare un'altra via" fallisce apposta -> m4c, il Guardiano anticipato
     },
     sequences: {
@@ -1022,10 +1027,14 @@ scenarios.push(scenario(
     a2: 'Aprire con le chiavi',
     m6: 'Dargli la Zero',
     m7: 'Che venga',
+    k12: 'Accettare il lavoretto',
+    k14: 'Il credito',
+    k8: 'Prenderlo. Serve ai vostri',
     z2: 'La foto',
   },
   {
     difficulty: 'facile',
+    forceLossAt: 'k13', // l'Ufficiale della casa vince il primo round: k_ko, poi la rivincita
     sequences: {
       h1: ['Il corridoio delle porte', 'La porta fredda', 'Seguire il suono'],
       k1: ['congelatore', 'Frugare il frigo'],
