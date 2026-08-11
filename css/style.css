@@ -107,6 +107,10 @@ canvas { image-rendering: pixelated; image-rendering: crisp-edges; display:block
 .char-card:hover { border-color: var(--border-light); }
 .char-card.selected { border-color: var(--gold); box-shadow: 0 0 16px rgba(245,197,66,.25); }
 .char-card.selected::after { content:'✔ IN SQUADRA'; position:absolute; top:8px; right:8px; font-family:var(--font-pixel); font-size:9px; color:var(--gold); }
+.char-card.locked { opacity:.75; border-style:dashed; position:relative; }
+.char-card.locked canvas { filter:grayscale(.85); }
+.char-card.locked:hover { border-color: var(--border-light); opacity:.9; }
+.char-card.locked::after { content:'🔒 PRIGIONIERO DELLA CASA'; position:absolute; top:8px; right:8px; font-family:var(--font-pixel); font-size:9px; color:var(--text-dim); }
 .char-card-top { display:flex; gap: 12px; align-items:center; margin-bottom: 8px; }
 .char-card canvas { width: 72px; height: 72px; border: 2px solid var(--border); background:#111; flex-shrink:0; }
 .char-name { font-family: var(--font-pixel); font-size: 12px; color: var(--gold); margin-bottom: 6px; }

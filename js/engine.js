@@ -61,7 +61,10 @@ const Engine = (() => {
       }),
       uses: {},
       gold: solo ? 12 : 10,   // 🎨 Colore
-      inventory: solo ? ['kit_emanuela', 'lattina_zero', 'lattina_zero'] : ['kit_emanuela'],
+      // Il tronello di scorta di Natalino parte SEMPRE nello zaino (come la borsa Kerastase):
+      // è la chiave del cerchio del tronello (h1 -> h2) e il pegno che il Mercante esige
+      // per il Cuore di Colore — senza, quei due contenuti sarebbero irraggiungibili.
+      inventory: solo ? ['kit_emanuela', 'tronello', 'lattina_zero', 'lattina_zero'] : ['kit_emanuela', 'tronello'],
       flags: solo ? { solo: true } : {},
       sceneId: CAMPAIGN_START,
       usedChoices: {},   // sceneId -> [testi scelti "once"]
@@ -333,7 +336,7 @@ const Engine = (() => {
   let typeTimer = null;
 
   const MUSIC_BY_LOCATION = {
-    strada: 'viaggio', palazzo: 'viaggio', pianerottolo: 'villa',
+    strada: 'viaggio', palazzo: 'viaggio', pianerottolo: 'appartamento',
     appartamento: 'appartamento', corridoio: 'corridoio', salotto: 'salotto',
     biblioteca: 'biblioteca', porte: 'porte', cameretta: 'porte', spiaggia_grigia: 'porte',
     cabina: 'porte', stanza_sommersa: 'sommersa',

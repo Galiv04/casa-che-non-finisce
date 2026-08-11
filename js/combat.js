@@ -100,7 +100,7 @@ const Combat = (() => {
     banner.classList.remove('hidden', 'victory');
     render();
 
-    const COMBAT_MUSIC = { camera: 'combat_carillon', pianoProibito: 'combat_carillon', giardino: 'combat_verde', tornantiPiedi: 'combat_verde', pozzo: 'combat_verde', cantina: 'combat_forno', ossario: 'combat_forno', riflesso: 'combat_riflesso', riflesso_interno: 'combat_riflesso' };
+    const COMBAT_MUSIC = {}; // una sola traccia di scontro (+ 'boss'): la Casa non ha bisogno di variare per farvi male
     const loc = (Engine.currentScene() || {}).location;
     if (typeof Sound !== 'undefined') { Sound.play('combat'); Sound.music(battle.isBoss ? 'boss' : (COMBAT_MUSIC[loc] || 'combat')); }
     log(`<b>Nemici:</b> ${battle.enemies.map(e => e.name).join(', ')}`, 'log-info');
@@ -361,6 +361,7 @@ const Combat = (() => {
     const box = $('combat-actions');
     box.innerHTML = `<div class="action-title">Scegli il compagno:</div>`;
     G.party.forEach((h, i) => {
+      if (h.morto) return; // gli SPIRITI non bevono e non si medicano: serve un Cuore di Colore
       if (h.down && !includeDown) return;
       const b = document.createElement('button');
       b.className = 'action-btn target-btn';

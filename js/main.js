@@ -269,6 +269,30 @@ const Main = (() => {
   function renderSetup() {
     const grid = $('char-grid');
     grid.innerHTML = '';
+
+    // gli eroi bloccati (Daniele) si VEDONO ma non si scelgono: la scheda resta leggibile
+    for (const h of HEROES.filter(x => x.locked)) {
+      const card = document.createElement('div');
+      card.className = 'char-card locked';
+      card.innerHTML = `
+        <div class="char-card-top">
+          <canvas width="72" height="72"></canvas>
+          <div>
+            <div class="char-name">${h.name} 🔒</div>
+            <div class="char-class">${h.class}</div>
+          </div>
+        </div>
+        <div class="char-tag">"${h.tagline}"</div>
+        <div class="char-card-btns">
+          <button class="btn btn-small" data-act="story">📜 Storia</button>
+          <button class="btn btn-small" disabled title="Si sblocca giocando">🔒 Si sblocca giocando</button>
+        </div>`;
+      const cv = card.querySelector('canvas');
+      Sprites.renderToCanvas(cv, Sprites.registry[h.sprite]);
+      card.querySelector('[data-act="story"]').onclick = e => { e.stopPropagation(); showCharDetail(h); };
+      grid.appendChild(card);
+    }
+
     for (const h of selectableHeroes()) {
       const card = document.createElement('div');
       card.className = 'char-card' + (selection[h.id].selected ? ' selected' : '');
@@ -319,19 +343,24 @@ const Main = (() => {
 
   function showCharDetail(h) {
     const box = $('modal-char-content');
+    const pickBtn = h.locked
+      ? `<button class="btn" disabled>🔒 Si sblocca giocando: andate a riprendervelo</button>`
+      : `<button class="btn btn-gold" id="btn-char-pick">✔ Scegli ${h.name.split(' ')[0]}</button>`;
     box.innerHTML = Engine.heroSheetHTML(h, false) +
-      `<div style="display:flex;gap:10px;margin-top:14px">
-        <button class="btn btn-gold" id="btn-char-pick">✔ Scegli ${h.name.split(' ')[0]}</button>
+      `<div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
+        ${pickBtn}
         <button class="btn" id="btn-char-close">Chiudi</button>
       </div>`;
     $('modal-char').classList.remove('hidden');
     $('btn-char-close').onclick = () => $('modal-char').classList.add('hidden');
-    $('btn-char-pick').onclick = () => {
-      const count = Object.values(selection).filter(s => s.selected).length;
-      if (!selection[h.id].selected && count < 6) selection[h.id].selected = true;
-      $('modal-char').classList.add('hidden');
-      renderSetup();
-    };
+    if (!h.locked) {
+      $('btn-char-pick').onclick = () => {
+        const count = Object.values(selection).filter(s => s.selected).length;
+        if (!selection[h.id].selected && count < 6) selection[h.id].selected = true;
+        $('modal-char').classList.add('hidden');
+        renderSetup();
+      };
+    }
   }
 
   function startAdventure() {

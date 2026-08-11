@@ -1,15 +1,24 @@
 /* ============ PLAYTHROUGH — simulazioni complete headless (no browser) ============
    Uso: node tests/playthrough.mjs
 
-   Basato sull'harness collaudato di dnd-corona-di-mezzanotte/tests/playthrough.mjs:
+   Basato sull'harness collaudato del Relais (a sua volta figlio della Corona):
    carica engine.js, combat.js, dice.js (+ dati) in un vm.Context Node con uno stub
    minimale di document/localStorage/timer, e gioca partite complete cliccando
    programmaticamente i bottoni generati dal gioco (choices, azioni di combattimento,
    overlay dei dadi, selezione eroe per le prove), esattamente come farebbe un utente.
 
+   Novità della Casa gestite dall'harness:
+   - unlockHero (Daniele): la modale arriva con setTimeout(600) → la coda timer dello
+     stub la DRENA dentro act(), e la modale (solo informativa) viene chiusa.
+   - choice.sacrifice: la modale di scelta dell'eroe viene cliccata (scenario.sacrificeHero).
+   - killRoller: nessuna UI — muore chi ha tirato l'ultimo dado (G.lastRoller).
+   - checkOutcomes: esiti dei tiri FORZATI per scena (Math.random pilotato solo durante
+     il click dell'eroe nella modale della prova: 0.999 → 20 naturale, 0 → 1 naturale),
+     per rendere deterministici i percorsi che dipendono dal dado.
+   - forceLossAt: sconfitta VOLUTA in un combattimento specifico (solo Difesa totale).
+
    Obiettivo: scovare bug di RUNTIME (eccezioni, scene mancanti, loop infiniti,
-   stato incoerente) che i controlli statici di validate.mjs non possono vedere,
-   perché richiedono di ESEGUIRE la logica di gioco (combattimenti, prove, salvataggi). */
+   stato incoerente) che i controlli statici di validate.mjs non possono vedere. */
 
 import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
@@ -103,8 +112,8 @@ class FakeElement {
   get textContent() { return this._textContent; }
   set textContent(v) { this._textContent = String(v); }
   // Alias tollerante: alcuni punti del gioco leggono .parentElement (standard DOM) invece
-  // di .parentNode. Se non è mai stato collegato a nulla (es. i canvas, che nello stub non
-  // vengono mai "appendChild-ati" da nessuna parte), si auto-crea un contenitore fittizio.
+  // di .parentNode. Se non è mai stato collegato a nulla (es. i canvas), si auto-crea
+  // un contenitore fittizio.
   get parentElement() {
     if (!this.parentNode) this.parentNode = new FakeElement('div');
     return this.parentNode;
@@ -162,7 +171,7 @@ function makeDocument() {
 
 const scriptCache = SOURCES.map(s => ({ name: s.name, script: new vm.Script(s.code, { filename: s.name }) }));
 const scriptGetG = new vm.Script('(typeof G !== "undefined" ? G : null)');
-const scriptGetApi = new vm.Script('({Engine, Combat, Dice, HEROES, BESTIARY, ITEMS, CAMPAIGN, CAMPAIGN_START, WORLD_MAP})');
+const scriptGetApi = new vm.Script('({Engine, Combat, Dice, HEROES, BESTIARY, ITEMS, CAMPAIGN, CAMPAIGN_START, CHAPTERS, WORLD_MAP})');
 
 function makeTimers() {
   let seq = 0;
@@ -225,7 +234,8 @@ function buildGame(seed) {
     try { script.runInContext(context); } catch (e) { throw new Error(`Errore caricando ${name}: ${e.message}`); }
   }
   const ctxMath = vm.runInContext('Math', context);
-  ctxMath.random = mulberry32(seed);
+  const gameRandom = mulberry32(seed);
+  ctxMath.random = gameRandom;
 
   const api = scriptGetApi.runInContext(context);
   const getG = () => scriptGetG.runInContext(context);
@@ -234,7 +244,12 @@ function buildGame(seed) {
     timers.drain();
     return r;
   }
-  return { context, doc, api, getG, consoleErrors, act };
+  // Math.random pilotato SOLO per la durata di fn (dado forzato: 0.999 → 20, 0 → 1)
+  function withForcedRandom(value, fn) {
+    ctxMath.random = () => value;
+    try { return fn(); } finally { ctxMath.random = gameRandom; }
+  }
+  return { context, doc, api, getG, consoleErrors, act, withForcedRandom };
 }
 
 /* ==================== UTILITA' DI INTERAZIONE ==================== */
@@ -250,8 +265,8 @@ function matchButton(list, matcher) {
   return null;
 }
 
-// A differenza di Corona (sigle a 3 lettere "SAG: +2"), il Relais scrive il nome
-// completo della statistica ("Saggezza: +2"): il pattern deve cercare solo ": +N"/": -N".
+// La Casa scrive il nome completo della statistica ("Saggezza: +2"): il pattern
+// cerca solo ": +N"/": -N" (identico al Relais).
 function statModFromButton(html) {
   const m = html.match(/:\s*([+-]?\d+)/);
   return m ? parseInt(m[1], 10) : 0;
@@ -261,16 +276,26 @@ function hpRatioFromButton(html) {
   return m ? parseInt(m[1], 10) / Math.max(1, parseInt(m[2], 10)) : 1;
 }
 
+// Testo della barra del gruppo (per verificare 👻 SPIRITO / 🕸 PRESO / PV)
+function partyBarText(doc, id = 'party-bar') {
+  const bar = doc.getElementById(id);
+  const collect = el => [el._innerHTML || '', ...el.children.map(collect)].join(' ');
+  return collect(bar);
+}
+
 /* ==================== CONTROLLI DI COERENZA DELLO STATO ==================== */
 
 function checkInvariants(G, where) {
   if (!G) return;
   if (!Number.isFinite(G.gold) || G.gold < 0) {
-    throw new Error(`STATO INCOERENTE: Sangue Freddo invalido (${G.gold}) @ ${where}`);
+    throw new Error(`STATO INCOERENTE: Colore invalido (${G.gold}) @ ${where}`);
   }
   for (const h of G.party) {
     if (!Number.isFinite(h.hp) || h.hp < 0 || h.hp > h.maxHp) {
       throw new Error(`STATO INCOERENTE: HP invalidi per "${h.id}" (${h.hp}/${h.maxHp}) @ ${where}`);
+    }
+    if (h.morto && h.hp !== 0) {
+      throw new Error(`STATO INCOERENTE: SPIRITO con PV > 0 per "${h.id}" (${h.hp}) @ ${where}`);
     }
     if (h.veleno !== undefined && typeof h.veleno !== 'boolean') {
       throw new Error(`STATO INCOERENTE: h.veleno non booleano per "${h.id}" (${JSON.stringify(h.veleno)}) @ ${where}`);
@@ -278,6 +303,10 @@ function checkInvariants(G, where) {
     if (h.preso !== undefined && typeof h.preso !== 'boolean') {
       throw new Error(`STATO INCOERENTE: h.preso non booleano per "${h.id}" (${JSON.stringify(h.preso)}) @ ${where}`);
     }
+  }
+  const vivi = G.party.filter(h => !h.morto).length;
+  if (G.party.length && vivi === 0 && !/e_scambio|sacrificio/.test(where)) {
+    throw new Error(`STATO INCOERENTE: TUTTO il gruppo risulta morto (killRoller sull'ultimo vivo?) @ ${where}`);
   }
   for (const hid of Object.keys(G.uses || {})) {
     for (const abid of Object.keys(G.uses[hid])) {
@@ -292,8 +321,8 @@ function checkInvariants(G, where) {
 /* ==================== STRATEGIA DI COMBATTIMENTO ==================== */
 
 function classifyCombatMenu(btns) {
-  if (btns.some(b => /^🎯/.test(b.innerHTML))) return 'target'; // 🎯 = 🎯
-  if (btns.some(b => /^❤|^💀/.test(b.innerHTML))) return 'ally'; // ❤ o 💀
+  if (btns.some(b => /^🎯/.test(b.innerHTML))) return 'target';
+  if (btns.some(b => /^❤|^💀/.test(b.innerHTML))) return 'ally';
   return 'main';
 }
 
@@ -314,13 +343,14 @@ function pickAllyForHealing(btns) {
 function pickMainCombatAction(btns, turnCounter, G) {
   const enabled = btns.filter(b => !b.disabled);
   if (!enabled.length) return btns[0];
-  const needHeal = G && G.party.some(h => h.down || h.hp / h.maxHp < 0.35);
+  // gli SPIRITI non contano: la morte vera non si cura con le pozioni
+  const needHeal = G && G.party.some(h => !h.morto && (h.down || h.hp / h.maxHp < 0.35));
   if (needHeal) {
-    const healer = enabled.find(b => /Cura/i.test(b.innerHTML) && /^(✨|🧪)/.test(b.innerHTML)); // ✨ o 🧪
+    const healer = enabled.find(b => /Cura/i.test(b.innerHTML) && /^(✨|🧪)/.test(b.innerHTML));
     if (healer) return healer;
   }
-  const attack = enabled.find(b => /^⚔/.test(b.innerHTML)); // ⚔
-  const abilities = enabled.filter(b => /^✨/.test(b.innerHTML)); // ✨
+  const attack = enabled.find(b => /^⚔/.test(b.innerHTML));
+  const abilities = enabled.filter(b => /^✨/.test(b.innerHTML));
   const pool = [];
   if (attack) pool.push(attack);
   pool.push(...abilities);
@@ -360,13 +390,6 @@ function runCombat(game, scenario, state) {
       chosen = pickWeakestTarget(btns);
     } else if (kind === 'ally') {
       chosen = pickAllyForHealing(btns);
-    } else if (scenario.forceCombatItem && !state.forceCombatItemUsed) {
-      // Forza l'uso di un oggetto da lancio specifico (es. il Bengala) almeno una volta,
-      // per garantirne la copertura: il bersaglio scelto poi non conta per gli oggetti
-      // "colpiscono tutti" (combat.all), ma pickTarget lo richiede comunque a schermo.
-      const itemBtn = enabledButtons(box).find(b => b.innerHTML.includes(scenario.forceCombatItem));
-      if (itemBtn) { chosen = itemBtn; state.forceCombatItemUsed = true; }
-      else chosen = pickMainCombatAction(btns, turnCounter++, game.getG());
     } else {
       chosen = pickMainCombatAction(btns, turnCounter++, game.getG());
     }
@@ -378,10 +401,8 @@ function runCombat(game, scenario, state) {
 
 /* ==================== STRATEGIA DI NAVIGAZIONE SCENE ==================== */
 
-// A differenza dell'hub di Corona (v1: sempre gli stessi bottoni, si può tornare
-// all'infinito), l'hub h1 del Relais offre scelte "once": ogni visita ne consuma
-// una diversa (finché non sono finite). Le "sequences" per-scenario indicano, in
-// ORDINE, quale bottone scegliere a ogni visita successiva della stessa scena.
+// L'hub h1 e il corridoio u1 si rivisitano: le "sequences" per-scenario indicano,
+// in ORDINE, quale bottone scegliere a ogni visita successiva della stessa scena.
 function pickSceneChoice(sceneId, btns, scenario, state) {
   const seq = scenario.sequences && scenario.sequences[sceneId];
   if (seq && seq.length) {
@@ -408,14 +429,28 @@ function pickCheckHero(btns, scenario) {
   return withMod[0].b;
 }
 
+// Esito forzato del prossimo tiro originato dalla scena sceneId ('success' | 'fail' | null).
+// Un array viene consumato un elemento per tiro (es. u6: ['fail','success']).
+function forcedOutcomeFor(scenario, state, sceneId) {
+  const co = scenario.checkOutcomes || {};
+  let v = co[sceneId];
+  if (Array.isArray(v)) {
+    state.coIdx = state.coIdx || {};
+    const i = state.coIdx[sceneId] || 0;
+    v = i < v.length ? v[i] : v[v.length - 1];
+    state.coIdx[sceneId] = i + 1;
+  }
+  return v || scenario.defaultCheckOutcome || null;
+}
+
 /* ==================== ESECUZIONE DI UNA PARTITA ==================== */
 
 function runGame(scenario) {
   const game = buildGame(scenario.seed);
   scenario.rand = mulberry32(scenario.seed * 7919 + 13); // rand separato per le scelte, dal dado di gioco
   const { doc, api, getG } = game;
-  const log = { scenes: [], ending: null, combats: 0 };
-  const state = { strategy: 'aggressive', firstLossForced: !scenario.forceFirstCombatLoss, seqIdx: {} };
+  const log = { scenes: [], ending: null, combats: 0, everMorto: new Set(), itemsEverOwned: new Set() };
+  const state = { strategy: 'aggressive', forcedLossDone: false, seqIdx: {}, coIdx: {} };
 
   try {
     game.act(() => api.Engine.newGame(
@@ -427,7 +462,7 @@ function runGame(scenario) {
     return { ok: false, scenario, error: `Engine.newGame ha lanciato un'eccezione: ${e.stack || e}`, log };
   }
 
-  const STEP_LIMIT = 2000;
+  const STEP_LIMIT = 2500;
   let steps = 0;
   try {
     checkInvariants(getG(), 'dopo newGame');
@@ -440,23 +475,54 @@ function runGame(scenario) {
       const scene = api.CAMPAIGN[sceneId];
       if (!scene) throw new Error(`Scena non trovata: "${sceneId}" (riferita da qualche parte ma assente in CAMPAIGN)`);
       log.scenes.push(sceneId);
+      for (const h of G.party) if (h.morto) log.everMorto.add(h.id);
+      for (const it of G.inventory) log.itemsEverOwned.add(it);
 
       if (scene.ending) { log.ending = sceneId; break; }
 
-      // Qualunque modale generica (selezione eroe per una prova, modale informativa di
-      // avvio in modalità Sopravvissuto, ecc.): i bottoni con un handler JS reale
-      // (b.onclick assegnato via codice, non `onclick="..."` dentro l'HTML — quelli lì
-      // il nostro DOM finto non li esegue, esattamente come farebbe un browser vero con
-      // l'HTML statico, MA senza il parsing degli attributi inline) si cliccano; se non
-      // ce ne sono di funzionali, si considera la modale "solo informativa" e si chiude.
+      /* Modali generiche, in ordine di riconoscimento:
+         1) offerta di ritiro col d20 di Daniele (bottoni via innerHTML + getElementById);
+         2) modale di SACRIFICIO (bottoni-eroe reali + "Riparliamone");
+         3) selezione eroe per una prova (bottoni-eroe reali, con eventuale esito forzato);
+         4) modale solo informativa (nessun handler JS reale: si chiude, come farebbe
+            un browser che non esegue gli onclick scritti dentro l'HTML statico). */
       const modalGeneric = doc.getElementById('modal-generic');
       if (!modalGeneric.classList.contains('hidden')) {
         const content = doc.getElementById('modal-generic-content');
+
+        if (/btn-reroll-yes/.test(content.innerHTML)) {
+          const yes = doc.getElementById('btn-reroll-yes');
+          const no = doc.getElementById('btn-reroll-no');
+          const btn = scenario.acceptReroll ? yes : no;
+          if (typeof btn.onclick !== 'function') throw new Error('modale del d20 di Daniele senza handler');
+          const fn = btn.onclick;
+          yes.onclick = null; no.onclick = null; // niente handler stantii al prossimo giro
+          game.act(() => fn());
+          checkInvariants(getG(), `dopo offerta di ritiro (d20) in "${sceneId}"`);
+          continue;
+        }
+
         const btns = buttons(content);
         const clickable = btns.filter(b => typeof b.onclick === 'function');
         if (!clickable.length) { modalGeneric.classList.add('hidden'); continue; }
+
+        // NB: il bottone "Riparliamone" è creato con textContent, non innerHTML — vanno letti entrambi
+        const btnText = b => (b.innerHTML || '') + (b.textContent || '');
+        if (clickable.some(b => /Riparliamone/.test(btnText(b)))) {
+          // modale di sacrificio: il tavolo sceglie CHI resta
+          const heroBtns = clickable.filter(b => !/Riparliamone/.test(btnText(b)));
+          const chosen = (scenario.sacrificeHero && matchButton(heroBtns, scenario.sacrificeHero)) || heroBtns[0];
+          if (!chosen) throw new Error(`modale di sacrificio senza eroi selezionabili in "${sceneId}"`);
+          game.act(() => chosen.onclick());
+          checkInvariants(getG(), `dopo sacrificio in "${sceneId}"`);
+          continue;
+        }
+
         const chosen = pickCheckHero(clickable, scenario);
-        game.act(() => chosen.onclick());
+        const outcome = forcedOutcomeFor(scenario, state, sceneId);
+        if (outcome === 'success') game.withForcedRandom(0.999, () => game.act(() => chosen.onclick()));
+        else if (outcome === 'fail') game.withForcedRandom(0, () => game.act(() => chosen.onclick()));
+        else game.act(() => chosen.onclick());
         checkInvariants(getG(), `dopo scelta eroe per prova in "${sceneId}"`);
         continue;
       }
@@ -475,9 +541,9 @@ function runGame(scenario) {
         const box = doc.getElementById('choices');
         const startBtn = buttons(box)[0];
         if (!startBtn) throw new Error(`Bottone "INIZIA IL COMBATTIMENTO" mancante in scena "${sceneId}"`);
-        if (scenario.forceFirstCombatLoss && !state.firstLossForced) {
-          state.strategy = 'passive';
-          state.firstLossForced = true;
+        if (scenario.forceLossAt === sceneId && !state.forcedLossDone) {
+          state.strategy = 'passive'; // solo Difesa totale: la sconfitta è garantita
+          state.forcedLossDone = true;
         } else {
           state.strategy = 'aggressive';
         }
@@ -502,9 +568,14 @@ function runGame(scenario) {
   if (game.consoleErrors.length) {
     return { ok: false, scenario, error: `console.error catturati durante la partita: ${game.consoleErrors.join(' | ')}`, log };
   }
-  log.flags = { ...(getG().flags || {}) };
-  log.inventory = [...(getG().inventory || [])];
-  log.usedForceItem = !!state.forceCombatItemUsed;
+  const G = getG();
+  log.flags = { ...(G.flags || {}) };
+  log.inventory = [...(G.inventory || [])];
+  log.gold = G.gold;
+  log.finalParty = G.party.map(h => ({ id: h.id, hp: h.hp, maxHp: h.maxHp, morto: !!h.morto, down: !!h.down }));
+  log.partyBar = partyBarText(doc);
+  log.everMorto = [...log.everMorto];
+  log.itemsEverOwned = [...log.itemsEverOwned];
   return { ok: true, scenario, log };
 }
 
@@ -513,81 +584,60 @@ function runGame(scenario) {
 let seedCounter = 1;
 function nextSeed() { return seedCounter++ * 104729; }
 
-// Sequenza di default per l'hub h1: visita cantina, poi piano proibito, poi pozzo,
-// poi la domanda a Gregorio (h2), poi finalmente barrica/procede al Banchetto.
-const DEFAULT_SEQUENCES = { h1: ['CANTINA', 'PIANO PROIBITO', 'POZZO', 'Trattenere Gregorio', 'barricarsi'] };
-
-// Mappa di scelte "felici" di default per ogni scena che potrebbe presentarsi: ogni
-// scenario ne eredita una copia e sovrascrive solo le chiavi che gli interessano.
-const BASE_CHOICES = {
-  a2: '🤝 Presentazioni e convenevoli',
-  a2_siepi: 'Entrate. Insieme.',
-  a3: '✍️ Firmate il registro', // firma diretta, senza controllare il registro
-  a3_registro: '✍️ Firmate. Con gli occhi aperti',
-  a3_registro_ko: '✍️ Firmate: siete stanchi',
-  a4_rinvio: 'Alle camere',
-  a4_firma_forzata: 'Alle camere',
-  a4_firma: 'Alle camere',
-  a5: '🧳 Disfare le valigie',
-  a5_pozzo: 'Scendete per la cena',
-  a6: '🏊 Buttarla sul programma',
-  a6_brindisi: '🏊 In piscina!',
-  a6_no_brindisi: '🏊 In piscina!',
-  a7: '🏊 In piscina!',
-  p1: '😅 "Ne avranno messo uno di scorta."',
-  p1_accappatoio: 'Tornare in acqua e fare finta di niente',
-  p1_accappatoio_ko: 'Tornare in acqua. Vicini.',
-  p2: '🏃 FUORI DALL\'ACQUA',
-  p2_esperimento: 'Fuori dall\'acqua. La scienza',
-  p2_esperimento_ko: 'Fuori. FUORI. Tutti.',
-  p3_fuori: '🚪 Dentro. Ora.',
-  p4_fuga: 'Rientrare. Compatti.',
-  p4_rientro: 'Su. Insieme.',
-  h2: 'Tornare al corridoio',
-  k1: '👂 Avvicinare l\'orecchio',
-  k2_sofia: 'Verso il fondo della cantina',
-  k2_sofia_ko: 'Verso il fondo. Ormai.',
-  k3: '💇 Natalino fa un passo avanti',
-  k4_scambio: 'Risalire. C\'è ancora tanta notte',
-  k4_furto: 'Risalire, prima che ci ripensi',
-  k5_dopo_chef: 'Risalire. La notte non è finita',
-  u1: '🚪 1899 — la stanza dov\'è cominciato tutto',
-  u2_1999: '🚪 Ancora una stanza: la 1924',
-  u2_1924: 'Attraversare la stanza A TEMPO DI VALZER',
-  u3_medaglione: '🚨 La porta con la targhetta vuota',
-  u3_bambole_vinte: '🚨 La porta con la targhetta vuota',
-  u2_1899: '🚨 Rispettare il lutto e andare',
-  u5_specchio: 'Alla porta con la targhetta vuota',
-  u4_porta_vuota: 'Giù, al corridoio delle tre porte',
-  b1: '👁 Il piano di Gaetano',
-  b2_orto: 'Al pozzo. È il momento.',
-  b3_pozzo: '🪢 Qualcuno si cala nel pozzo',
-  b4_medaglione: 'Dentro. Verso l\'alba. Verso il Banchetto.',
-  b4_vino: 'Dentro. Verso l\'alba.',
-  b4_parole: 'Dentro. Verso l\'alba.',
-  b4_ira: 'Dentro. E qualcuno prepari',
-  b4_calata: 'Dentro. Verso l\'alba.',
-  b4_calata_ko: 'Dentro. Subito.',
-  x_celle: '↩ Tornare là fuori e riprovare',
-  z1: '⚔ Il gruppo si mette in mezzo',
-  z2_vino: '⚔ La casa manderà qualcuno',
-  z2_trattativa: '⚔ La casa chiede comunque',
-  z2_rituale: 'Nel buio, qualcosa di ENORME',
-  z_custode: '↩ No. NESSUNO resta.',
-  z_resa: '🔥 ALZARSI. Rovesciare la sedia',
-  z5_vittoria: 'Guardare l\'alba.',
-  z6_alba: '☕ Il caffè, l\'abbraccio',
-  // ---- Pista Pietrafonda (solo se firma_rinviata) e nuove offerte al Banchetto ----
-  pp2: '🚪 Bussare alla canonica',
-  pp3: '📖 Raccontargli tutto',
-  pp4_cripta: 'Su, da Don Michele',
-  pp4: '⬆ Risalire',
-  pp6: '🚶 Testa bassa e passo costante',
-  pp6_ko: 'Dentro. Con quel che resta della dignità',
-  pp7: 'Al corridoio delle tre porte',
-  z_vespri: '⚔ Adesso la battaglia',
-  z_smemorati: '↩ No. Questa notte è NOSTRA',
+// Piste standard dall'hub: biblioteca, poi porte, poi lo snodo m1 (che si apre con due piste).
+const DEFAULT_SEQUENCES = {
+  h1: ['La porta dei libri', 'Il corridoio delle porte', 'Seguire il suono'],
+  u1: ['La porta "1994"', 'La porta "GAETA"', 'La porta "IMBARCO"', 'Chiudere col corridoio'],
 };
+
+// Scelte "felici" di default per ogni scena che potrebbe presentarsi: ogni scenario
+// ne eredita una copia e sovrascrive solo le chiavi che gli interessano.
+const BASE_CHOICES = {
+  /* prologo + soglia */
+  a0: '🔔 Citofonare',
+  a2: '🔑 Aprire con le chiavi',
+  a3: '🍳 Prima la cucina',
+  a4: '🚿 Controllare il bagno',
+  a7_ko: '⚔️ Ai topi',
+  s3: '🤬 Lasciar parlare Federico',
+  s4: 'RIPROVA SOCIALE',
+  /* biblioteca */
+  b1: '🚶 Inoltrarsi',
+  b2: 'Portaci alla sezione',
+  b3: 'Fermarsi a leggere',
+  b5: 'Attraversare la sala',
+  b7: 'Strappare la catena',
+  b8b: 'Riprovare',
+  b9: 'Portare il segreto',
+  b_ko: 'RIVINCITA',
+  /* porte */
+  u5: 'Sfilare la foto',
+  u5b: 'Ricomporre la foto',
+  u_ko: 'Tornare là dentro',
+  /* cucina */
+  k1: 'Seguire la freccia',
+  k2: 'Non aprire',
+  k3: 'Prendere anche le birre',
+  k4: 'Calarsi in cordata',
+  k4b: 'Tornare alla botola',
+  k6: 'Lasciare il banco',
+  k8: 'Lasciar stare',
+  k9: 'Gaetano tenta la sequenza',
+  k_ko: 'Tornare giù',
+  /* snodo */
+  m3: 'Accoppiare il joy-con',
+  m6: 'Dargli la Zero',
+  m_ko: 'Di nuovo addosso',
+  /* finale */
+  z_ko: 'Ancora',
+  z3: 'STRAWMAN',
+  z4: 'FALSA DICOTOMIA',
+  z5: 'RICATTO EMOTIVO',
+};
+
+// Esiti forzati standard: le prove che APRONO contenuti (joycon, foto, calata in cucina)
+// riescono; tutto il resto va a dado naturale.
+const HAPPY_CHECKS = { u2: 'success', u5: 'success', b5: 'success', b8: 'success', k4: 'success', k9: 'success' };
 
 function scenario(name, heroes, choices, opts = {}) {
   return {
@@ -595,287 +645,194 @@ function scenario(name, heroes, choices, opts = {}) {
     seed: opts.seed ?? nextSeed(),
     heroes,
     choices: { ...BASE_CHOICES, ...choices },
-    sequences: opts.sequences || DEFAULT_SEQUENCES,
+    sequences: { ...DEFAULT_SEQUENCES, ...(opts.sequences || {}) },
     checkBias: opts.checkBias || 'best',
-    forceFirstCombatLoss: !!opts.forceFirstCombatLoss,
-    forceCombatItem: opts.forceCombatItem || null,
+    checkOutcomes: { ...HAPPY_CHECKS, ...(opts.checkOutcomes || {}) },
+    defaultCheckOutcome: opts.defaultCheckOutcome || null,
+    sacrificeHero: opts.sacrificeHero || null,
+    forceLossAt: opts.forceLossAt || null,
+    acceptReroll: !!opts.acceptReroll,
     difficulty: opts.difficulty || 'normale',
+    verify: opts.verify || null, // (r, expect) => void
   };
 }
 
 const scenarios = [];
 
-/* ---- PROLOGO: le tre varianti della firma ---- */
-
-scenarios.push(scenario('prologo: firma diretta (a4_firma), poi rientro standard', ['claudia', 'federico'], {
-  a3: '✍️ Firmate il registro',
-}));
-
-scenarios.push(scenario('prologo: registro sfogliato (INT) poi firma subito', ['gaetano', 'natalino'], {
-  a3: '📖 Prima, sfogliare il registro',
-  a3_registro: '✍️ Firmate. Con gli occhi aperti',
-}, { checkBias: 'best' }));
-
-// (la copertura di a4_rinvio è affidata a un executeUntil più sotto: anche con Federico,
-// il migliore in Carisma, un 1 naturale fallisce sempre la prova CD 12.)
-
-scenarios.push(scenario('prologo: registro letto male (INT fallita) poi firma forzata', ['emanuela', 'natalino'], {
-  a3: '📖 Prima, sfogliare il registro',
-}, { checkBias: 'worst' }));
-
-/* ---- PISCINA: tutte le varianti richieste ---- */
-
-scenarios.push(scenario('piscina: accappatoio ispezionato goffamente (SAG fallita)', ['federico', 'gaetano'], {
-  p1: '🔍 Uscire a controllare l\'accappatoio',
-}, { checkBias: 'worst' }));
-
-/* ---- FUGA / RIENTRO: entrambi i rami dopo p3_fuori ---- */
-
-scenarios.push(scenario('dopo la piscina: tentata fuga (cancello chiuso)', ['natalino', 'federico'], {
-  p3_fuori: '🚗 SUBITO IN MACCHINA',
-}));
-
-scenarios.push(scenario('dopo la piscina: rientro ordinato (tisaniera)', ['claudia', 'emanuela'], {
-  p3_fuori: '🚪 Dentro. Ora.',
-}));
-
-/* ---- HUB h1 + h2 (storia di Ada) — copre anche il giro completo delle 3 piste ---- */
-
-scenarios.push(scenario('hub completo: cantina + piano + pozzo + storia di Ada, poi rituale', ['claudia', 'federico'], {
-  b3_pozzo: 'Parlarle di Gregorio', // richiede storia_ada (ottenuta con h2, visitato prima nella sequenza)
-}, { checkBias: 'best' }));
-
-/* ---- PISTA CANTINA: scambio (CAR), furto (DES), combattimento vinto ---- */
-
-scenarios.push(scenario('cantina: scambio con lo Chef riuscito (CAR) — nodo sciolto senza sangue', ['natalino', 'federico'], {
-  k3: '💇 Natalino fa un passo avanti',
-  sequences: { h1: ['CANTINA', 'barricarsi'] },
-}, { checkBias: 'best', sequences: { h1: ['CANTINA', 'barricarsi'] } }));
-
-scenarios.push(scenario('cantina: attacco diretto allo Chef, k4_chef_fight VINTO', ['natalino', 'federico'], {
-  k3: '⚔ Non si tratta con chi ha una mannaia',
-}, { sequences: { h1: ['CANTINA', 'barricarsi'] } }));
-
-/* ---- PISTA PIANO PROIBITO: stanza 1999, valzer (vinto/perso), 1899, specchio ----
-   (u3_medaglione E u3_bambole_vinte puntano ENTRAMBI verso la 1899: la copertura dello
-   specchio non deve dipendere dall'esito — imprevedibile — della prova di Destrezza.) */
-
-scenarios.push(scenario('piano: tour completo 1999 -> 1924 (valzer DES) -> 1899 -> specchio', ['natalino', 'claudia'], {
-  u1: '🚪 1999 — l\'anno di Sofia',
-  u2_1999: '🚪 Ancora una stanza: la 1924',
-  u2_1924: 'Attraversare la stanza A TEMPO DI VALZER',
-  u3_medaglione: '🚪 La stanza 1899',
-  u3_bambole_vinte: '🚪 La stanza 1899',
-  u2_1899: 'Prima di uscire: scoprire lo specchio velato',
-}, { checkBias: 'best', sequences: { h1: ['PIANO PROIBITO', 'barricarsi'] } }));
-
-scenarios.push(scenario('piano: valzer perso (DES fallita) -> u3_bambole_fight VINTO', ['gaetano', 'emanuela'], {
-  u1: '🚪 1924 — la stanza del valzer',
-  u2_1924: 'Attraversare la stanza A TEMPO DI VALZER',
-}, { checkBias: 'worst', sequences: { h1: ['PIANO PROIBITO', 'barricarsi'] } }));
-
-/* ---- PISTA POZZO: giardiniere evitato/combattuto, orto+antidoto, tutte le varianti ---- */
-
-scenarios.push(scenario('pozzo: giardiniere evitato (SAG) -> orto -> calata riuscita (FOR)', ['claudia', 'gaetano'], {
-  b1: '👁 Il piano di Gaetano',
-  b3_pozzo: '🪢 Qualcuno si cala nel pozzo',
-}, { checkBias: 'best', sequences: { h1: ['POZZO', 'barricarsi'] } }));
-
-scenarios.push(scenario('pozzo: giardiniere combattuto (SAG fallita) -> b2_giardiniere_fight VINTO', ['natalino', 'federico'], {
-  b1: '👁 Il piano di Gaetano',
-}, { checkBias: 'worst', sequences: { h1: ['POZZO', 'barricarsi'] } }));
-
-scenarios.push(scenario('pozzo: fuga di corsa (DES) evitando il giardiniere', ['natalino', 'claudia'], {
-  b1: '🏃 Il piano di Natalino',
-}, { checkBias: 'best', sequences: { h1: ['POZZO', 'barricarsi'] } }));
-
-scenarios.push(scenario('pozzo: medaglione mostrato ad Ada (richiede il flag "medaglione")', ['natalino', 'claudia'], {
-  u1: '🚪 1924 — la stanza del valzer',
-  u2_1924: 'Attraversare la stanza A TEMPO DI VALZER',
-  b3_pozzo: '💍 Mostrarle il MEDAGLIONE',
-}, { checkBias: 'best', sequences: { h1: ['PIANO PROIBITO', 'POZZO', 'barricarsi'] } }));
-
-scenarios.push(scenario('pozzo: bottiglia del 1899 calata ad Ada (richiede l\'oggetto "vino_1899")', ['natalino', 'federico'], {
-  k3: '💇 Natalino fa un passo avanti',
-  b3_pozzo: '🍷 Calare nel secchio la BOTTIGLIA',
-}, { checkBias: 'best', sequences: { h1: ['CANTINA', 'POZZO', 'barricarsi'] } }));
-
-scenarios.push(scenario('pozzo: parole giuste su Gregorio (CAR, richiede storia_ada) -> b4_parole', ['federico', 'natalino'], {
-  b3_pozzo: 'Parlarle di Gregorio',
-}, { checkBias: 'best', sequences: { h1: ['Trattenere Gregorio', 'POZZO', 'barricarsi'] } }));
-
-scenarios.push(scenario('pozzo: parola sbagliata su Gregorio (CAR fallita, richiede storia_ada) -> b4_ira', ['gaetano', 'emanuela'], {
-  b3_pozzo: 'Parlarle di Gregorio',
-}, { checkBias: 'worst', sequences: { h1: ['Trattenere Gregorio', 'POZZO', 'barricarsi'] } }));
-
-/* ---- FINALE: rituale completo, boss pieno, vino di Gregorio, trattativa, sconfitta+retry, z_custode/z_resa ---- */
-
-scenarios.push(scenario('finale: rituale completo (sale dallo Chef, acqua da Ada, nome da u2_1899) -> boss indebolito -> vittoria', ['claudia', 'emanuela'], {
-  u1: '🚪 1899 — la stanza dov\'è cominciato tutto',
-  k3: '💇 Natalino fa un passo avanti',
-  b1: '👁 Il piano di Gaetano',
-  b3_pozzo: '🍷 Calare nel secchio la BOTTIGLIA',
-  z1: '🧂💧 IL RITUALE',
-}, { checkBias: 'best', sequences: { h1: ['CANTINA', 'POZZO', 'PIANO PROIBITO', 'barricarsi'] } }));
-
-scenarios.push(scenario('finale: boss PIENO (z3_boss -> z4_fase2 -> vittoria), party di 5', HEROES_ALL(), {
-  u1: '🚪 1899 — la stanza dov\'è cominciato tutto',
-  z1: '⚔ Il gruppo si mette in mezzo',
-}, { checkBias: 'best', sequences: { h1: ['CANTINA', 'POZZO', 'PIANO PROIBITO', 'barricarsi'] }, difficulty: 'facile' }));
-
-scenarios.push(scenario('finale: il vino di Gregorio (z2_vino, richiede vino_1899)', ['natalino', 'federico'], {
-  k3: '💇 Natalino fa un passo avanti',
-  z1: '🍷 Prima di tutto: versare il vino',
-}, { checkBias: 'best', sequences: { h1: ['CANTINA', 'barricarsi'] }, difficulty: 'facile' }));
-
-scenarios.push(scenario('finale: trattativa di Federico RIUSCITA (CAR) -> z2_trattativa', ['federico', 'emanuela'], {
-  u1: '🚪 1899 — la stanza dov\'è cominciato tutto',
-  z1: '🗣 Federico chiede la parola',
-}, { checkBias: 'best', sequences: { h1: ['CANTINA', 'POZZO', 'PIANO PROIBITO', 'barricarsi'] }, difficulty: 'facile' }));
-
-scenarios.push(scenario('finale: trattativa di Federico FALLITA (CAR) -> z3_boss_arrabbiato', ['gaetano', 'natalino'], {
-  u1: '🚪 1899 — la stanza dov\'è cominciato tutto',
-  z1: '🗣 Federico chiede la parola',
-}, { checkBias: 'worst', sequences: { h1: ['PIANO PROIBITO', 'barricarsi'] }, difficulty: 'facile' }));
-
-scenarios.push(scenario('finale: sconfitta VOLUTA contro il boss -> x_celle -> RETRY vittorioso', ['claudia', 'federico'], {
-  u1: '🚪 1899 — la stanza dov\'è cominciato tutto',
-  z1: '⚔ Il gruppo si mette in mezzo',
-}, { checkBias: 'best', sequences: { h1: ['PIANO PROIBITO', 'barricarsi'] }, forceFirstCombatLoss: true }));
-
-scenarios.push(scenario('finale: z_custode -> qualcuno firma -> e_custode', ['natalino', 'emanuela'], {
-  u1: '🚪 1899 — la stanza dov\'è cominciato tutto',
-  z1: '🖋 La scelta di cui non parlerete mai più',
-  z_custode: '🖋 Qualcuno firma',
-}, { sequences: { h1: ['PIANO PROIBITO', 'barricarsi'] } }));
-
-scenarios.push(scenario('finale: z_resa -> restare seduti -> e_ospiti', ['gaetano', 'claudia'], {
-  u1: '🚪 1899 — la stanza dov\'è cominciato tutto',
-  z1: '🍽 Sedersi. Tutti e cinque.',
-  z_resa: 'Restare seduti',
-}, { sequences: { h1: ['PIANO PROIBITO', 'barricarsi'] } }));
-
-/* ---- Party solitario (1 eroe) — copre la modalità Sopravvissuto end-to-end ---- */
-
-scenarios.push(scenario('modalità Sopravvissuto: Natalino SOLO a difficoltà NORMALE (porzioni ridotte)', ['natalino'], {
-  u1: '🚪 1899 — la stanza dov\'è cominciato tutto',
-  k3: '💇 Natalino fa un passo avanti',
-  b1: '👁 Il piano di Gaetano',
-  b3_pozzo: '🍷 Calare nel secchio la BOTTIGLIA',
-  z1: '🧂💧 IL RITUALE',
-}, { checkBias: 'best', sequences: { h1: ['CANTINA', 'POZZO', 'PIANO PROIBITO', 'barricarsi'] } }));
-
-scenarios.push(scenario('modalità Sopravvissuto: Emanuela SOLA, rituale -> alba', ['emanuela'], {
-  u1: '🚪 1899 — la stanza dov\'è cominciato tutto',
-  k3: '💇 Natalino fa un passo avanti',
-  b1: '👁 Il piano di Gaetano',
-  b3_pozzo: '🍷 Calare nel secchio la BOTTIGLIA',
-  z1: '🧂💧 IL RITUALE',
-}, { checkBias: 'best', sequences: { h1: ['CANTINA', 'POZZO', 'PIANO PROIBITO', 'barricarsi'] }, difficulty: 'facile' }));
-
-
-scenarios.push(scenario('difficoltà INCUBO: gruppo al completo, rituale con gli ingredienti -> alba', ['gaetano', 'natalino', 'claudia', 'federico', 'emanuela'], {
-  u1: '🚪 1899 — la stanza dov\'è cominciato tutto',
-  k3: '💇 Natalino fa un passo avanti',
-  b1: '👁 Il piano di Gaetano',
-  b3_pozzo: '🍷 Calare nel secchio la BOTTIGLIA',
-  z1: '🧂💧 IL RITUALE',
-}, { checkBias: 'best', sequences: { h1: ['CANTINA', 'POZZO', 'PIANO PROIBITO', 'barricarsi'] }, difficulty: 'incubo' }));
-
-/* ---- PISTA SEGRETA DI PIETRAFONDA + nuove offerte al Banchetto ----
-   Pietrafonda esiste SOLO se a3_registro -> il check di Carisma per rinviare la firma è
-   RIUSCITO (a4_rinvio, flag firma_rinviata): quella prova dipende dal dado, quindi le
-   varianti che la richiedono sono degli executeUntil (vedi sezione di esecuzione più sotto).
-   L'offerta impensabile ACCETTATA, invece, non richiede alcuna pista (la scelta è sempre
-   disponibile al Banchetto): è il quarto finale e_smemorati, quasi del tutto deterministico. */
-
-scenarios.push(scenario('Banchetto: offerta impensabile ACCETTATA -> e_smemorati (quarto finale)',
-  ['gaetano', 'emanuela'], {
-    u1: '🚪 1899 — la stanza dov\'è cominciato tutto',
-    z1: '🫙 L\'offerta impensabile',
-    z_smemorati: '🫙 Sì. Offrire i ricordi',
-  }, { sequences: { h1: ['PIANO PROIBITO', 'barricarsi'] } }));
-
-/* ---- Round-robin extra per varietà (coppie diverse, seed diversi, bias misti) ---- */
-
-const heroPairs = [
-  ['gaetano', 'natalino'], ['claudia', 'federico'], ['federico', 'emanuela'],
-  ['natalino', 'claudia'], ['gaetano', 'emanuela'], ['emanuela', 'natalino'],
-];
-for (let i = 0; i < 8; i++) {
-  const heroes = heroPairs[i % heroPairs.length];
-  scenarios.push(scenario(`variante extra #${i + 1} (coppia ${heroes.join('+')})`, heroes, {
-    a3: i % 2 === 0 ? '📖 Prima, sfogliare il registro' : '✍️ Firmate il registro',
-    p1: i % 3 === 0 ? '🔍 Uscire a controllare l\'accappatoio' : '😅 "Ne avranno messo uno di scorta."',
-    p3_fuori: i % 2 === 0 ? '🚪 Dentro. Ora.' : '🚗 SUBITO IN MACCHINA',
-    z1: i % 4 === 0 ? '⚔ Il gruppo si mette in mezzo' : '🧂💧 IL RITUALE',
-    u1: '🚪 1899 — la stanza dov\'è cominciato tutto',
-  }, { checkBias: i % 3 === 0 ? 'worst' : 'best', sequences: { h1: ['PIANO PROIBITO', 'CANTINA', 'barricarsi'] }, difficulty: 'facile' }));
-}
-
-/* ---- IL MONDO DEL RIFLESSO (espansione): tour hub con cantina + tre scene del cuore,
-   poi il riflesso rifiutando il patto del Direttore fino al combattimento e alla vittoria
-   ---- + due varianti dedicate per le diramazioni narrative non a dado (w12_tradimento,
-   w12_sofia -> w16_amaro) che l'esecuzione "principale" sopra non tocca. ---- */
-
+/* ---- 1. FINALE e_parola — modalità Sopravvissuto (party di 1) ----
+   Prologo → soglia → biblioteca COMPLETA (manuale + note + segreto dello specchio)
+   → porte (foto ricomposta + joycon) → m1 → liberazione col joycon → boss m8 →
+   z2 via della Parola → duello z3/z4/z5 con le risposte GIUSTE → e_parola. */
 scenarios.push(scenario(
-  'mondo del riflesso + cuori: cantina, i tre momenti di coppia, poi il riflesso (rifiuto -> boss vinto) -> barricarsi',
-  ['claudia', 'federico'], {
-    k3: '💇 Natalino fa un passo avanti',
-    cuore_gc: 'Restare ancora un minuto sul balcone',
-    w10_orologio: '💗 Restituirlo a Sofia',
-    w11_inventario: '⚔ Rifiutare in blocco',
-  }, {
-    checkBias: 'best',
-    sequences: { h1: ['CANTINA', 'Gaetano e Claudia', 'Federico ed Emanuela', 'Natalino: la finestra', 'Tornare alla PISCINA', 'barricarsi'] },
+  'e_parola — Sopravvissuto: Natalino SOLO, biblioteca+porte complete, duello perfetto',
+  ['natalino'],
+  { z2: 'Smontiamolo' },
+  {
+    difficulty: 'facile',
+    verify: (r, expect) => {
+      expect(r.log.ending === 'e_parola', `finale atteso e_parola, trovato ${r.log.ending}`);
+      expect(r.log.flags.segreto_specchio, 'flag segreto_specchio non impostato (biblioteca completa)');
+      expect(r.log.flags.manuale_annotato_letto, 'flag manuale_annotato_letto non impostato');
+      expect(r.log.flags.foto_ricomposta, 'flag foto_ricomposta non impostato');
+      expect(r.log.flags.daniele_in_squadra, 'Daniele non risulta in squadra dopo m6 (unlockHero)');
+      expect(r.log.finalParty.some(h => h.id === 'daniele'), 'Daniele assente dal party finale');
+      expect(r.log.everMorto.length === 0, `morti inattesi nella run pulita: ${r.log.everMorto.join(', ')}`);
+      expect(r.log.itemsEverOwned.includes('joycon_sinistro'), 'joycon_sinistro mai ottenuto');
+      expect(r.log.scenes.includes('m4'), 'la liberazione col joycon (m4) non risulta usata');
+      expect(['z3', 'z4', 'z5', 'z5b'].every(s => r.log.scenes.includes(s)), 'duello z3→z4→z5→z5b incompleto');
+      expect(!r.log.scenes.includes('z3_colpo') && !r.log.scenes.includes('z4_colpo'), 'risposte sbagliate in una run che doveva essere perfetta');
+      expect(r.log.flags.solo === true, 'flag solo non impostato in modalità Sopravvissuto');
+    },
   }));
 
+/* ---- 2. FINALE e_parola con DUELLO SBAGLIATO DUE VOLTE in z4 (killRoller) ----
+   Stesso percorso, ma in z4 si sbaglia due volte: la PRIMA visita a z4_colpo uccide
+   DAVVERO chi ha tirato l'ultimo dado (killRoller); la vittoria finale (e_parola,
+   reviveAll) lo riporta indietro. */
 scenarios.push(scenario(
-  'mondo del riflesso: il patto viene accettato e poi TRADITO -> w12_tradimento VINTO',
-  ['gaetano', 'natalino'], {
-    w11_inventario: '🖋 Accettare: qualcuno del gruppo si offre',
-  }, { checkBias: 'best', sequences: { h1: ['POZZO', 'Tornare alla PISCINA', 'barricarsi'] } }));
+  'e_parola — duello sbagliato DUE volte in z4: killRoller uccide, reviveAll ripara',
+  ['gaetano', 'emanuela'],
+  { z2: 'Smontiamolo' },
+  {
+    difficulty: 'facile',
+    sequences: { z4: ['AUTORITÀ', 'SCARSITÀ', 'FALSA DICOTOMIA'] },
+    verify: (r, expect) => {
+      expect(r.log.ending === 'e_parola', `finale atteso e_parola, trovato ${r.log.ending}`);
+      const colpi = r.log.scenes.filter(s => s === 'z4_colpo').length;
+      expect(colpi >= 2, `z4_colpo atteso 2 volte, visto ${colpi}`);
+      expect(r.log.everMorto.length >= 1, 'killRoller in z4_colpo non ha ucciso nessuno (G.lastRoller?)');
+      expect(r.log.finalParty.every(h => !h.morto), 'reviveAll di e_parola non ha riportato indietro gli spiriti');
+    },
+  }));
 
+/* ---- 3. FINALE e_gemelli — piste porte+cucina, via dei Gemelli ---- */
 scenarios.push(scenario(
-  'mondo del riflesso: Sofia si offre al posto del gruppo, scelta RISPETTATA -> w16_amaro',
-  ['emanuela', 'claudia'], {
-    w10_orologio: '⏳ "Non ora, Sofì',
-    w11_inventario: '🕯 Fermarsi: "La decisione tocca a Sofia',
-    w12_sofia: '🤝 Rispettare la sua scelta',
-  }, { checkBias: 'best', sequences: { h1: ['POZZO', 'Tornare alla PISCINA', 'barricarsi'] } }));
+  'e_gemelli — porte+cucina, foto ricomposta, z2 via dei Gemelli (CAR riuscita)',
+  ['federico', 'claudia'],
+  { z2: 'La foto' },
+  {
+    difficulty: 'facile',
+    sequences: { h1: ['Il corridoio delle porte', 'La porta fredda', 'Seguire il suono'] },
+    checkOutcomes: { z6: 'success' },
+    verify: (r, expect) => {
+      expect(r.log.ending === 'e_gemelli', `finale atteso e_gemelli, trovato ${r.log.ending}`);
+      expect(r.log.flags.segreto_gemelli, 'flag segreto_gemelli non impostato (stanza 1994)');
+      expect(r.log.flags.foto_ricomposta, 'flag foto_ricomposta non impostato');
+      expect(r.log.flags.gemelli_pace, 'flag gemelli_pace non impostato (z6)');
+      expect(r.log.scenes.includes('k10') && r.log.scenes.includes('u8'), 'una delle due piste (porte/cucina) non è stata completata');
+      expect(r.log.finalParty.every(h => !h.morto), 'reviveAll di e_gemelli non ha funzionato');
+    },
+  }));
 
-/* ---- OSSARIO (sotto la cantina, dietro il freezer del Banchetto — solo dopo aver VINTO
-   il combattimento contro lo Chef: k4_scambio/k4_furto saltano k5_dopo_chef e vanno
-   direttamente a h1, quindi os1 è raggiungibile SOLO via k4_chef_fight) ---- */
-
+/* ---- 4. FINALE e_colori — party di 5, scene di respiro dell'hub, battaglia z7 ----
+   Copre anche h2 (il cerchio del tronello: RICHIEDE il tronello di partenza),
+   h3 (racchettoni), h4 (bivacco) e la sveglia dei Sonnambuli (eco nel boss). */
 scenarios.push(scenario(
-  'ossario: percorso diretto senza doni (combattimento contro lo Chef vinto) -> os1..os4 + os6',
-  ['natalino', 'claudia'], {
-    k3: '⚔ Non si tratta con chi ha una mannaia',
-    k5_dopo_chef: '🕳 Dietro la cella frigorifera',
-    os4: '🗣 Sedersi e basta',
-  }, { checkBias: 'best', sequences: { h1: ['CANTINA', 'barricarsi'] } }));
+  'e_colori — 5 giocatori, respiro all\'hub (tronello/racchettoni/bivacco), battaglia z7 vinta',
+  ['gaetano', 'natalino', 'claudia', 'federico', 'emanuela'],
+  { z2: 'Basta parlare', m3: 'Cercare un\'altra via' },
+  {
+    sequences: { h1: ['Un momento. Un momento SOLO', 'Claudia e Gaetano scaldano', 'Bivacco', 'La porta dei libri', 'La porta fredda', 'Seguire il suono'] },
+    checkOutcomes: { m3: 'success' },
+    verify: (r, expect) => {
+      expect(r.log.ending === 'e_colori', `finale atteso e_colori, trovato ${r.log.ending}`);
+      expect(r.log.scenes.includes('h2'), 'h2 (cerchio del tronello) non raggiunto: manca il tronello di partenza?');
+      expect(r.log.flags.fumo_mappa && r.log.flags.racchettoni_pronti && r.log.flags.bivacco_fatto, 'flag delle scene di respiro mancanti');
+      expect(r.log.flags.sonnambuli_svegli, 'flag sonnambuli_svegli non impostato (k9 riuscita)');
+      expect(r.log.flags.eleinad_distrutto, 'flag eleinad_distrutto non impostato (z8)');
+      expect(r.log.scenes.includes('z7') && r.log.scenes.includes('z8'), 'battaglia z7→z8 non attraversata');
+    },
+  }));
 
-/* ---- SOFFITTA (in fondo al corridoio del piano proibito, oltre l'ultima porta) ---- */
-
+/* ---- 5. FINALE e_scambio + MERCANTE — si compra Boccata di Colore e Cuore di Colore ----
+   Tutti i tiri riescono (defaultCheckOutcome) per accumulare Colore; alla cucina si
+   passa dal citofono (Luca Giunti!) e dal frigo, poi il banco del Mercante: Boccata
+   (3🎨) e CUORE DI COLORE (12🎨 + il tronello). Chiusura: z9, la modale di sacrificio
+   sceglie Emanuela, e_scambio. */
 scenarios.push(scenario(
-  'soffitta: tour completo evitando i ritratti (telescopio, casse di Gregorio e Ada, nido)',
-  ['claudia', 'gaetano'], {
-    u1: '🪜 In fondo al corridoio',
-    sf4: '👁 Restare a guardare',
-  }, { checkBias: 'best', sequences: { h1: ['PIANO PROIBITO', 'barricarsi'] } }));
+  'e_scambio + Mercante — boccata_colore e cuore_colore comprati, sacrificio di Emanuela',
+  ['natalino', 'emanuela'],
+  {
+    a0: 'Claudia guarda le finestre',
+    a4: 'Cercare come cercherebbe un amico',
+    z2: 'Ascoltare l\'offerta',
+    z9: 'Accettare lo scambio',
+  },
+  {
+    difficulty: 'facile',
+    defaultCheckOutcome: 'success',
+    sacrificeHero: 'Emanuela',
+    sequences: {
+      h1: ['La porta fredda', 'La porta dei libri', 'Seguire il suono'],
+      k1: ['Il citofono', 'Frugare il frigo'],
+      k6: ['Boccata di Colore', 'CUORE DI COLORE', 'Il Divano-Trono'],
+    },
+    choicesOverride: null,
+    checkOutcomes: { m3: 'success' },
+    verify: (r, expect) => {
+      expect(r.log.ending === 'e_scambio', `finale atteso e_scambio, trovato ${r.log.ending}`);
+      expect(r.log.itemsEverOwned.includes('boccata_colore'), 'boccata_colore mai comprata dal Mercante');
+      expect(r.log.itemsEverOwned.includes('cuore_colore'), 'cuore_colore mai comprato dal Mercante (Colore o tronello mancanti?)');
+      expect(!r.log.inventory.includes('tronello'), 'il tronello doveva essere ceduto al Mercante per il Cuore');
+      expect(r.log.flags.segreto_trono, 'flag segreto_trono non impostato (k7)');
+      expect(r.log.flags.luca_promosso, 'flag luca_promosso non impostato (citofono k2 → Luca Giunti sconfitto)');
+      expect(r.log.flags.sacrificio_emanuela, 'flag sacrificio_emanuela non impostato dalla modale di sacrificio');
+      const morti = r.log.finalParty.filter(h => h.morto).map(h => h.id);
+      expect(morti.length === 1 && morti[0] === 'emanuela', `atteso solo emanuela spirito, trovato: ${morti.join(', ') || '(nessuno)'}`);
+      expect(r.log.gold >= 0, 'Colore negativo dopo gli acquisti');
+    },
+  }));
+scenarios[scenarios.length - 1].choices.m3 = 'Cercare un\'altra via'; // niente joycon in questa run
 
-/* ---- STANZE 1949 e 1974 (dal piano proibito: la porta "1949" incatena automaticamente
-   anche la stanza "1974" subito dopo, vedi s49_3/s49_3_ko -> s74_1). La copertura di
-   s49_3 (e dell'ASSO DI DENARI, ottenuto solo lì) dipende dal dado: eseguita più sotto
-   come executeUntil insieme alla variante s49_3_ko, invece che qui come scenario fisso. */
+/* ---- 6. FINALE e_grigio — sconfitta VOLUTA a z7, poi la resa ---- */
+scenarios.push(scenario(
+  'e_grigio — sconfitta voluta contro ELEINAD (z7), z_ko, resa',
+  ['gaetano', 'claudia'],
+  { z2: 'Basta parlare', z_ko: 'Non alzarsi più' },
+  {
+    difficulty: 'facile',
+    sequences: { h1: ['Il corridoio delle porte', 'La porta fredda', 'Seguire il suono'] },
+    forceLossAt: 'z7',
+    verify: (r, expect) => {
+      expect(r.log.ending === 'e_grigio', `finale atteso e_grigio, trovato ${r.log.ending}`);
+      expect(r.log.scenes.includes('z_ko'), 'z_ko (sconfitta al boss) mai raggiunta');
+      expect(r.log.flags.finale_grigio, 'flag finale_grigio non impostato');
+      expect(r.log.everMorto.length === 0, 'la sconfitta in combattimento non deve creare SPIRITI (solo a terra)');
+    },
+  }));
 
-/* ==================== ESECUZIONE (con retry adattivo per gli esiti a dado) ====================
-   Alcuni contenuti dipendono dal SUCCESSO (o dal FALLIMENTO) di un tiro di dado, che il test
-   può orientare scegliendo l'eroe con il modificatore migliore/peggiore (checkBias) ma non
-   forzare con certezza (un 1 naturale fallisce sempre, un 20 naturale riesce sempre). Per
-   garantire comunque la copertura, questi scenari vengono ripetuti con semi diversi finché lo
-   scopo non è raggiunto: ogni tentativo conta comunque come una run a sé, loggata come le altre. */
+/* ---- 7. MORTE VERA a u6 + SPIRITO fino alla fine (e_colori NON rianima) ----
+   La prova di COS a u6 viene FORZATA a fallire: killRoller uccide chi ha tirato,
+   che resta 👻 SPIRITO. Si ritenta (successo forzato) e si prende il Cuore di Colore
+   dall'acqua — che resta nello zaino, non usato. Lo spirito apre le scelte dedicate
+   (u9, z2b) e a e_colori è ANCORA spirito: quel finale non rianima nessuno. */
+scenarios.push(scenario(
+  'morte vera a u6 — spirito, porta dei morti (u9), z2b, e_colori senza resurrezione',
+  ['claudia', 'federico', 'natalino'],
+  { u6: 'Immergersi', u6_morte: 'si ritenta', z2: 'Basta parlare' },
+  {
+    difficulty: 'facile',
+    sequences: {
+      h1: ['Il corridoio delle porte', 'La porta fredda', 'Seguire il suono'],
+      u1: ['La porta "NON APRIRE"', 'La porta senza targhetta', 'La porta "1994"', 'La porta "IMBARCO"', 'Chiudere col corridoio'],
+      z2: ['I morti non ti temono', 'Basta parlare'],
+    },
+    checkOutcomes: { u6: ['fail', 'success'] },
+    verify: (r, expect) => {
+      expect(r.log.ending === 'e_colori', `finale atteso e_colori, trovato ${r.log.ending}`);
+      expect(r.log.scenes.includes('u6_morte'), 'u6_morte mai raggiunta (la prova forzata a fallire non è fallita)');
+      expect(r.log.everMorto.length === 1, `atteso esattamente 1 morto vero, trovati: ${r.log.everMorto.join(', ') || '(nessuno)'}`);
+      const spiriti = r.log.finalParty.filter(h => h.morto);
+      expect(spiriti.length === 1, 'lo spirito doveva RESTARE spirito a e_colori (niente reviveAll lì)');
+      expect(/SPIRITO/.test(r.log.partyBar), 'la barra del gruppo non mostra 👻 SPIRITO per il morto vero');
+      expect(r.log.flags.indizio_spiriti, 'la porta senza targhetta (u9, solo spiriti) non è stata aperta');
+      expect(r.log.flags.eleinad_vacilla, 'z2b (la scelta degli Spiriti) non è stata usata');
+      expect(r.log.inventory.includes('cuore_colore'), 'il Cuore di Colore pescato a u6 non risulta nello zaino');
+      expect(r.log.scenes.includes('u6b') || r.log.scenes.includes('u6c'), 'il secondo tentativo a u6 (successo forzato) non è avvenuto');
+    },
+  }));
+
+/* ==================== ESECUZIONE ==================== */
 
 section('Simulazione di partite complete (headless)');
 
@@ -884,538 +841,17 @@ function execute(sc) {
   const r = runGame(sc);
   results.push(r);
   const endingTxt = r.ok ? (r.log.ending || '(nessun finale?!)') : 'ERRORE';
-  const line = `  ${r.ok ? '✅' : '❌'} [seed ${sc.seed}] ${sc.name} — scene: ${r.log.scenes.length}, combattimenti: ${r.log.combats}, esito: ${endingTxt}`;
-  console.log(line);
-  if (!r.ok) console.error(`      ↳ ${r.error.split('\n')[0]}`);
+  console.log(`  ${r.ok ? '✅' : '❌'} [seed ${sc.seed}] ${sc.name} — scene: ${r.log.scenes.length}, combattimenti: ${r.log.combats}, esito: ${endingTxt}`);
+  if (!r.ok) { console.error(`      ↳ ${r.error.split('\n')[0]}`); return r; }
+  if (sc.verify) {
+    const expect = (cond, msg) => { if (!cond) fail(`[${sc.name}] ${msg}`); };
+    try { sc.verify(r, expect); } catch (e) { fail(`[${sc.name}] verifica esplosa: ${e.message}`); }
+  }
   return r;
 }
 
-// extraCheck(result): predicato opzionale aggiuntivo oltre alle scene richieste — utile per
-// verificare un FLAG (result.log.flags) o che un'azione specifica sia avvenuta davvero
-// (es. result.log.usedForceItem), non solo che una certa scena sia stata visitata.
-function executeUntil(name, heroes, choices, opts, targetScenes, maxAttempts = 14, extraCheck = () => true) {
-  let last = null;
-  for (let i = 0; i < maxAttempts; i++) {
-    const sc = scenario(`${name} (tentativo ${i + 1}/${maxAttempts})`, heroes, choices, { ...opts, seed: (opts.seedBase || 555000) + i * 131 });
-    last = execute(sc);
-    if (last.ok && targetScenes.every(id => last.log.scenes.includes(id)) && extraCheck(last)) return true;
-  }
-  console.error(`      ↳ ⚠ non raggiunto dopo ${maxAttempts} tentativi: ${targetScenes.join(', ')} (dipende da un tiro di dado — vedi copertura sotto)`);
-  return false;
-}
-
-console.log(`  Esecuzione di ${scenarios.length} partite pilotate + tentativi adattivi per gli esiti a dado...\n`);
+console.log(`  Esecuzione di ${scenarios.length} partite pilotate...\n`);
 for (const sc of scenarios) execute(sc);
-
-// Piscina — l'esperimento di Gaetano va storto (INT fallita): AVVELENAMENTO narrativo
-// (vedi nota sul bug G.lastRoller più sotto: la scena viene comunque raggiunta).
-executeUntil('piscina: esperimento andato storto (INT fallita) -> p2_esperimento_ko', ['emanuela', 'natalino'],
-  { p2: '🔬 Gaetano vuole capire' },
-  { checkBias: 'worst', seedBase: 610000 }, ['p2_esperimento_ko']);
-
-// Pozzo — calata riuscita (FOR) con le pagine del diario
-executeUntil('pozzo: calata riuscita (FOR) -> b4_calata (pagine del diario)', ['gaetano', 'federico'],
-  { b1: '👁 Il piano di Gaetano', b3_pozzo: '🪢 Qualcuno si cala nel pozzo' },
-  { checkBias: 'best', seedBase: 620000, sequences: { h1: ['POZZO', 'barricarsi'] } }, ['b4_calata']);
-
-// Pozzo — calata fallita (FOR) -> avvelenamento narrativo
-executeUntil('pozzo: calata fallita (FOR) -> b4_calata_ko', ['claudia', 'emanuela'],
-  { b1: '👁 Il piano di Gaetano', b3_pozzo: '🪢 Qualcuno si cala nel pozzo' },
-  { checkBias: 'worst', seedBase: 630000, sequences: { h1: ['POZZO', 'barricarsi'] } }, ['b4_calata_ko']);
-
-// Piscina — accappatoio ispezionato con SUCCESSO (SAG, Claudia SAG 4+2=6, CD 11: quasi
-// certo, ma un 1 naturale fallisce sempre — un solo seed non basta a garantirlo).
-executeUntil('piscina: accappatoio ispezionato con successo (SAG)', ['claudia', 'emanuela'],
-  { p1: '🔍 Uscire a controllare l\'accappatoio' },
-  { checkBias: 'best', seedBase: 660000 }, ['p1_accappatoio']);
-
-// Piscina — esperimento di Gaetano RIUSCITO (INT, Gaetano INT 4+2=6, CD 12).
-executeUntil('piscina: esperimento di Gaetano riuscito (INT) — vista la finestra', ['gaetano', 'claudia'],
-  { p2: '🔬 Gaetano vuole capire' },
-  { checkBias: 'best', seedBase: 670000 }, ['p2_esperimento']);
-
-// Cantina — furto dalla mensola RIUSCITO (DES, Natalino DES 4, CD 13).
-executeUntil('cantina: furto dalla mensola riuscito (DES)', ['natalino', 'claudia'],
-  { k3: '🤫 Distrarlo e arraffare sale' },
-  { checkBias: 'best', seedBase: 680000, sequences: { h1: ['CANTINA', 'barricarsi'] } }, ['k4_furto']);
-
-// Prologo — firma RINVIATA (CAR, Federico CAR 4+2=6, CD 12).
-executeUntil('prologo: registro sfogliato, poi firma rinviata (CAR)', ['federico', 'natalino'],
-  { a3: '📖 Prima, sfogliare il registro', a3_registro: 'Firmiamo domani con calma' },
-  { checkBias: 'best', seedBase: 690000 }, ['a4_rinvio']);
-
-/* ---- PISTA SEGRETA DI PIETRAFONDA (richiede a4_rinvio, dipendente dal dado) + le nuove
-   offerte al Banchetto che dipendono dalla pista (campanella_1974 -> z_vespri) ---- */
-
-// Bengala usato DAVVERO in combattimento: si scende a Pietrafonda per prenderlo (pp1), poi
-// si va dritti allo scontro deterministico contro lo Chef (k3 -> attacco diretto) e lo si
-// lancia lì (verificato con log.usedForceItem, non solo con la scena raggiunta). Copre anche
-// l'intera pista pp1..pp7 (percorso diretto, senza le due prove opzionali del bar/cripta).
-executeUntil('Pietrafonda (pista completa) + Bengala usato in combattimento (k4_chef_fight)',
-  ['claudia', 'federico'],
-  {
-    a3: '📖 Prima, sfogliare il registro',
-    a3_registro: 'Firmiamo domani con calma',
-    k3: '⚔ Non si tratta con chi ha una mannaia',
-  },
-  { checkBias: 'best', seedBase: 700000, sequences: { h1: ['Pietrafonda', 'CANTINA', 'barricarsi'] }, forceCombatItem: 'Bengala' },
-  ['pp1', 'pp2', 'pp3', 'pp4', 'pp6', 'pp7', 'k4_chef_fight'], 20,
-  r => r.log.usedForceItem === true);
-
-// Giro turistico completo di Pietrafonda: entrambe le prove opzionali (bar del 1999 SAG,
-// cripta dei custodi INT) riuscite, oltre alla firma rinviata (CAR) necessaria per scendere.
-executeUntil('Pietrafonda: bar del 1999 (SAG) e cripta dei custodi (INT) riuscite',
-  ['claudia', 'federico'],
-  {
-    a3: '📖 Prima, sfogliare il registro',
-    a3_registro: 'Firmiamo domani con calma',
-    pp2: '🔦 Prima, una torcia dentro al bar',
-    pp3: '⛪ Prima: chiedergli della cripta',
-  },
-  { checkBias: 'best', seedBase: 710000, sequences: { h1: ['Pietrafonda', 'barricarsi'] } },
-  ['pp2_bar', 'pp4_cripta'], 24,
-  r => !!(r.log.flags && r.log.flags.segreto_custodi));
-
-// La nebbia della risalita "assaggia" chi tira (SAG fallita): stesso bug narrativo del
-// veleno già documentato più sotto (G.lastRoller non viene mai assegnato), ma la scena e il
-// -1 Sangue Freddo sono comunque raggiunti e verificati.
-executeUntil('Pietrafonda: la nebbia della risalita assaggia (SAG fallita) -> pp6_ko',
-  ['federico', 'natalino'],
-  {
-    a3: '📖 Prima, sfogliare il registro',
-    a3_registro: 'Firmiamo domani con calma',
-  },
-  { checkBias: 'best', seedBase: 720000, sequences: { h1: ['Pietrafonda', 'barricarsi'] } },
-  ['pp6_ko'], 20);
-
-// I vespri di Don Michele (richiede la campanella_1974, ottenuta a Pietrafonda): si scende,
-// si prende la campanella, si rifiuta prima l'offerta impensabile (solo per toccare anche
-// z_smemorati senza chiudere la partita lì), poi si suonano i vespri e si va alla vittoria.
-executeUntil('Banchetto: i vespri di Don Michele (richiede campanella_1974) -> vittoria',
-  ['claudia', 'federico'],
-  {
-    a3: '📖 Prima, sfogliare il registro',
-    a3_registro: 'Firmiamo domani con calma',
-    z1: '🫙 L\'offerta impensabile', // primo giro: solo per toccare z_smemorati
-    z_smemorati: '↩ No. Questa notte è NOSTRA',
-  },
-  {
-    checkBias: 'best', seedBase: 730000,
-    sequences: { h1: ['Pietrafonda', 'barricarsi'], z1: ['offerta impensabile', 'Suonare la campanella'] },
-  },
-  ['pp7', 'z_smemorati', 'z_vespri', 'z3_boss', 'z5_vittoria', 'e_alba'], 24,
-  r => !!(r.log.flags && r.log.flags.pista_paese && r.log.flags.vespri_suonati));
-
-/* ---- IL MONDO DEL RIFLESSO — varianti a dado (i "_ko"/combattimento) ----
-   w1_tuffo, w3_giardino, w7_ronda, w9_studio e w17_fuga offrono ciascuno DUE approcci
-   alternativi a un'unica prova: qualunque approccio o esito, il filo narrativo
-   RICONVERGE subito dopo (successo e fallimento/combattimento portano alla stessa scena
-   successiva) — motivo per cui la scelta dell'approccio non viene forzata qui: basta il
-   checkBias 'worst' per rendere probabile il fallimento, e ripetere il seed finché non
-   capita davvero. */
-
-executeUntil('mondo del riflesso: il tuffo va storto (COS/INT fallita) -> w2_riflesso_ko',
-  ['emanuela', 'natalino'], {},
-  { checkBias: 'worst', seedBase: 750000, sequences: { h1: ['POZZO', 'Tornare alla PISCINA', 'barricarsi'] } },
-  ['w2_riflesso_ko'], 16);
-
-executeUntil('mondo del riflesso: il Cameriere del giardino capovolto si accorge di voi -> w3_pattuglia_combat VINTO',
-  ['gaetano', 'federico'], {},
-  { checkBias: 'worst', seedBase: 760000, sequences: { h1: ['POZZO', 'Tornare alla PISCINA', 'barricarsi'] } },
-  ['w3_pattuglia_combat'], 16);
-
-executeUntil('mondo del riflesso: il cambio di guardia va storto -> w7_ronda_combat VINTO',
-  ['claudia', 'natalino'], {},
-  { checkBias: 'worst', seedBase: 770000, sequences: { h1: ['POZZO', 'Tornare alla PISCINA', 'barricarsi'] } },
-  ['w7_ronda_combat'], 16);
-
-executeUntil('mondo del riflesso: il Doppio di Sofia si sveglia -> w9_studio_combat VINTO',
-  ['federico', 'emanuela'], {},
-  { checkBias: 'worst', seedBase: 780000, sequences: { h1: ['POZZO', 'Tornare alla PISCINA', 'barricarsi'] } },
-  ['w9_studio_combat'], 16);
-
-executeUntil('mondo del riflesso: la casa capovolta cerca di trattenervi mentre crolla -> w17_fuga_ko',
-  ['gaetano', 'claudia'], {},
-  { checkBias: 'worst', seedBase: 790000, sequences: { h1: ['POZZO', 'Tornare alla PISCINA', 'barricarsi'] } },
-  ['w17_fuga_ko'], 24);
-
-/* ---- OSSARIO — variante con la moka di Don Michele (richiede firma_rinviata -> Pietrafonda) ----
-   Il Contabile mostra il Libro Mastro (flag segreto_contabile) SOLO se gli si offre la moka
-   in os4: qui serve prima scendere a Pietrafonda per procurarsela (pp4), il che dipende dalla
-   firma rinviata (CAR, a4_rinvio) — un dado, da qui l'executeUntil. */
-executeUntil('ossario: con la moka di Don Michele (Pietrafonda) -> os5, il segreto del Contabile',
-  ['claudia', 'federico'], {
-    a3: '📖 Prima, sfogliare il registro',
-    a3_registro: 'Firmiamo domani con calma',
-    k3: '⚔ Non si tratta con chi ha una mannaia',
-    k5_dopo_chef: '🕳 Dietro la cella frigorifera',
-    os4: '☕ Offrirgli la moka',
-  },
-  { checkBias: 'best', seedBase: 820000, sequences: { h1: ['Pietrafonda', 'CANTINA', 'barricarsi'] } },
-  ['pp4', 'os1', 'os2', 'os3', 'os4', 'os5'], 20,
-  r => !!(r.log.flags && r.log.flags.segreto_contabile));
-
-/* ---- SOFFITTA — variante di combattimento (i ritratti si svegliano) ---- */
-executeUntil('soffitta: i ritratti si svegliano davvero -> sf5 VINTO',
-  ['natalino', 'federico'],
-  { u1: '🪜 In fondo al corridoio', sf4: '👁 Restare a guardare' },
-  { checkBias: 'worst', seedBase: 830000, sequences: { h1: ['PIANO PROIBITO', 'barricarsi'] } },
-  ['sf5'], 16);
-
-/* ---- STANZA 1949 (+ 1974 in coda) — le due varianti della mano di scopa ---- */
-executeUntil('piano proibito: stanza 1949 vinta a scopa (INT) -> ASSO DI DENARI + stanza 1974',
-  ['gaetano', 'emanuela'],
-  { u1: '🚪 1949 — da dietro la porta' },
-  { checkBias: 'best', seedBase: 845000, sequences: { h1: ['PIANO PROIBITO', 'barricarsi'] } },
-  ['s49_1', 's49_2', 's49_3', 's74_1', 's74_2', 's74_3'], 16);
-
-executeUntil('piano proibito: la mano di scopa va persa (INT fallita) -> s49_3_ko',
-  ['natalino', 'claudia'],
-  { u1: '🚪 1949 — da dietro la porta' },
-  { checkBias: 'worst', seedBase: 840000, sequences: { h1: ['PIANO PROIBITO', 'barricarsi'] } },
-  ['s49_3_ko'], 16);
-
-/* ---- GARAGE / RIMESSA (dopo l'orto, prima del pozzo: b2_orto -> gr1) ----
-   Entrambe le varianti della prova di Destrezza in gr2 (candela recuperata pulita o
-   con fracasso) devono comparire: due esecuzioni forzate, una per verso. */
-executeUntil('pozzo: la rimessa — candela del motore recuperata pulita (DES) -> gr3',
-  ['gaetano', 'claudia'],
-  { b1: '👁 Il piano di Gaetano', b2_orto: '🚗 Prima: la porta della rimessa' },
-  { checkBias: 'best', seedBase: 800000, sequences: { h1: ['POZZO', 'barricarsi'] } },
-  ['gr1', 'gr2', 'gr3'], 16);
-
-executeUntil('pozzo: la rimessa — il domino di pezzi crolla (DES fallita) -> gr3_ko',
-  ['natalino', 'federico'],
-  { b1: '👁 Il piano di Gaetano', b2_orto: '🚗 Prima: la porta della rimessa' },
-  { checkBias: 'worst', seedBase: 810000, sequences: { h1: ['POZZO', 'barricarsi'] } },
-  ['gr3_ko'], 16);
-
-
-/* ---- LA STRADA CHE TORNA (fuga a piedi dai tornanti: gr3/gr3_ko -> ft*) ----
-   Tre varianti: la rivelazione dell'anello (SAG riuscita), la notte persa (SAG fallita)
-   e la fuga inseguiti col Giardiniere tra i filari (combattimento ft_cesoie). Poi l'eco
-   al Banchetto: la denuncia della geometria (z2_strada) sblocca la trattativa SENZA dado. */
-
-executeUntil('strada che torna: l\'anello VISTO dal terzo tornante (SAG) -> ft2_capito',
-  ['claudia', 'gaetano'],
-  { b1: '👁 Il piano di Gaetano', b2_orto: '🚗 Prima: la porta della rimessa',
-    gr3: 'al diavolo tutto', ft1: 'Fermarsi e GUARDARE' },
-  { checkBias: 'best', seedBase: 850000, sequences: { h1: ['POZZO', 'barricarsi'] } },
-  ['ft1', 'ft2_capito'], 16, r => !!(r.log.flags && r.log.flags.strada_che_torna));
-
-executeUntil('strada che torna: un\'ora di buio, il cancello dall\'altra parte -> ft2_notte',
-  ['claudia', 'gaetano'],
-  { b1: '👁 Il piano di Gaetano', b2_orto: '🚗 Prima: la porta della rimessa',
-    gr3: 'al diavolo tutto', ft1: 'Fermarsi e GUARDARE' },
-  { seedBase: 855000, sequences: { h1: ['POZZO', 'barricarsi'] } },
-  ['ft1', 'ft2_notte'], 20);
-
-executeUntil('strada che torna: inseguiti dal Giardiniere tra i filari -> ft_cesoie VINTO',
-  ['natalino', 'emanuela', 'gaetano'],
-  { b1: '👁 Il piano di Gaetano', b2_orto: '🚗 Prima: la porta della rimessa',
-    gr3_ko: 'GIÙ per i tornanti' },
-  { seedBase: 860000, sequences: { h1: ['POZZO', 'barricarsi'] } },
-  ['ft1_inseguiti', 'ft_cesoie', 'ft2_notte'], 24);
-
-executeUntil('Banchetto: la geometria denunciata -> z2_strada + trattativa SENZA dado',
-  ['gaetano', 'federico'],
-  { b1: '👁 Il piano di Gaetano', b2_orto: '🚗 Prima: la porta della rimessa',
-    gr3: 'al diavolo tutto', ft1: 'Fermarsi e GUARDARE' },
-  { checkBias: 'best', seedBase: 865000,
-    sequences: { h1: ['POZZO', 'barricarsi'], z1: ['strade TORNANO', 'la casa ASCOLTA'] } },
-  ['z2_strada', 'z2_trattativa'], 20, r => !!(r.log.flags && r.log.flags.casa_rispetta));
-
-
-/* ---- I GRATTA E VINCI DI BAIANO (gv1 nel corridoio, gvz al Banchetto) ----
-   e la Candela del motore scagliata DAVVERO in combattimento (2d6). */
-
-executeUntil('Gratta e Vinci: quattro RITENTA nel corridoio + l\'ultimo strappato in faccia a Gregorio',
-  ['natalino', 'federico'],
-  {},
-  { checkBias: 'best', seedBase: 870000,
-    sequences: { h1: ['Gratta e Vinci', 'POZZO', 'barricarsi'], z1: ['ULTIMO Gratta e Vinci', 'VENIRSELO A PRENDERE'] } },
-  ['gv1', 'gvz'], 20, r => !!(r.log.flags && r.log.flags.biglietto_strappato));
-
-executeUntil('Candela del motore: recuperata in rimessa e scagliata contro lo Chef (2d6)',
-  ['gaetano', 'natalino'],
-  { b1: '👁 Il piano di Gaetano', b2_orto: '🚗 Prima: la porta della rimessa',
-    gr3: 'Uscire dalla rimessa', gr3_ko: 'Correre fuori', k3: '⚔ Non si tratta con chi ha una mannaia' },
-  { checkBias: 'best', seedBase: 875000,
-    sequences: { h1: ['POZZO', 'CANTINA', 'barricarsi'] }, forceCombatItem: 'Candela del motore' },
-  ['k4_chef_fight'], 20, r => r.log.usedForceItem === true);
-
-
-/* ---- ECHI INCROCIATI TRA LE PISTE ----
-   La Lanterna del 1899 (ossario, pista cantina) addormenta le bambole del 1924
-   (pista piano proibito); il Nastro del '74 (piano proibito) ammansisce lo Chef
-   (cantina). Ordine inverso delle piste in ciascuna run. */
-
-executeUntil('eco incrociato: la Lanterna del 1899 addormenta le bambole -> u3_lanterna (medaglione senza dado)',
-  ['claudia', 'emanuela'],
-  {
-    k3: '⚔ Non si tratta con chi ha una mannaia',
-    k5_dopo_chef: '🕳 Dietro la cella frigorifera',
-    os4: '🗣 Sedersi e basta',
-    u1: '🚪 1924 — la stanza del valzer',
-    u2_1924: '🏮 Alzare la LANTERNA DEL 1899',
-  },
-  { checkBias: 'best', seedBase: 880000, sequences: { h1: ['CANTINA', 'PIANO PROIBITO', 'barricarsi'] } },
-  ['os6', 'u3_lanterna'], 20,
-  r => !!(r.log.flags && r.log.flags.bambole_addormentate && r.log.flags.medaglione));
-
-executeUntil('eco incrociato: il Nastro del \'74 ammansisce lo Chef -> k4_nastro (cantina senza scontro)',
-  ['gaetano', 'federico'],
-  {
-    u1: '🚪 1949 — da dietro la porta',
-    k3: '📼 Mettere il NASTRO DEL',
-  },
-  { checkBias: 'best', seedBase: 885000, sequences: { h1: ['PIANO PROIBITO', 'CANTINA', 'barricarsi'] } },
-  ['s74_3', 'k4_nastro'], 20,
-  r => !!(r.log.flags && r.log.flags.chef_amico));
-
-
-/* ---- GLI ALLEATI DEL BANCHETTO (chef_amico -> sciopero della cucina, bambole_addormentate -> cerchio di porcellana) ---- */
-
-executeUntil('Banchetto: lo Chef sciopera per voi -> z2_alleato + fase uno SENZA camerieri',
-  ['gaetano', 'federico'],
-  {
-    u1: '🚪 1949 — da dietro la porta',
-    k3: '📼 Mettere il NASTRO DEL',
-  },
-  { checkBias: 'best', seedBase: 890000,
-    sequences: { h1: ['PIANO PROIBITO', 'CANTINA', 'barricarsi'], z1: ['CHEF! La portata è cambiata'] } },
-  ['k4_nastro', 'z2_alleato', 'z3_boss_solo'], 20,
-  r => !!(r.log.flags && r.log.flags.cucina_in_sciopero));
-
-executeUntil('Banchetto: il cerchio di porcellana delle signorine del 1924 -> z2_bambole',
-  ['claudia', 'emanuela'],
-  {
-    k3: '⚔ Non si tratta con chi ha una mannaia',
-    k5_dopo_chef: '🕳 Dietro la cella frigorifera',
-    os4: '🗣 Sedersi e basta',
-    u1: '🚪 1924 — la stanza del valzer',
-    u2_1924: '🏮 Alzare la LANTERNA DEL 1899',
-  },
-  { checkBias: 'best', seedBase: 895000,
-    sequences: { h1: ['CANTINA', 'PIANO PROIBITO', 'barricarsi'], z1: ['fischia piano il valzer', 'VENIRSELO A PRENDERE'] } },
-  ['u3_lanterna', 'z2_bambole'], 20,
-  r => !!(r.log.flags && r.log.flags.cerchio_di_porcellana));
-
-
-executeUntil('Banchetto: la diretta di Claudia -> z2_claudia (sorpresa accesa al boss, SPENTA dopo la vittoria)',
-  ['claudia', 'gaetano'],
-  {},
-  { checkBias: 'best', seedBase: 900000,
-    sequences: { h1: ['POZZO', 'barricarsi'], z1: ['INQUADRA la sedia', 'VENIRSELO A PRENDERE'] } },
-  ['z2_claudia', 'z3_boss'], 20,
-  r => !!(r.log.flags) && r.log.flags.sorpresa === false);
-
-
-/* ---- COERENZA DEL GIARDINIERE: battuto nell'orto, la fuga dal garage diventa quieta ---- */
-
-executeUntil('Giardiniere battuto nell\'orto -> b2_vinto, poi dal garage in fracasso si scende CON COMODO (ft1, non inseguiti)',
-  ['natalino', 'emanuela', 'gaetano'],
-  { b1: '👁 Il piano di Gaetano', b2_orto: '🚗 Prima: la porta della rimessa',
-    gr3_ko: 'con comodo', ft1: 'Fermarsi e GUARDARE' },
-  { seedBase: 905000, sequences: { h1: ['POZZO', 'barricarsi'] } },
-  ['b2_vinto', 'gr3_ko', 'ft1'], 24,
-  r => !!(r.log.flags && r.log.flags.giardiniere_potato) && !r.log.scenes.includes('ft1_inseguiti'));
-
-
-/* ---- ECO A PIETRAFONDA: la corriera del '74 (richiede strada_che_torna PRIMA di scendere) ---- */
-
-executeUntil('Pietrafonda sa dell\'anello: pozzo+garage+tornanti PRIMA, poi la domanda a Don Michele -> pp_anello',
-  ['claudia', 'federico'],
-  {
-    a3: '📖 Prima, sfogliare il registro',
-    a3_registro: 'Firmiamo domani con calma',
-    b1: '👁 Il piano di Gaetano', b2_orto: '🚗 Prima: la porta della rimessa',
-    gr3: 'al diavolo tutto', ft1: 'Fermarsi e GUARDARE',
-    pp2: '🚪 Bussare alla canonica',
-  },
-  { checkBias: 'best', seedBase: 910000,
-    sequences: { h1: ['POZZO', 'Pietrafonda', 'barricarsi'], pp3: ['la strada che scende', 'Raccontargli tutto'] } },
-  ['ft2_capito', 'pp_anello'], 24,
-  r => !!(r.log.flags && r.log.flags.paese_sa));
-
-
-/* ---- IL QUINTO FINALE: LA PENNA SPEZZATA (cripta -> segreto_custodi -> z_penna, CAR 14) ---- */
-
-executeUntil('quinto finale: il segreto della cripta convince Gregorio a ROMPERE la penna -> e_penna',
-  ['federico', 'claudia'],
-  {
-    a3: '📖 Prima, sfogliare il registro',
-    a3_registro: 'Firmiamo domani con calma',
-    pp2: '🚪 Bussare alla canonica',
-    pp3: '⛪ Prima: chiedergli della cripta',
-    z_penna: 'Resta l\'uomo',
-  },
-  { checkBias: 'best', seedBase: 915000,
-    sequences: { h1: ['Pietrafonda', 'CANTINA', 'barricarsi'], z1: ['ROMPERLA'] } },
-  ['pp4_cripta', 'z_penna', 'e_penna'], 24,
-  r => r.log.ending === 'e_penna');
-
-executeUntil('quinto finale: Gregorio VACILLA ma la casa stringe (CAR fallita) -> z_penna_no e si torna al tavolo',
-  ['federico', 'gaetano'],
-  {
-    a3: '📖 Prima, sfogliare il registro',
-    a3_registro: 'Firmiamo domani con calma',
-    pp2: '🚪 Bussare alla canonica',
-    pp3: '⛪ Prima: chiedergli della cripta',
-    z_penna: 'Resta l\'uomo',
-  },
-  { seedBase: 920000,
-    sequences: { h1: ['Pietrafonda', 'CANTINA', 'barricarsi'], z1: ['ROMPERLA'] } },
-  ['z_penna', 'z_penna_no'], 40);
-
-
-/* ---- LE PROMESSE PAGATE: la terza modalità della torcia e l'accendino di Federico ---- */
-
-executeUntil('torcia LED: lo strobo tattico usato DAVVERO in combattimento (acceca tutti)',
-  ['gaetano', 'emanuela'],
-  { k3: '⚔ Non si tratta con chi ha una mannaia' },
-  { checkBias: 'best', seedBase: 925000, sequences: { h1: ['CANTINA', 'barricarsi'] }, forceCombatItem: 'Torcia LED' },
-  ['k4_chef_fight'], 20, r => r.log.usedForceItem === true);
-
-executeUntil('accendino di Federico: la fiamma vera scagliata sullo Chef (2d4, doppi alla casa)',
-  ['federico', 'natalino'],
-  { k3: '⚔ Non si tratta con chi ha una mannaia' },
-  { checkBias: 'best', seedBase: 930000, sequences: { h1: ['CANTINA', 'barricarsi'] }, forceCombatItem: 'Accendino' },
-  ['k4_chef_fight'], 20, r => r.log.usedForceItem === true);
-
-
-/* ---- IL TRONELLO: la pausa di Natalino e la promessa mantenuta al pozzo ---- */
-
-executeUntil('tronello: la pausa di Natalino (nat_tronello) e la promessa calata nel pozzo (b4_tronello)',
-  ['natalino', 'gaetano'],
-  { b1: '👁 Il piano di Gaetano', b3_pozzo: '🌿 Mantenere la promessa' },
-  { checkBias: 'best', seedBase: 935000,
-    sequences: { h1: ['ho bisogno di un tronello', 'POZZO', 'barricarsi'] } },
-  ['nat_tronello', 'b4_tronello'], 20,
-  r => !!(r.log.flags && r.log.flags.tronello_promesso && r.log.flags.ada_ride));
-
-
-
-executeUntil('tronello: il CERCHIO del balcone (dilemma: consumato in gruppo, niente offerta ad Ada)',
-  ['natalino', 'emanuela', 'claudia'],
-  {},
-  { checkBias: 'best', seedBase: 945000,
-    sequences: { h1: ['ho bisogno di un tronello', 'il CERCHIO del tronello', 'PIANO PROIBITO', 'barricarsi'] } },
-  ['nat_tronello', 'tronello_cerchio'], 20,
-  r => !!(r.log.flags && r.log.flags.fumata_di_gruppo && r.log.flags.stanza_intravista && !r.log.flags.ada_ride));
-
-
-executeUntil('intercapedine: la mappa di fumo -> misurare la stanza -> IL RITRATTO DELLA CASA (e usato in battaglia)',
-  ['gaetano', 'claudia'],
-  { u1: '🚪 1924 — la stanza del valzer', u2_1924: '🚨 La porta con la targhetta vuota',
-    u4_porta_vuota: '📐 La mappa di fumo' },
-  { checkBias: 'best', seedBase: 950000,
-    sequences: { h1: ['ho bisogno di un tronello', 'il CERCHIO del tronello', 'PIANO PROIBITO', 'barricarsi'] },
-    forceCombatItem: 'Ritratto della Casa' },
-  ['tronello_cerchio', 'u4_intercapedine'], 20,
-  r => !!(r.log.flags && r.log.flags.intercapedine_trovata) && r.log.usedForceItem === true);
-
-
-executeUntil('anello del 1999: la ricevuta dell\'esperimento -> mostrato a Sofia ("per sempre qui") -> sorpresa al Direttore',
-  ['gaetano', 'claudia'],
-  {
-    p2: '🔬 Gaetano vuole capire',
-    w10_orologio: '⏳ "Non ora, Sofì',
-    w11_inventario: '🕯 Fermarsi: "La decisione tocca a Sofia',
-    w12_sofia: '💍 Mostrarle l\'anello',
-  },
-  { checkBias: 'best', seedBase: 955000,
-    sequences: { h1: ['POZZO', 'Tornare alla PISCINA', 'barricarsi'] } },
-  ['p2_esperimento', 'w12_sofia', 'w14_direttore_boss'], 20,
-  r => !!(r.log.flags && r.log.flags.anello_reso));
-
-
-executeUntil('il perdono di Ada riferito al Banchetto -> z2_perdono (gregorio_umano senza il vino)',
-  ['emanuela', 'gaetano'],
-  { b1: '👁 Il piano di Gaetano', k3: '💇 Natalino fa un passo avanti',
-    b3_pozzo: '🍷 Calare nel secchio la BOTTIGLIA' },
-  { checkBias: 'best', seedBase: 960000,
-    sequences: { h1: ['CANTINA', 'POZZO', 'barricarsi'], z1: ['Ada ti perdona', 'VENIRSELO A PRENDERE'] } },
-  ['b4_vino', 'z2_perdono'], 20,
-  r => !!(r.log.flags && r.log.flags.gregorio_umano) && !r.log.scenes.includes('z2_vino'));
-
-
-executeUntil('chef ALLERTATO (bottiglia di Ernesto spaccata): il furto passa a CD 15 ma resta possibile',
-  ['natalino', 'claudia'],
-  { k1: '🍷 Ascoltare le bottiglie', k3: 'Provarci comunque' },
-  { checkBias: 'best', seedBase: 965000,
-    sequences: { h1: ['CANTINA', 'barricarsi'] } },
-  ['k2_sofia_ko', 'k4_furto'], 30,
-  r => !!(r.log.flags && r.log.flags.chef_allertato));
-
-
-executeUntil('l\'avviso del benzinaio si capisce al pozzo -> b1_avviso (benzinaio_sapeva)',
-  ['natalino', 'claudia'],
-  { a0: '⛽ Prima, il pieno al distributore', b1: '⛽ Fermarsi un secondo' },
-  { checkBias: 'best', seedBase: 970000,
-    sequences: { h1: ['POZZO', 'barricarsi'] } },
-  ['a0_benzina', 'b1_avviso'], 20,
-  r => !!(r.log.flags && r.log.flags.benzinaio_sapeva));
-
-
-executeUntil('Emanuela nell\'orto di Ada -> ema_orto (rametto d\'argento: cura veleno + PV)',
-  ['emanuela', 'gaetano'],
-  {},
-  { checkBias: 'best', seedBase: 975000,
-    sequences: { h1: ['controllare una cosa nell', 'PIANO PROIBITO', 'barricarsi'] } },
-  ['ema_orto'], 20,
-  r => !!(r.log.flags && r.log.flags.orto_curato));
-
-
-executeUntil('il menù dei vivi: la contro-offerta di Emanuela al Banchetto -> z2_menu_vivi',
-  ['emanuela', 'federico'],
-  { a6: '🍝' },
-  { checkBias: 'best', seedBase: 980000,
-    sequences: { h1: ['POZZO', 'barricarsi'], z1: ['MENÙ DEI VIVI', 'VENIRSELO A PRENDERE'] } },
-  ['a6_menu', 'z2_menu_vivi'], 20,
-  r => !!(r.log.flags && r.log.flags.menu_dei_vivi));
-
-
-executeUntil('la NOTTE SENZA SANGUE: vino a Gregorio + menù dei vivi -> capitolazione -> alba senza boss',
-  ['emanuela', 'gaetano'],
-  { a6: '🍝', k3: '💇 Natalino fa un passo avanti', z2_vino: '↩ Tornare al tavolo' },
-  { checkBias: 'best', seedBase: 985000,
-    sequences: { h1: ['CANTINA', 'barricarsi'],
-                 z1: ['MENÙ DEI VIVI', 'versare il vino del 1899', 'La casa ha già PERSO'] } },
-  ['z2_menu_vivi', 'z2_vino', 'z2_capitolazione', 'z6_alba'], 24,
-  r => !!(r.log.flags && r.log.flags.capitolazione) && !r.log.scenes.includes('z3_boss') && !r.log.scenes.includes('z4_fase2'));
-
-
-executeUntil('la Stanza del Custode -> il biglietto del 1949 -> Gregorio vacilla -> PENNA SENZA DADO',
-  ['gaetano', 'federico'],
-  {
-    a3: '📖 Prima, sfogliare il registro',
-    a3_registro: 'Firmiamo domani con calma',
-    pp2: '🚪 Bussare alla canonica',
-    pp3: '⛪ Prima: chiedergli della cripta',
-    cst1: '🚪 Entrare, piano, con rispetto',
-    k3: '💇 Natalino fa un passo avanti',
-  },
-  { checkBias: 'best', seedBase: 990000,
-    sequences: { h1: ['Seguire Gregorio quando si ritira', 'Pietrafonda', 'CANTINA', 'barricarsi'],
-                 z1: ['IL SUO biglietto del 1949', 'senza chiedere'] } },
-  ['cst2', 'z_biglietto'], 24,
-  r => !!(r.log.flags && r.log.flags.gregorio_vacilla));
-
-
-executeUntil('il SESTO finale: Gregorio vacilla e ferma la mano -> e_custode_gregorio (la Firma Volontaria)',
-  ['federico', 'gaetano'],
-  {
-    a3: '📖 Prima, sfogliare il registro', a3_registro: 'Firmiamo domani con calma',
-    pp2: '🚪 Bussare alla canonica', cst1: '🚪 Entrare, piano, con rispetto',
-    k3: '💇 Natalino fa un passo avanti',
-    z_custode: 'una mano guantata',
-  },
-  { checkBias: 'best', seedBase: 995000,
-    sequences: { h1: ['Seguire Gregorio quando si ritira', 'CANTINA', 'barricarsi'],
-                 z1: ['IL SUO biglietto del 1949', 'La scelta di cui non parlerete'] } },
-  ['z_biglietto', 'e_custode_gregorio'], 24,
-  r => r.log.ending === 'e_custode_gregorio');
 
 const fatalRuns = results.filter(r => !r.ok);
 for (const r of fatalRuns) fail(`Partita "${r.scenario.name}" (seed ${r.scenario.seed}): ${r.error.split('\n')[0]}`);
@@ -1424,8 +860,11 @@ for (const r of fatalRuns) fail(`Partita "${r.scenario.name}" (seed ${r.scenario
 
 section('Copertura dei percorsi richiesti');
 
-const allScenesSeen = new Set(results.filter(r => r.ok).flatMap(r => r.log.scenes));
-const allEndings = new Set(results.filter(r => r.ok && r.log.ending).map(r => r.log.ending));
+const okRuns = results.filter(r => r.ok);
+const allScenesSeen = new Set(okRuns.flatMap(r => r.log.scenes));
+const allEndings = new Set(okRuns.filter(r => r.log.ending).map(r => r.log.ending));
+const allFlagsSeen = new Set(okRuns.filter(r => r.log.flags).flatMap(r => Object.keys(r.log.flags).filter(k => r.log.flags[k])));
+const allItemsSeen = new Set(okRuns.flatMap(r => r.log.itemsEverOwned || []));
 
 function coverage(label, sceneIds) {
   const seen = sceneIds.filter(id => allScenesSeen.has(id));
@@ -1433,23 +872,12 @@ function coverage(label, sceneIds) {
   console.log(`  ${ok ? '✅' : '❌'} ${label}: ${seen.join(', ') || '(nessuna)'}`);
   if (!ok) fail(`${label}: mancano ${sceneIds.filter(id => !allScenesSeen.has(id)).join(', ')}`);
 }
-
-// Come coverage(), ma controlla dei FLAG (G.flags) effettivamente impostati alla fine di
-// almeno una run riuscita, non solo l'aver visitato la scena che dovrebbe impostarli.
-const allFlagsSeen = new Set(
-  results.filter(r => r.ok && r.log.flags).flatMap(r => Object.keys(r.log.flags).filter(k => r.log.flags[k]))
-);
 function coverageFlag(label, flagNames) {
   const seen = flagNames.filter(f => allFlagsSeen.has(f));
   const ok = seen.length === flagNames.length;
   console.log(`  ${ok ? '✅' : '❌'} ${label}: ${seen.join(', ') || '(nessuno)'}`);
   if (!ok) fail(`${label}: mancano i flag ${flagNames.filter(f => !allFlagsSeen.has(f)).join(', ')}`);
 }
-
-// Come coverage(), ma controlla che un OGGETTO sia comparso nell'inventario finale di
-// almeno una run riuscita (un oggetto rimosso più tardi nella STESSA run, es. l'orologio
-// di Sofia se restituito, non risulterà qui: si verifica quella scena a parte via coverage()).
-const allItemsSeen = new Set(results.filter(r => r.ok && r.log.inventory).flatMap(r => r.log.inventory));
 function coverageItem(label, itemIds) {
   const seen = itemIds.filter(id => allItemsSeen.has(id));
   const ok = seen.length === itemIds.length;
@@ -1457,646 +885,280 @@ function coverageItem(label, itemIds) {
   if (!ok) fail(`${label}: mancano gli oggetti ${itemIds.filter(id => !allItemsSeen.has(id)).join(', ')}`);
 }
 
-coverage('Prologo — registro sfogliato', ['a3_registro']);
-coverage('Prologo — firma diretta', ['a4_firma']);
-coverage('Prologo — firma rinviata (CAR)', ['a4_rinvio']);
+coverage('Prologo completo', ['a0', 'a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7', 'a8']);
+coverage('Soglia (TV, Eleinad, primo duello, la casa si apre)', ['s1', 's2', 's3', 's4', 's4b', 's5']);
+coverage('Hub h1 + scene di respiro', ['h1', 'h2', 'h3', 'h4']);
+coverage('Biblioteca — manuale, note, sala di lettura, specchio, uscita', ['b1', 'b2', 'b3', 'b3b', 'b5', 'b7', 'b8', 'b9', 'b11']);
+coverage('Porte — 1994, imbarco, foto ricomposta, uscita', ['u1', 'u2', 'u2b', 'u3', 'u3b', 'u5', 'u5b', 'u5d', 'u8']);
+coverage('Porte — NON APRIRE: morte vera, cuore, la Cosa', ['u6', 'u6_morte', 'u7', 'u7b']);
+coverage('Porte — la porta degli spiriti', ['u9']);
+coverage('Cucina — segnali, citofono (Luca), dispensa, calata', ['k1', 'k1b', 'k2', 'k2b', 'k2c', 'k3', 'k4', 'k5']);
+coverage('Mercante e Galleria', ['k6', 'k7', 'k8', 'k9', 'k10']);
+coverage('Snodo — sala della Switch, liberazione, maschera', ['m1', 'm2', 'm3', 'm4', 'm6', 'm7', 'm8', 'm9']);
+coverage('Snodo — la via senza joycon (m4b/m5)', ['m4b', 'm5']);
+coverage('Cattedrale — tutte le vie di z2', ['z1', 'z2', 'z2b', 'z3', 'z4', 'z5', 'z5b', 'z6', 'z7', 'z8', 'z9', 'z_ko']);
+coverage('Duello — i colpi sbagliati', ['z4_colpo']);
+coverageFlag('Segreti su Eleinad', ['segreto_specchio', 'segreto_gemelli', 'segreto_trono']);
+coverageFlag('Echi dei boss', ['foto_ricomposta', 'daniele_sabota', 'sonnambuli_svegli', 'gemelli_pace', 'manuale_annotato_letto', 'eleinad_vacilla']);
+coverageFlag('Daniele in squadra (unlockHero)', ['daniele_in_squadra']);
+coverageFlag('Finali (flag)', ['finale_parola', 'finale_gemelli', 'finale_colori', 'finale_scambio', 'finale_grigio']);
+coverageItem('Oggetti chiave posseduti almeno una volta', [
+  'manuale_annotato', 'joycon_sinistro', 'foto_meta_federico', 'foto_meta_daniele', 'foto_gemelli',
+  'cuore_colore', 'boccata_colore', 'conchiglia_gaeta', 'pallina_racchettoni', 'tronello', 'gocce_dottore',
+]);
 
-coverage('Piscina — accappatoio ispezionato (SAG successo)', ['p1_accappatoio']);
-coverage('Piscina — esperimento riuscito (INT successo)', ['p2_esperimento']);
-coverage('Piscina — esperimento fallito (INT fallita, avvelenamento narrativo)', ['p2_esperimento_ko']);
-
-coverage('Tentata fuga', ['p4_fuga']);
-coverage('Rientro ordinato', ['p4_rientro']);
-
-coverage('Hub h1 raggiunto', ['h1']);
-coverage('h2 — la storia di Ada', ['h2']);
-
-coverage('Cantina — scambio con lo Chef (CAR)', ['k4_scambio']);
-coverage('Cantina — furto dalla mensola (DES)', ['k4_furto']);
-coverage('Cantina — combattimento contro lo Chef vinto', ['k4_chef_fight', 'k5_dopo_chef']);
-
-coverage('Piano — stanza 1999', ['u2_1999']);
-coverage('Piano — valzer vinto (DES) -> medaglione', ['u3_medaglione']);
-coverage('Piano — valzer perso -> combattimento bambole vinto', ['u3_bambole_fight', 'u3_bambole_vinte']);
-coverage('Piano — stanza 1899', ['u2_1899']);
-coverage('Piano — specchio velato', ['u5_specchio']);
-
-coverage('Pozzo — giardiniere evitato (SAG/DES)', ['b2_orto']);
-coverage('Pozzo — giardiniere combattuto', ['b2_giardiniere_fight']);
-coverage('Pozzo — medaglione ad Ada', ['b4_medaglione']);
-coverage('Pozzo — bottiglia del 1899 ad Ada', ['b4_vino']);
-coverage('Pozzo — parole giuste su Gregorio (CAR successo)', ['b4_parole']);
-coverage('Pozzo — parola sbagliata (CAR fallita, avvelenamento narrativo)', ['b4_ira']);
-coverage('Pozzo — calata riuscita (FOR)', ['b4_calata']);
-coverage('Pozzo — calata fallita (FOR, avvelenamento narrativo)', ['b4_calata_ko']);
-
-coverage('Finale — rituale completo', ['z2_rituale', 'z3_boss_indebolito', 'z5_vittoria', 'e_alba']);
-coverage('Finale — boss pieno', ['z3_boss', 'z4_fase2', 'z5_vittoria']);
-coverage('Finale — vino di Gregorio', ['z2_vino']);
-coverage('Finale — trattativa riuscita', ['z2_trattativa']);
-coverage('Finale — trattativa fallita', ['z3_boss_arrabbiato']);
-coverage('Finale — sconfitta contro il boss -> celle', ['x_celle']);
+const EXPECTED_ENDINGS = ['e_parola', 'e_gemelli', 'e_colori', 'e_scambio', 'e_grigio'];
+console.log(`  ${allEndings.size >= 5 ? '✅' : '❌'} Finali raggiunti (${allEndings.size}/5): ${[...allEndings].join(', ') || '(nessuno)'}`);
+if (!EXPECTED_ENDINGS.every(e => allEndings.has(e))) {
+  fail(`Finali non raggiunti: ${EXPECTED_ENDINGS.filter(e => !allEndings.has(e)).join(', ')}`);
+}
 {
-  // La sconfitta forzata deve portare a x_celle e poi RIPROVARE lo stesso combattimento
-  // (z3_boss compare due volte nel log: la volta persa e la volta vinta dopo il RETRY).
-  const retryRun = results.find(r => r.ok && /sconfitta VOLUTA/.test(r.scenario.name));
-  const timesBossSeen = retryRun ? retryRun.log.scenes.filter(id => id === 'z3_boss').length : 0;
-  const ok = retryRun && timesBossSeen >= 2 && retryRun.log.scenes.includes('x_celle');
-  console.log(`  ${ok ? '✅' : '❌'} RETRY_COMBAT dopo le celle: z3_boss affrontato ${timesBossSeen} volte`);
-  if (!ok) fail(`RETRY_COMBAT: non risulta un secondo tentativo di z3_boss dopo x_celle (visto ${timesBossSeen} volte)`);
-}
-coverage('Finale — z_custode', ['z_custode']);
-coverage('Finale — z_resa', ['z_resa']);
-
-coverage('Pietrafonda — pista completa (pp1..pp7)', ['pp1', 'pp2', 'pp3', 'pp4', 'pp6', 'pp7']);
-coverage('Pietrafonda — bar del 1999 (SAG successo)', ['pp2_bar']);
-coverage('Pietrafonda — cripta dei custodi (INT successo)', ['pp4_cripta']);
-coverage('Pietrafonda — nebbia della risalita (SAG fallita, avvelenamento narrativo)', ['pp6_ko']);
-coverageFlag('Pietrafonda — flag pista_paese', ['pista_paese']);
-coverageFlag('Pietrafonda — flag segreto_custodi', ['segreto_custodi']);
-coverage('Banchetto — Bengala usato in combattimento (k4_chef_fight)', ['k4_chef_fight']);
-{
-  const bengalaRun = results.find(r => r.ok && r.log.usedForceItem);
-  console.log(`  ${bengalaRun ? '✅' : '❌'} Bengala effettivamente LANCIATO in almeno un combattimento`);
-  if (!bengalaRun) fail('Bengala: nessuna run ha registrato log.usedForceItem=true (mai lanciato davvero in combattimento)');
-}
-coverage('Banchetto — i vespri di Don Michele (richiede campanella_1974)', ['z_vespri']);
-coverageFlag('Banchetto — flag vespri_suonati', ['vespri_suonati']);
-coverage('Banchetto — l\'offerta impensabile (toccata, non necessariamente accettata)', ['z_smemorati']);
-coverage('Banchetto — l\'offerta impensabile ACCETTATA (quarto finale)', ['e_smemorati']);
-
-/* ---- ESPANSIONE: IL MONDO DEL RIFLESSO ---- */
-
-coverage('Riflesso — ingresso e i due esiti del tuffo', ['w1_tuffo', 'w2_riflesso', 'w2_riflesso_ko']);
-coverage('Riflesso — il giardino capovolto e la pattuglia', ['w3_giardino', 'w3_pattuglia_combat']);
-coverage('Riflesso — Sofia e il suo racconto (l\'Inventario)', ['w4_sofia', 'w5_racconto']);
-coverage('Riflesso — il gruppo del 1924 (i Ballerini)', ['w6_1924']);
-coverage('Riflesso — il cambio di guardia e il Direttore', ['w7_ronda', 'w7_ronda_combat', 'w8_direttore']);
-coverage('Riflesso — lo studio privato e il Doppio di Sofia', ['w9_studio', 'w9_studio_combat']);
-coverage('Riflesso — l\'orologio ritrovato e restituito', ['w10_orologio', 'w10_orologio_reso']);
-coverage('Riflesso — la Sala dell\'Inventario e le sue diramazioni', ['w11_inventario', 'w12_tradimento', 'w12_sofia']);
-coverage('Riflesso — lo scontro col Direttore (boss)', ['w14_direttore_boss']);
-coverage('Riflesso — vittoria e il prezzo amaro pagato da Sofia', ['w15_vittoria', 'w16_amaro']);
-coverage('Riflesso — la fuga dalla casa che crolla (e la variante KO)', ['w17_fuga', 'w17_fuga_ko']);
-coverage('Riflesso — la soglia e il ritorno alla piscina vera', ['w18_soglia', 'w_finale']);
-coverageFlag('Riflesso — flag chiave (attraversamento, Sofia, Direttore, vittoria)', [
-  'riflesso_attraversato', 'sofia_incontrata', 'inventario_scoperto', 'regole_casa_note',
-  'gruppo_1924_visto', 'direttore_incontrato', 'direttore_sconfitto', 'ostaggi_liberati',
-  'riflesso_fatto',
-]);
-
-/* ---- ESPANSIONE: LE SCENE DEL CUORE ---- */
-
-coverage('Il balcone — l\'esito di Gaetano e Claudia (la foto con la nebbia sbagliata)', ['cuore_gc_esito']);
-coverage('Scene del cuore — Gaetano e Claudia, Federico ed Emanuela, Natalino', [
-  'cuore_gc', 'cuore_fe', 'cuore_fe_esito', 'cuore_nat', 'cuore_nat_esito',
-]);
-coverageFlag('Scene del cuore — flag impostati', ['cuore_gc', 'cuore_fe', 'cuore_nat']);
-
-/* ---- ESPANSIONE: OSSARIO, SOFFITTA, STANZE 1949/1974, GARAGE ---- */
-
-coverage('Ossario — tour completo (dietro la cella frigorifera)', ['os1', 'os2', 'os3', 'os4', 'os5', 'os6']);
-coverageFlag('Ossario — flag chiave (tacca di Gregorio, bagagli mai ritirati, segreto del Contabile)', [
-  'sceso_ossario', 'tacca_di_gregorio', 'bagagli_visti', 'segreto_contabile', 'ossario_visitato',
-]);
-coverage('Soffitta — tour completo (telescopio, casse, nido dei ritratti + variante di combattimento)', [
-  'sf1', 'sf2', 'sf3', 'sf4', 'sf5', 'sf6',
-]);
-coverageFlag('Soffitta — flag chiave (occhio nella piscina, lettere lette)', ['visto_occhio', 'lettere_lette']);
-coverage('Stanza 1949 — la mano di scopa interrotta (vinta e persa)', ['s49_1', 's49_2', 's49_3', 's49_3_ko']);
-coverageFlag('Stanza 1949 — flag esito della partita', ['carte_1949_vinte', 'carte_1949_perse']);
-coverage('Stanza 1974 — la comune e l\'ultima registrazione', ['s74_1', 's74_2', 's74_3']);
-coverageFlag('Stanza 1974 — flag ascolto/possesso del nastro', ['nastro_1974_ascoltato', 'stanza_1974_visitata']);
-coverage('Garage/rimessa — il motore smontato (candela recuperata pulita e con fracasso)', [
-  'gr1', 'gr2', 'gr3', 'gr3_ko',
-]);
-coverageFlag('Garage — flag visita', ['garage_visto']);
-
-/* ---- ESPANSIONE: LA STRADA CHE TORNA ---- */
-
-coverage('Strada che torna — la discesa, la rivelazione e la notte persa', [
-  'ft1', 'ft2_capito', 'ft2_notte',
-]);
-coverage('Strada che torna — eco al Banchetto (denuncia della geometria)', ['z2_strada']);
-coverageFlag('Strada che torna — flag di trama', ['strada_che_torna', 'casa_rispetta']);
-
-/* ---- ESPANSIONE: GRATTA E VINCI ---- */
-
-coverage('Gratta e Vinci — il gradino del corridoio e l\'ultimo biglietto al Banchetto', ['gv1', 'gvz']);
-coverageFlag('Gratta e Vinci — flag di trama', ['ultimo_biglietto', 'biglietto_strappato']);
-
-/* ---- ESPANSIONE: ECHI INCROCIATI ---- */
-
-coverage('Echi incrociati — lanterna sulle bambole e nastro sullo Chef', ['u3_lanterna', 'k4_nastro']);
-coverageFlag('Echi incrociati — flag di trama', ['bambole_addormentate', 'chef_amico']);
-
-/* ---- ESPANSIONE: GLI ALLEATI DEL BANCHETTO ---- */
-
-coverage('Alleati del Banchetto — lo sciopero della cucina e il cerchio di porcellana', ['z2_alleato', 'z3_boss_solo', 'z2_bambole']);
-coverageFlag('Alleati del Banchetto — flag di trama', ['cucina_in_sciopero', 'cerchio_di_porcellana']);
-coverage('La diretta di Claudia', ['z2_claudia']);
-coverage('Il perdono di Ada al Banchetto', ['z2_perdono']);
-coverage('Coerenza del Giardiniere — vittoria nell\'orto ricordata dai filari', ['b2_vinto']);
-coverageFlag('Coerenza del Giardiniere — flag', ['giardiniere_potato']);
-coverage('Eco a Pietrafonda — la corriera del \'74', ['pp_anello']);
-coverageFlag('Eco a Pietrafonda — flag', ['paese_sa']);
-coverage('Il quinto finale — la proposta, il rifiuto e la penna spezzata', ['z_penna', 'z_penna_no', 'e_penna']);
-coverage('La Stanza del Custode e il biglietto del 1949', ['cst1', 'cst2', 'z_biglietto']);
-coverageFlag('Stanza del Custode — flag', ['stanza_custode', 'gregorio_vacilla']);
-coverage('Il tronello — la pausa di Natalino e la promessa al pozzo', ['nat_tronello', 'b4_tronello']);
-coverage('Il tronello — il cerchio del balcone', ['tronello_cerchio']);
-coverageFlag('Il cerchio — flag', ['fumata_di_gruppo', 'stanza_intravista']);
-coverage('L\'intercapedine — il ritratto della casa', ['u4_intercapedine']);
-coverageFlag('L\'intercapedine — flag', ['intercapedine_trovata']);
-coverageFlag('Il tronello — flag', ['tronello_promesso', 'ada_ride']);
-
-
-
-
-
-
-
-
-
-
-/* ---- ESPANSIONE: NUOVI OGGETTI ---- */
-
-coverageItem('Nuovi oggetti — ottenuti almeno una volta nelle rispettive scene', [
-  'lanterna_1899', 'asso_di_denari', 'nastro_1974', 'candela_motore', 'gratta_vinci', 'torcia_led', 'accendino', 'birra_limone', 'anello_1999', 'taralli', 'orologio_sofia', 'inventario_riflesso', 'lettere_1899',
-]);
-
-console.log(`  ${allEndings.size >= 6 ? '✅' : '❌'} Finali raggiunti (${allEndings.size}/6): ${[...allEndings].join(', ') || '(nessuno)'}`);
-if (allEndings.size < 6) {
-  const missing = ['e_alba', 'e_custode', 'e_ospiti', 'e_smemorati', 'e_penna', 'e_custode_gregorio'].filter(e => !allEndings.has(e));
-  fail(`Finali non raggiunti in nessuna delle ${scenarios.length} run: ${missing.join(', ')}`);
+  const sizes = new Set(okRuns.map(r => r.scenario.heroes.length));
+  const ok = sizes.has(1) && sizes.has(2) && sizes.has(5);
+  console.log(`  ${ok ? '✅' : '❌'} Dimensioni del party coperte: ${[...sizes].sort().join(', ')} (richieste 1, 2 e 5)`);
+  if (!ok) fail('Manca una run in 1, 2 o 5 giocatori');
 }
 
-/* ==================== VERIFICHE DIRETTE: VELENO, MALUS -2, ANTIDOTO, MOKA ====================
-   Nota storica: il bug "G.lastRoller mai assegnato" è stato CORRETTO in engine.js
-   (pickHeroForCheck ora registra chi tira prima del gotoScene). Le verifiche dirette
-   qui sotto restano: controllano il meccanismo del malus e dell'antidoto in isolamento. */
+/* ==================== VERIFICHE DIRETTE ==================== */
 
-section('Verifiche dirette: malus -2 da veleno e cura con l\'Antidoto');
-
-function findHeroButton(box, heroName) {
-  return buttons(box).find(b => b.innerHTML.startsWith(heroName));
-}
-
-
-
-
-
-
-
-
-
-(function testPennaSenzaDado() {
-  section('Verifica diretta: la Penna senza dado (segreto della cripta + Gregorio che vacilla)');
-  const game = buildGame(2468);
-  game.act(() => game.api.Engine.newGame([{ heroId: 'natalino', player: '' }, { heroId: 'emanuela', player: '' }]));
+(function testKillRollerRisparmiaUltimoVivo() {
+  section('Verifica diretta: killRoller NON uccide mai l\'ultimo vivo');
+  const game = buildGame(1111);
+  game.act(() => game.api.Engine.newGame([{ heroId: 'natalino', player: '' }]));
   const G = game.getG();
-  G.flags.un_nodo_sciolto = true; G.flags.segreto_custodi = true; G.flags.gregorio_vacilla = true;
-  game.act(() => game.api.Engine.gotoScene('z1'));
-  const b = matchButton(buttons(game.doc.getElementById('choices')), 'SENZA chiedere');
-  if (!b) { fail('testPennaSenzaDado: la scelta combinata non compare con entrambi i flag'); return; }
-  game.act(() => b.onclick());
-  if (G.sceneId !== 'e_penna') fail(`testPennaSenzaDado: attesa e_penna, trovata ${G.sceneId}`);
-  console.log('  ✅ Penna senza dado: scelta visibile coi due flag e arrivo diretto a e_penna');
+  game.act(() => game.api.Engine.gotoScene('u1'));
+  game.act(() => matchButton(buttons(game.doc.getElementById('choices')), 'NON APRIRE').onclick());
+  game.act(() => matchButton(buttons(game.doc.getElementById('choices')), 'Immergersi').onclick());
+  const heroBtn = buttons(game.doc.getElementById('modal-generic-content'))[0];
+  if (!heroBtn) { fail('killRollerUltimoVivo: modale della prova senza bottoni'); return; }
+  game.withForcedRandom(0, () => game.act(() => heroBtn.onclick())); // 1 naturale: fallita
+  const cont = game.doc.getElementById('btn-dice-continue');
+  if (typeof cont.onclick === 'function') game.act(() => cont.onclick());
+  if (G.sceneId !== 'u6_morte') { fail(`killRollerUltimoVivo: attesa u6_morte, trovata ${G.sceneId}`); return; }
+  if (G.party[0].morto) fail('killRollerUltimoVivo: l\'ULTIMO vivo è stato ucciso da killRoller (vietato dal design)');
+  else console.log('  ✅ u6_morte raggiunta in solitaria: il Sopravvissuto NON muore (mai sull\'ultimo vivo)');
 })();
 
-(function testRitualeServeSaleEAcqua() {
-  section('Verifica diretta: il rituale esige sale e acqua IN INVENTARIO (e li consuma)');
-  const game = buildGame(7474);
-  game.act(() => game.api.Engine.newGame([{ heroId: 'claudia', player: '' }, { heroId: 'gaetano', player: '' }]));
+(function testMorteSpiritoRevive() {
+  section('Verifica diretta: morte vera → SPIRITO → Cuore di Colore dal Mercante → resurrezione');
+  const game = buildGame(2222);
+  game.act(() => game.api.Engine.newGame([{ heroId: 'claudia', player: '' }, { heroId: 'gaetano', player: '' }, { heroId: 'emanuela', player: '' }]));
   const G = game.getG();
-  G.flags.rituale_noto = true; G.flags.un_nodo_sciolto = true;
-  game.act(() => game.api.Engine.gotoScene('z1'));
-  let btns = buttons(game.doc.getElementById('choices'));
-  if (matchButton(btns, 'IL RITUALE')) fail('testRitualeServeSaleEAcqua: il rituale è offerto SENZA sale e acqua in inventario');
-  G.inventory.push('sale_grosso', 'acqua_pozzo');
-  game.act(() => game.api.Engine.gotoScene('h2'));
-  game.act(() => game.api.Engine.gotoScene('z1'));
-  btns = buttons(game.doc.getElementById('choices'));
-  const rit = matchButton(btns, 'IL RITUALE');
-  if (!rit) { fail('testRitualeServeSaleEAcqua: il rituale NON è offerto nemmeno con gli oggetti'); return; }
-  game.act(() => rit.onclick());
-  if (G.inventory.includes('sale_grosso') || G.inventory.includes('acqua_pozzo')) {
-    fail('testRitualeServeSaleEAcqua: sale o acqua non consumati dal rituale');
+
+  // morte VERA per la via del gioco: u6 fallita → killRoller
+  game.act(() => game.api.Engine.gotoScene('u1'));
+  game.act(() => matchButton(buttons(game.doc.getElementById('choices')), 'NON APRIRE').onclick());
+  game.act(() => matchButton(buttons(game.doc.getElementById('choices')), 'Immergersi').onclick());
+  const heroBtn = buttons(game.doc.getElementById('modal-generic-content'))[0];
+  if (!heroBtn) { fail('morteSpiritoRevive: modale della prova senza bottoni'); return; }
+  const rollerName = heroBtn.innerHTML.split(' ')[0];
+  game.withForcedRandom(0, () => game.act(() => heroBtn.onclick()));
+  const cont = game.doc.getElementById('btn-dice-continue');
+  if (typeof cont.onclick === 'function') game.act(() => cont.onclick());
+  const spirito = G.party.find(h => h.morto);
+  if (!spirito) { fail('morteSpiritoRevive: nessun morto vero dopo u6 fallita (killRoller rotto)'); return; }
+  if (spirito.hp !== 0) fail(`morteSpiritoRevive: lo spirito ha ${spirito.hp} PV (attesi 0)`);
+  if (!new RegExp(rollerName.split(' ')[0]).test(spirito.name)) fail(`morteSpiritoRevive: morto ${spirito.name}, ma a tirare era ${rollerName}`);
+  if (!/SPIRITO/.test(partyBarText(game.doc))) fail('morteSpiritoRevive: la barra del gruppo non mostra 👻 SPIRITO');
+
+  // dal Mercante: il Cuore costa 12🎨 e il tronello (di partenza)
+  G.gold = 20;
+  game.act(() => game.api.Engine.gotoScene('k6'));
+  const cuoreBtn = matchButton(enabledButtons(game.doc.getElementById('choices')), 'CUORE DI COLORE');
+  if (!cuoreBtn) { fail('morteSpiritoRevive: il CUORE DI COLORE non è acquistabile (manca il tronello di partenza?)'); return; }
+  game.act(() => cuoreBtn.onclick());
+  if (!G.inventory.includes('cuore_colore')) { fail('morteSpiritoRevive: cuore_colore non in zaino dopo l\'acquisto'); return; }
+  if (G.inventory.includes('tronello')) fail('morteSpiritoRevive: il tronello non è stato ceduto al Mercante');
+  if (G.gold !== 8) fail(`morteSpiritoRevive: Colore atteso 8 dopo l'acquisto, trovato ${G.gold}`);
+
+  // resurrezione: useRevive popola la modale, applyRevive fa il lavoro (il bottone
+  // reale ha l'onclick DENTRO l'HTML, come per l'antidoto: si chiama la funzione)
+  game.act(() => game.api.Engine.useRevive('cuore_colore'));
+  const modalHtml = game.doc.getElementById('modal-generic-content').innerHTML;
+  if (!new RegExp(spirito.name.split(' ')[0]).test(modalHtml)) fail('morteSpiritoRevive: useRevive non elenca lo spirito nella modale');
+  const idx = G.party.indexOf(spirito);
+  game.act(() => game.api.Engine.applyRevive('cuore_colore', idx));
+  if (spirito.morto) fail('morteSpiritoRevive: applyRevive non ha tolto lo stato di SPIRITO');
+  if (spirito.hp !== Math.ceil(spirito.maxHp / 2)) fail(`morteSpiritoRevive: PV attesi ${Math.ceil(spirito.maxHp / 2)}, trovati ${spirito.hp}`);
+  if (G.inventory.includes('cuore_colore')) fail('morteSpiritoRevive: il Cuore non è stato consumato');
+  if (!G.flags['tornato_' + spirito.id]) fail('morteSpiritoRevive: flag tornato_<id> non impostato');
+  if (/SPIRITO/.test(partyBarText(game.doc))) fail('morteSpiritoRevive: la barra mostra ancora SPIRITO dopo la resurrezione');
+  if (!failures) console.log(`  ✅ ${spirito.name}: morte vera a u6, 👻 SPIRITO in barra, Cuore comprato (12🎨+tronello), resurrezione a ${spirito.hp}/${spirito.maxHp} PV`);
+
+  // useRevive senza spiriti non deve esplodere
+  const game2 = buildGame(2223);
+  game2.act(() => game2.api.Engine.newGame([{ heroId: 'natalino', player: '' }]));
+  game2.getG().inventory.push('cuore_colore');
+  try { game2.act(() => game2.api.Engine.useRevive('cuore_colore')); }
+  catch (e) { fail(`morteSpiritoRevive: useRevive senza spiriti ha lanciato: ${e.message}`); }
+})();
+
+(function testMercanteBoccata() {
+  section('Verifica diretta: il Mercante vende la Boccata di Colore (cura il Grigiore)');
+  const game = buildGame(3333);
+  game.act(() => game.api.Engine.newGame([{ heroId: 'emanuela', player: '' }, { heroId: 'federico', player: '' }]));
+  const G = game.getG();
+  G.gold = 5;
+  game.act(() => game.api.Engine.gotoScene('k6'));
+  const btn = matchButton(enabledButtons(game.doc.getElementById('choices')), 'Boccata di Colore');
+  if (!btn) { fail('mercanteBoccata: bottone della Boccata assente/disabilitato con 5🎨'); return; }
+  game.act(() => btn.onclick());
+  if (!G.inventory.includes('boccata_colore')) fail('mercanteBoccata: boccata_colore non in zaino');
+  if (G.gold !== 2) fail(`mercanteBoccata: Colore atteso 2, trovato ${G.gold}`);
+  // e la boccata CURA il Grigiore: useAntidote/applyAntidote
+  G.party[1].veleno = true;
+  game.act(() => game.api.Engine.useAntidote('boccata_colore'));
+  if (!/Federico/.test(game.doc.getElementById('modal-generic-content').innerHTML)) fail('mercanteBoccata: useAntidote non mostra l\'INGRIGITO');
+  game.act(() => game.api.Engine.applyAntidote('boccata_colore', 1));
+  if (G.party[1].veleno !== false) fail('mercanteBoccata: la Boccata non ha curato il Grigiore');
+  if (G.inventory.includes('boccata_colore')) fail('mercanteBoccata: la Boccata non è stata consumata');
+  console.log('  ✅ Boccata comprata (3🎨) e usata: il Grigiore se ne va, l\'oggetto si consuma');
+})();
+
+(function testUnlockHeroModale() {
+  section('Verifica diretta: unlockHero (Daniele) — la modale ritardata (600ms) viene drenata');
+  const game = buildGame(4444);
+  game.act(() => game.api.Engine.newGame([{ heroId: 'gaetano', player: '' }, { heroId: 'claudia', player: '' }]));
+  const G = game.getG();
+  G.inventory.push('joycon_sinistro', 'lattina_zero');
+  game.act(() => game.api.Engine.gotoScene('m3'));
+  game.act(() => matchButton(buttons(game.doc.getElementById('choices')), 'Accoppiare il joy-con').onclick()); // m4
+  game.act(() => matchButton(buttons(game.doc.getElementById('choices')), 'Prenderlo al volo').onclick());     // m6 → unlockHero
+  if (!G.party.some(h => h.id === 'daniele')) { fail('unlockHero: Daniele non è entrato nel party a m6'); return; }
+  if (!G.flags.daniele_in_squadra) fail('unlockHero: flag daniele_in_squadra mancante');
+  if (!G.uses.daniele || Object.keys(G.uses.daniele).length === 0) fail('unlockHero: usi delle abilità di Daniele non inizializzati');
+  const modal = game.doc.getElementById('modal-generic');
+  const html = game.doc.getElementById('modal-generic-content').innerHTML;
+  if (modal.classList.contains('hidden') || !/si unisce al gruppo/.test(html)) {
+    fail('unlockHero: la modale di benvenuto (setTimeout 600ms) non risulta aperta dopo il drain dei timer');
+  } else {
+    console.log('  ✅ Daniele si unisce a m6: party aggiornato, usi pronti, modale ritardata aperta dal drain dei timer');
   }
-  console.log('  ✅ Rituale: nascosto senza ingredienti, offerto e CONSUMANTE con sale e acqua in zaino');
 })();
 
+(function testCapitoliRientraNellaCasa() {
+  section('Verifica diretta: "Rientra nella Casa" — capitolo z1 con Daniele (addHero) fino a e_parola');
+  const game = buildGame(5555);
+  const E = game.api.Engine;
+  if (E.reviveUnlocked()) fail('capitoli: "Rientra nella Casa" risulta sbloccato PRIMA di aver visto un finale');
+  const CH = game.api.CHAPTERS;
+  const idx = CH.findIndex(c => (c.scene || c.id) === 'z1' && c.addHero === 'daniele');
+  if (idx < 0) { fail('capitoli: nessun capitolo z1 con addHero daniele in CHAPTERS'); return; }
+  game.act(() => E.startChapter(idx));
+  const G = game.getG();
+  if (G.sceneId !== 'z1') fail(`capitoli: scena attesa z1, trovata ${G.sceneId}`);
+  if (!G.party.some(h => h.id === 'daniele')) fail('capitoli: Daniele NON è nel party del capitolo (addHero rotto)');
+  if (G.party.length !== 6) fail(`capitoli: attesi 6 eroi (5 amici + Daniele), trovati ${G.party.length}`);
+  const c = CH[idx];
+  for (const f of Object.keys(c.flags || {})) if (!G.flags[f]) fail(`capitoli: flag del capitolo "${f}" non applicato`);
+  for (const it of (c.items || [])) if (!G.inventory.includes(it)) fail(`capitoli: oggetto del capitolo "${it}" non nello zaino`);
+  // e il capitolo è GIOCABILE: la via della Parola fino in fondo (nessun dado nel duello)
+  const click = (m) => {
+    const b = matchButton(enabledButtons(game.doc.getElementById('choices')), m);
+    if (!b) throw new Error(`bottone "${m}" non trovato in ${G.sceneId}`);
+    game.act(() => b.onclick());
+  };
+  try {
+    click('Percorrere la navata');            // z1 → z2
+    click('Smontiamolo');                     // z2 → z3 (richiede Daniele + manuale)
+    click('STRAWMAN');                        // z3 → z4
+    click('FALSA DICOTOMIA');                 // z4 → z5
+    click('RICATTO EMOTIVO');                 // z5 → z5b
+    click('Guardarlo cadere');                // z5b → e_parola
+  } catch (e) { fail(`capitoli: duello dal capitolo z1 interrotto: ${e.message}`); }
+  if (G.sceneId !== 'e_parola') fail(`capitoli: atteso e_parola a fine duello, trovato ${G.sceneId}`);
+  if (!E.reviveUnlocked()) fail('capitoli: reviveUnlocked ancora falso dopo un finale');
+  else console.log('  ✅ Capitolo z1: 6 eroi (Daniele incluso), flag e zaino pronti, duello giocato fino a e_parola, sblocco registrato');
+  // e il capitolo "a mani nude" (z1_puro) apre la stessa scena
+  const idx2 = CH.findIndex(c2 => c2.id === 'z1_puro');
+  if (idx2 >= 0) {
+    game.act(() => E.startChapter(idx2));
+    if (game.getG().sceneId !== 'z1') fail('capitoli: z1_puro non apre z1');
+  }
+})();
 
-
-
-(function testExportImportSalvataggio() {
-  section('Verifica diretta: codice di esportazione dei salvataggi (roundtrip tra dispositivi)');
-  const game = buildGame(7711);
+(function testSalvataggioRicarica() {
+  section('Verifica diretta: salvataggio/ricarica + codici di esportazione (roundtrip)');
+  const game = buildGame(6666);
   const E = game.api.Engine;
   game.act(() => E.newGame([{ heroId: 'gaetano', player: 'Gali' }, { heroId: 'emanuela', player: '' }], 1));
   game.act(() => E.gotoScene('a2'));
   const G1 = game.getG();
-  G1.inventory.push('asso_di_denari'); G1.gold = 7;
+  G1.inventory.push('manuale_annotato'); G1.gold = 7;
   game.act(() => E.gotoScene('a3'));   // l'auto-save fotografa lo stato
+  // ricarica dallo stesso slot
+  game.act(() => E.loadGame(1));
+  let G2 = game.getG();
+  if (G2.sceneId !== 'a3') fail(`saveLoad: scena attesa a3 dopo loadGame, trovata ${G2.sceneId}`);
+  if (!G2.inventory.includes('manuale_annotato') || G2.gold !== 7) fail('saveLoad: zaino o Colore persi nella ricarica');
+  if (G2.party[0].player !== 'Gali') fail('saveLoad: nome del giocatore perso');
+  // "altro dispositivo": export → import su slot diverso → load
   const code = E.exportCode(1);
-  if (!code) { fail('testExportImport: exportCode ha restituito null'); return; }
-  // "altro dispositivo": si importa su uno slot diverso e si carica
+  if (!code) { fail('saveLoad: exportCode ha restituito null'); return; }
   const err = E.importCode(code, 3);
-  if (err) { fail('testExportImport: importCode ha rifiutato il proprio codice: ' + err); return; }
+  if (err) { fail('saveLoad: importCode ha rifiutato il proprio codice: ' + err); return; }
   game.act(() => E.loadGame(3));
-  const G2 = game.getG();
-  if (G2.sceneId !== 'a3') fail(`testExportImport: scena attesa a3, trovata ${G2.sceneId}`);
-  if (!G2.inventory.includes('asso_di_denari') || G2.gold !== 7) fail('testExportImport: inventario o Sangue Freddo persi nel viaggio');
-  if (G2.party[0].player !== 'Gali') fail('testExportImport: nome del giocatore perso');
-  if (E.importCode('non-un-codice!!!', 3) === null) fail('testExportImport: un codice spazzatura è stato accettato');
-  console.log('  ✅ Export/import: codice generato, importato su altro slot, stato integro (scena, zaino, oro, nomi) e spazzatura rifiutata');
+  G2 = game.getG();
+  if (G2.sceneId !== 'a3' || G2.gold !== 7) fail('saveLoad: stato corrotto dopo il viaggio export/import');
+  if (E.importCode('non-un-codice!!!', 3) === null) fail('saveLoad: un codice spazzatura è stato accettato');
+  console.log('  ✅ Salvataggio, ricarica, export/import tra slot: stato integro (scena, zaino, Colore, nomi) e spazzatura rifiutata');
 })();
 
-(function testRiviviLaNotte() {
-  section('Verifica diretta: Rivivi la Notte (sblocco al finale, capitoli con flag e zaino pronti)');
-  const game = buildGame(6060);
-  const E = game.api.Engine;
-  if (E.reviveUnlocked()) fail('testRiviviLaNotte: risulta sbloccato PRIMA di aver visto un finale');
-  game.act(() => E.newGame([{ heroId: 'gaetano', player: '' }]));
-  game.act(() => E.gotoScene('e_alba'));
-  if (!E.reviveUnlocked()) { fail('testRiviviLaNotte: NON sbloccato dopo il finale'); return; }
-  // capitolo 9: "Banchetto — tutte le carte in mano"
-  game.act(() => E.startChapter(9));
+(function testSpiritiEsclusiDalleProve() {
+  section('Verifica diretta: gli SPIRITI non tirano dadi e non bevono in combattimento');
+  const game = buildGame(7777);
+  game.act(() => game.api.Engine.newGame([{ heroId: 'claudia', player: '' }, { heroId: 'gaetano', player: '' }]));
   const G = game.getG();
-  if (G.sceneId !== 'z1') fail(`testRiviviLaNotte: capitolo 9 doveva aprire z1 (trovato ${G.sceneId})`);
-  if (G.party.length !== 5) fail('testRiviviLaNotte: il capitolo non schiera tutti e cinque');
-  if (!G.flags.rituale_noto || !G.flags.chef_amico) fail('testRiviviLaNotte: flag del capitolo non applicati');
-  if (!G.inventory.includes('sale_grosso') || !G.inventory.includes('acqua_pozzo')) fail('testRiviviLaNotte: zaino del capitolo non preparato');
-  console.log('  ✅ Rivivi la Notte: sblocco corretto, capitolo del Banchetto con 5 eroi, flag e ingredienti pronti');
-})();
-
-(function testCollezioneImprese() {
-  section('Verifica diretta: la collezione delle imprese persiste tra le notti (per profilo)');
-  const game = buildGame(9292);
-  game.act(() => game.api.Engine.newGame([{ heroId: 'gaetano', player: '' }]));
-  const G1 = game.getG();
-  G1.flags.firma_rinviata = true; G1.flags.medaglione = true;
-  game.act(() => game.api.Engine.gotoScene('e_alba'));
-  // seconda notte, STESSO contesto (stesso localStorage): un'impresa diversa
-  game.act(() => game.api.Engine.newGame([{ heroId: 'claudia', player: '' }]));
-  const G2 = game.getG();
-  G2.flags.storia_ada = true;
-  game.act(() => game.api.Engine.gotoScene('e_alba'));
-  const html = game.doc.getElementById('choices').children.map(c => c.innerHTML).join('\n');
-  const m = html.match(/Collezione di [^:]+: (\d+)\//);
-  if (!m) { fail('testCollezioneImprese: contatore della collezione assente dal finale'); return; }
-  if (Number(m[1]) < 3) fail(`testCollezioneImprese: la collezione ha dimenticato le imprese della prima notte (attese >=3, trovate ${m[1]})`);
-  console.log(`  ✅ Collezione persistente: ${m[1]} imprese ricordate attraverso due notti dello stesso profilo`);
-})();
-
-(function testEpiloghiSmemorati() {
-  section('Verifica diretta: gli Smemorati NON ricordano (epiloghi coerenti con l\'amnesia)');
-  const game = buildGame(6363);
-  game.act(() => game.api.Engine.newGame([{ heroId: 'gaetano', player: '' }, { heroId: 'natalino', player: '' }]));
-  game.act(() => game.api.Engine.gotoScene('e_smemorati'));
-  const html = game.doc.getElementById('choices').children.map(c => c.innerHTML).join('\n');
-  if (!/NON RIPETERE L'ESPERIMENTO/.test(html)) fail('testEpiloghiSmemorati: epilogo amnesia di Gaetano assente');
-  if (/relazione tecnica di quarantadue pagine/.test(html)) fail('testEpiloghiSmemorati: compare l\'epilogo ALBA di Gaetano (che ricorda tutto) in un finale di amnesia');
-  console.log('  ✅ e_smemorati usa epiloghi dedicati all\'amnesia (niente ricordi dettagliati della notte)');
-})();
-
-(function testEpiloghiPenna() {
-  section('Verifica diretta: epiloghi personali e cronache del finale della Penna Spezzata');
-  const game = buildGame(5252);
-  game.act(() => game.api.Engine.newGame([{ heroId: 'gaetano', player: '' }, { heroId: 'natalino', player: '' }]));
-  const G = game.getG();
-  G.flags.finale_penna = true; G.flags.paese_sa = true;
-  game.act(() => game.api.Engine.gotoScene('e_penna'));
-  const scelte = game.doc.getElementById('choices');
-  const html = scelte.children.map(c => c.innerHTML).join('\n');
-  if (!/contachilometri azzerato/.test(html)) fail('testEpiloghiPenna: epilogo personale di Gaetano (tipo penna) assente');
-  if (!/scheggia della penna/.test(html)) fail('testEpiloghiPenna: epilogo personale di Natalino (tipo penna) assente');
-  if (!/Non scrive più. Non deve./.test(html)) fail('testEpiloghiPenna: cronaca della stilografica in teca assente');
-  if (!/Gennaro/.test(html)) fail('testEpiloghiPenna: cronaca della corriera (paese_sa) assente');
-  console.log('  ✅ e_penna mostra epiloghi dedicati ai personaggi e le cronache dei flag attivi');
-})();
-
-(function testSorpresaSiSpegne() {
-  section('Verifica diretta: la diretta di Claudia si spegne a battaglia vinta');
-  const game = buildGame(3131);
-  game.act(() => game.api.Engine.newGame([{ heroId: 'claudia', player: '' }, { heroId: 'gaetano', player: '' }, { heroId: 'natalino', player: '' }]));
-  const G = game.getG();
-  G.flags.sorpresa = true;
-  game.act(() => game.api.Engine.gotoScene('z3_boss_solo'));
-  game.act(() => matchButton(buttons(game.doc.getElementById('choices')), 'INIZIA IL COMBATTIMENTO').onclick());
-  // gioca la battaglia fino in fondo con il pilota standard
-  let guard = 0;
-  while (!game.doc.getElementById('combat-banner').classList.contains('victory') && guard++ < 400) {
-    const acts = buttons(game.doc.getElementById('combat-actions'));
-    const dice = game.doc.getElementById('btn-dice-continue');
-    if (!game.doc.getElementById('dice-overlay').classList.contains('hidden')) { game.act(() => dice.onclick && dice.onclick()); continue; }
+  G.party[0].morto = true; G.party[0].hp = 0;
+  // prova fuori combattimento: la modale non deve elencare lo spirito
+  game.act(() => game.api.Engine.gotoScene('a0'));
+  game.act(() => matchButton(buttons(game.doc.getElementById('choices')), 'Claudia guarda').onclick());
+  const heroBtns = buttons(game.doc.getElementById('modal-generic-content'));
+  if (heroBtns.some(b => /Claudia/.test(b.innerHTML))) fail('spiriti: Claudia (morta) compare nella modale della prova');
+  if (!heroBtns.some(b => /Gaetano/.test(b.innerHTML))) fail('spiriti: Gaetano (vivo) NON compare nella modale della prova');
+  // in combattimento: il menu delle cure non deve offrire lo spirito
+  const cont = game.doc.getElementById('btn-dice-continue');
+  if (typeof cont.onclick === 'function') game.act(() => cont.onclick()); // chiudi il tiro di Gaetano
+  const game2 = buildGame(7778);
+  game2.act(() => game2.api.Engine.newGame([{ heroId: 'emanuela', player: '' }, { heroId: 'natalino', player: '' }, { heroId: 'gaetano', player: '' }]));
+  const G2 = game2.getG();
+  G2.party[1].morto = true; G2.party[1].hp = 0; // Natalino spirito
+  game2.act(() => game2.api.Engine.gotoScene('a7'));
+  game2.act(() => matchButton(buttons(game2.doc.getElementById('choices')), 'INIZIA IL COMBATTIMENTO').onclick());
+  // primo menu principale di un eroe: apri il kit (🧪) e controlla la lista degli alleati
+  let guard = 0, checked = false;
+  while (guard++ < 200 && !checked) {
+    const dice = game2.doc.getElementById('btn-dice-continue');
+    if (!game2.doc.getElementById('dice-overlay').classList.contains('hidden')) { game2.act(() => dice.onclick()); continue; }
+    if (!game2.doc.getElementById('screen-combat').classList.contains('active')) break;
+    const acts = buttons(game2.doc.getElementById('combat-actions'));
     if (!acts.length) break;
-    const atk = acts.find(b => /⚔/.test(b.innerHTML)) || acts[0];
-    game.act(() => atk.onclick());
-    const targets = buttons(game.doc.getElementById('combat-actions')).filter(b => /^🎯/.test(b.innerHTML));
-    if (targets.length) game.act(() => targets[0].onclick());
+    const kind = classifyCombatMenu(acts);
+    if (kind === 'main') {
+      const potion = acts.find(b => /^🧪/.test(b.innerHTML) && !b.disabled);
+      if (potion) {
+        game2.act(() => potion.onclick());
+        const allies = buttons(game2.doc.getElementById('combat-actions')).filter(b => /^❤|^💀/.test(b.innerHTML));
+        if (allies.some(b => /Natalino/.test(b.innerHTML))) fail('spiriti: lo SPIRITO compare tra i bersagli delle cure in combattimento');
+        checked = true;
+        break;
+      }
+      game2.act(() => acts.find(b => !b.disabled).onclick());
+    } else {
+      game2.act(() => acts[0].onclick());
+    }
   }
-  if (game.doc.getElementById('combat-banner').classList.contains('victory') && G.flags.sorpresa) {
-    fail('testSorpresaSiSpegne: la sorpresa è rimasta accesa dopo la vittoria contro il boss');
-  }
-  console.log(`  ✅ Sorpresa ${game.doc.getElementById('combat-banner').classList.contains('victory') ? 'spenta dopo la vittoria' : '(battaglia non conclusa nel budget: check saltato senza errori)'}`);
-})();
-
-
-(function testFerroDiCavallo() {
-  section('Verifica diretta: il ferro di cavallo Made in China (Federico ritira il primo 1)');
-  const game = buildGame(9911);
-  game.act(() => game.api.Engine.newGame([{ heroId: 'federico', player: '' }, { heroId: 'emanuela', player: '' }]));
-  const G = game.getG();
-  G.flags.cuore_fe = true;
-  game.act(() => game.api.Engine.gotoScene('u3_bambole_fight'));
-  game.act(() => matchButton(buttons(game.doc.getElementById('choices')), 'INIZIA IL COMBATTIMENTO').onclick());
-  const forzaFumble = new vm.Script('Math.__orig = Math.__orig || Math.random; Math.random = () => 0;');
-  const ripristina = new vm.Script('if (Math.__orig) Math.random = Math.__orig;');
-  let guard = 0, ritirato = false;
-  while (guard++ < 200 && !ritirato) {
-    const dice = game.doc.getElementById('btn-dice-continue');
-    if (!game.doc.getElementById('dice-overlay').classList.contains('hidden') && typeof dice.onclick === 'function') { game.act(() => dice.onclick()); continue; }
-    const acts = buttons(game.doc.getElementById('combat-actions'));
-    if (!acts.length) break;
-    const attacco = acts.find(b => /⚔/.test(b.innerHTML));
-    if (!attacco) { game.act(() => acts[0].onclick()); continue; }
-    forzaFumble.runInContext(game.context);
-    game.act(() => attacco.onclick());
-    const targets = buttons(game.doc.getElementById('combat-actions')).filter(b => /^🎯/.test(b.innerHTML));
-    if (targets.length) game.act(() => targets[0].onclick());
-    ripristina.runInContext(game.context);
-    const logTxt = game.doc.getElementById('combat-log').children.map(c => c.innerHTML).join('\n');
-    if (/Made in China/.test(logTxt)) { ritirato = true; break; }
-    if (/vittoria|VITTORIA/i.test(logTxt) && !acts.length) break;
-  }
-  if (!ritirato) fail('testFerroDiCavallo: il ritiro del ferro di cavallo non è mai scattato con fumble forzati');
-  else console.log('  ✅ Ferro di cavallo: il primo 1 di Federico viene ritirato, col log giusto');
-})();
-
-(function testEchiFaseDue() {
-  section('Verifica diretta: mestolo dello Chef e sguardo delle signorine nella battaglia finale');
-  const game = buildGame(9191);
-  game.act(() => game.api.Engine.newGame([{ heroId: 'gaetano', player: '' }, { heroId: 'claudia', player: '' }, { heroId: 'natalino', player: '' }]));
-  const G = game.getG();
-  G.flags.cucina_in_sciopero = true; G.flags.cerchio_di_porcellana = true; G.flags.menu_dei_vivi = true;
-  game.act(() => game.api.Engine.gotoScene('z4_fase2'));
-  game.act(() => matchButton(buttons(game.doc.getElementById('choices')), 'INIZIA IL COMBATTIMENTO').onclick());
-  const log = game.doc.getElementById('combat-log').children.map(c => c.innerHTML).join('\n');
-  if (!/MESTOLO DI GHISA/.test(log)) fail('testEchiFaseDue: il mestolo dello Chef non è volato (cucina_in_sciopero senza effetto in fase due)');
-  if (!/signorine di porcellana fissano/.test(log)) fail('testEchiFaseDue: lo sguardo delle signorine non è scattato (cerchio_di_porcellana senza effetto in fase due)');
-  if (!/morde più piano/.test(log)) fail('testEchiFaseDue: il menù dei vivi non ha rallentato il morso della casa');
-  console.log('  ✅ Fase due: mestolo (-5 PV al boss) e sguardo di porcellana (svantaggio) attivi con i rispettivi flag');
-})();
-
-
-(function testDifficoltaIncubo() {
-  section('Verifica diretta: difficoltà Incubo (+25% PV, +1 al colpo, niente porzioni ridotte)');
-  const game = buildGame(8181);
-  game.act(() => game.api.Engine.newGame([{ heroId: 'natalino', player: '' }], null, 'incubo'));
-  const G = game.getG();
-  game.act(() => game.api.Engine.gotoScene('u3_bambole_fight'));
-  game.act(() => matchButton(buttons(game.doc.getElementById('choices')), 'INIZIA IL COMBATTIMENTO').onclick());
-  const log = game.doc.getElementById('combat-log').children.map(c => c.innerHTML).join('\n');
-  if (/Porzioni ridotte/.test(log)) fail('testDifficoltaIncubo: le porzioni ridotte sono scattate anche in Incubo (la casa NON deve perdonare)');
-  // bambola base 8 PV -> 10 in incubo: lo si verifica dal motore
-  const hpBambola = game.api.BESTIARY.bambola.maxHp;
-  const attesi = Math.round(hpBambola * 1.25);
-  console.log(`  ✅ Incubo: porzioni ridotte disattivate; scaling +25% PV verificato staticamente (bambola ${hpBambola} -> ${attesi})`);
-})();
-
-(function testPorzioniRidotte() {
-  section('Verifica diretta: porzioni ridotte per gruppi da 1-2 (scaling dei nemici)');
-  // solo: -30% PV e -1 al colpo
-  const game1 = buildGame(777);
-  game1.act(() => game1.api.Engine.newGame([{ heroId: 'natalino', player: '' }]));
-  game1.act(() => game1.api.Engine.gotoScene('u3_bambole_fight'));
-  game1.act(() => matchButton(buttons(game1.doc.getElementById('choices')), 'INIZIA IL COMBATTIMENTO').onclick());
-  const log1 = game1.doc.getElementById('combat-log').children.map(c => c.innerHTML).join('\n');
-  if (!/Porzioni ridotte/.test(log1) || !/in UNO/.test(log1)) fail('testPorzioniRidotte: nessun avviso di porzioni ridotte per il gruppo da 1');
-  // in tre: nessuno scaling
-  const game3 = buildGame(778);
-  game3.act(() => game3.api.Engine.newGame([{ heroId: 'natalino', player: '' }, { heroId: 'claudia', player: '' }, { heroId: 'gaetano', player: '' }]));
-  game3.act(() => game3.api.Engine.gotoScene('u3_bambole_fight'));
-  game3.act(() => matchButton(buttons(game3.doc.getElementById('choices')), 'INIZIA IL COMBATTIMENTO').onclick());
-  const log3 = game3.doc.getElementById('combat-log').children.map(c => c.innerHTML).join('\n');
-  if (/Porzioni ridotte/.test(log3)) fail('testPorzioniRidotte: lo scaling è scattato anche per un gruppo da 3');
-  console.log('  ✅ Porzioni ridotte: attive in solitaria (avviso nel log), assenti con 3 eroi');
-})();
-
-(function testDiarioDellaNotte() {
-  section('Verifica diretta: il Diario della Notte elenca le conoscenze acquisite');
-  const game = buildGame(4242);
-  game.act(() => game.api.Engine.newGame([{ heroId: 'gaetano', player: '' }, { heroId: 'claudia', player: '' }]));
-  const G = game.getG();
-  G.flags.strada_che_torna = true; G.flags.chef_amico = true; G.flags.rituale_noto = true;
-  game.act(() => game.api.Engine.showDiary());
-  const html = game.doc.getElementById('modal-generic-content').innerHTML;
-  if (!/Cose che la notte vi ha insegnato/.test(html)) fail('testDiarioDellaNotte: sezione delle conoscenze assente dal diario');
-  if (!/tornanti sono un anello/.test(html)) fail('testDiarioDellaNotte: la voce strada_che_torna non compare');
-  if (!/ospiti non si impiattano/.test(html)) fail('testDiarioDellaNotte: la voce chef_amico non compare');
-  if (!/sale sulla firma/.test(html)) fail('testDiarioDellaNotte: la voce rituale_noto non compare');
-  if (/valzer fischiato/.test(html)) fail('testDiarioDellaNotte: compare una voce per un flag NON impostato (bambole_addormentate)');
-  console.log('  ✅ Il Diario della Notte mostra solo le conoscenze davvero acquisite (3 voci attese, flag spenti esclusi)');
-})();
-
-(function testVelenoMalus() {
-  // baseline: Claudia (SAG 4 + passiva Scroll Infinito +2 = +6) SENZA veleno
-  const gameA = buildGame(31337);
-  gameA.act(() => gameA.api.Engine.newGame([{ heroId: 'claudia', player: '' }, { heroId: 'federico', player: '' }]));
-  gameA.act(() => gameA.api.Engine.gotoScene('a2'));
-  gameA.act(() => matchButton(buttons(gameA.doc.getElementById('choices')), 'occhiata alle siepi').onclick());
-  const boxA = gameA.doc.getElementById('modal-generic-content');
-  const btnA = findHeroButton(boxA, 'Claudia');
-  if (!btnA) { fail('testVelenoMalus: bottone di Claudia non trovato nella modale della prova (a2, SAG)'); return; }
-  const baseMod = statModFromButton(btnA.innerHTML);
-  if (baseMod !== 6) fail(`testVelenoMalus: mod SAG base di Claudia inatteso: ${baseMod} (atteso 6 = 4 stat + 2 passiva)`);
-
-  // stesso identico punto della storia, ma con Claudia avvelenata a forza (bypassando il
-  // trigger narrativo rotto, vedi nota sopra)
-  const gameB = buildGame(31337);
-  gameB.act(() => gameB.api.Engine.newGame([{ heroId: 'claudia', player: '' }, { heroId: 'federico', player: '' }]));
-  gameB.act(() => { gameB.getG().party[0].veleno = true; });
-  gameB.act(() => gameB.api.Engine.gotoScene('a2'));
-  gameB.act(() => matchButton(buttons(gameB.doc.getElementById('choices')), 'occhiata alle siepi').onclick());
-  const boxB = gameB.doc.getElementById('modal-generic-content');
-  const btnB = findHeroButton(boxB, 'Claudia');
-  if (!btnB) { fail('testVelenoMalus: bottone di Claudia non trovato nella modale della prova (avvelenata)'); return; }
-  const poisonedMod = statModFromButton(btnB.innerHTML);
-  if (poisonedMod !== baseMod - 2) {
-    fail(`testVelenoMalus: il malus -2 da veleno non risulta applicato correttamente (base=${baseMod}, avvelenata=${poisonedMod}, attesto ${baseMod - 2})`);
-  } else {
-    console.log(`  ✅ Malus -2 da veleno applicato correttamente alle prove (Claudia: ${baseMod} -> ${poisonedMod})`);
-  }
-  if (!/avvelenato dal freddo/i.test(btnB.innerHTML)) {
-    fail('testVelenoMalus: l\'etichetta "avvelenato dal freddo" non appare sul bottone dell\'eroe avvelenato');
-  }
-})();
-
-(function testAntidoto() {
-  const game = buildGame(42424);
-  game.act(() => game.api.Engine.newGame([{ heroId: 'emanuela', player: '' }, { heroId: 'gaetano', player: '' }]));
-  const G = game.getG();
-  G.party[0].veleno = true;
-  G.inventory.push('antidoto');
-  checkInvariants(G, 'prima della cura');
-
-  // useAntidote() imposta modal-generic-content.innerHTML con un bottone per ogni eroe
-  // avvelenato, ma quel bottone ha `onclick="Engine.applyAntidote(...)"` scritto DENTRO
-  // la stringa HTML (non un vero handler JS assegnato via codice): nel browser funziona
-  // (l'HTML viene parsato ed eseguito), ma il nostro `innerHTML` finto è una stringa pura
-  // e NON genera child-node reali (coerente con come il resto del gioco usa innerHTML per
-  // le modali informative) — quindi non possiamo "cliccare" quel bottone, e verifichiamo
-  // solo che la modale si popoli con il nome dell'eroe avvelenato, poi chiamiamo
-  // applyAntidote() direttamente, esattamente come farebbe quel click.
-  game.act(() => game.api.Engine.useAntidote('antidoto'));
-  const box = game.doc.getElementById('modal-generic-content');
-  if (!/Emanuela/.test(box.innerHTML)) fail('testAntidoto: useAntidote non ha mostrato Emanuela (l\'eroe avvelenato) nella modale');
-
-  game.act(() => game.api.Engine.applyAntidote('antidoto', 0));
-  checkInvariants(G, 'dopo la cura');
-  if (G.party[0].veleno !== false) fail(`testAntidoto: applyAntidote non ha rimosso il veleno (veleno=${G.party[0].veleno})`);
-  if (G.inventory.includes('antidoto')) fail('testAntidoto: applyAntidote non ha consumato l\'Antidoto dall\'inventario');
-  if (G.party[0].veleno === false && !G.inventory.includes('antidoto')) {
-    console.log('  ✅ Engine.useAntidote/applyAntidote curano correttamente il veleno e consumano l\'oggetto');
-  }
-
-  // useAntidote() su un gruppo senza nessun avvelenato non deve lanciare eccezioni
-  const game2 = buildGame(51515);
-  game2.act(() => game2.api.Engine.newGame([{ heroId: 'natalino', player: '' }]));
-  game2.getG().inventory.push('antidoto');
-  try {
-    game2.act(() => game2.api.Engine.useAntidote('antidoto'));
-  } catch (e) {
-    fail(`testAntidoto: useAntidote senza avvelenati ha lanciato un'eccezione: ${e.message}`);
-  }
-})();
-
-(function testMoka() {
-  // La Moka di Don Michele (ITEMS.moka: usable + recharge) ricarica TUTTI gli usi delle
-  // abilità di UNA persona. Stesso limite del test dell'Antidoto: il bottone reale nel
-  // gioco ha `onclick="Engine.applyPotion(...)"` scritto dentro l'HTML (innerHTML puro nel
-  // nostro DOM finto, niente child-node reali), quindi chiamiamo applyPotion() come farebbe
-  // quel click, dopo aver verificato che usePotionOutside() abbia popolato la modale.
-  const game = buildGame(63636);
-  game.act(() => game.api.Engine.newGame([{ heroId: 'natalino', player: '' }, { heroId: 'claudia', player: '' }]));
-  const G = game.getG();
-  const natalino = G.party[0];
-  if (natalino.id !== 'natalino') { fail('testMoka: ordine del party inatteso, il test presume party[0]=natalino'); return; }
-
-  // "consuma" gli usi delle abilità di Natalino, come farebbe un combattimento vero
-  for (const ab of natalino.abilities) G.uses[natalino.id][ab.id] = 0;
-  G.inventory.push('moka');
-  checkInvariants(G, 'prima della moka');
-
-  game.act(() => game.api.Engine.usePotionOutside('moka'));
-  const box = game.doc.getElementById('modal-generic-content');
-  if (!/Natalino/.test(box.innerHTML)) fail('testMoka: usePotionOutside non ha mostrato Natalino nella modale di scelta');
-
-  game.act(() => game.api.Engine.applyPotion('moka', 0));
-  checkInvariants(G, 'dopo la moka');
-  const usesAfter = natalino.abilities.map(ab => G.uses[natalino.id][ab.id]);
-  const usesExpected = natalino.abilities.map(ab => ab.uses);
-  const rechargedOk = usesAfter.every((v, i) => v === usesExpected[i]);
-  if (!rechargedOk) {
-    fail(`testMoka: applyPotion('moka', ...) non ha ricaricato tutti gli usi delle abilità di Natalino (attesi ${JSON.stringify(usesExpected)}, trovati ${JSON.stringify(usesAfter)})`);
-  } else {
-    console.log(`  ✅ Engine.applyPotion con item recharge ricarica correttamente tutti gli usi delle abilità (Natalino: ${JSON.stringify(usesAfter)})`);
-  }
-  if (G.inventory.includes('moka')) fail('testMoka: applyPotion non ha consumato la Moka dall\'inventario');
-
-  // la moka NON deve toccare gli usi di ALTRI eroi del party (solo la persona scelta)
-  const claudia = G.party[1];
-  const claudiaUsesOk = claudia.abilities.every(ab => G.uses[claudia.id][ab.id] === ab.uses);
-  if (!claudiaUsesOk) fail('testMoka: la moka ha alterato gli usi di un eroe diverso da quello scelto');
-})();
-
-/* ==================== VERIFICA DIRETTA: L'ASSO DI DENARI (espansione) ====================
-   BUG REALE individuato (NON corretto qui, solo segnalato — vedi report): la descrizione
-   dell'oggetto (js/campaign.js:33-37, ITEMS.asso_di_denari) promette esplicitamente
-   "UNA volta, permette di RITIRARE una prova fallita — il gioco ve lo proporrà al momento
-   giusto", esattamente come il Dado del Destino della Corona di Mezzanotte. Ma in
-   Nota storica: in origine l'offerta di ritiro controllava 'dado_destino' (residuo del
-   motore Corona) e l'Asso di Denari era lettera morta. CORRETTO in engine.js: ora
-   l'offerta scatta con 'asso_di_denari'. Qui verifichiamo il flusso completo:
-   fallimento forzato -> offerta -> SÌ -> asso consumato -> dado ritirato. */
-
-(function testAssoDiDenariRerollBug() {
-  const game = buildGame(24680);
-  game.act(() => game.api.Engine.newGame([{ heroId: 'claudia', player: '' }, { heroId: 'federico', player: '' }]));
-  const G = game.getG();
-  G.inventory.push('asso_di_denari');
-
-  game.act(() => game.api.Engine.gotoScene('a2'));
-  const siepiBtn = matchButton(buttons(game.doc.getElementById('choices')), 'occhiata alle siepi');
-  if (!siepiBtn) { fail('testAssoDiDenariRerollBug: bottone della prova (a2, SAG) non trovato'); return; }
-  game.act(() => siepiBtn.onclick());
-
-  const heroBtn = buttons(game.doc.getElementById('modal-generic-content'))[0];
-  if (!heroBtn) { fail('testAssoDiDenariRerollBug: nessun bottone eroe nella modale della prova'); return; }
-
-  const ctxMath = vm.runInContext('Math', game.context);
-  const realRandom = ctxMath.random;
-  ctxMath.random = () => 0; // garantisce 1 naturale = fallimento (fumble) al tiro
-  game.act(() => heroBtn.onclick());
-  ctxMath.random = realRandom;
-
-  const overlay = game.doc.getElementById('dice-overlay');
-  if (overlay.classList.contains('hidden')) { fail('testAssoDiDenariRerollBug: overlay del dado non visibile dopo il tiro'); return; }
-  const continueBtn = game.doc.getElementById('btn-dice-continue');
-  if (typeof continueBtn.onclick !== 'function') { fail('testAssoDiDenariRerollBug: bottone "Continua" senza onclick dopo il tiro'); return; }
-  game.act(() => continueBtn.onclick());
-
-  const modalGeneric = game.doc.getElementById('modal-generic');
-  const rerollOffered = !modalGeneric.classList.contains('hidden') &&
-    /Asso di Denari/.test(game.doc.getElementById('modal-generic-content').innerHTML);
-  if (!rerollOffered) {
-    fail('testAssoDiDenariRerollBug: il ritiro NON è stato offerto su una prova fallita con l\'Asso in inventario (regressione del fix)');
-    return;
-  }
-  const yesBtn = game.doc.getElementById('btn-reroll-yes');
-  if (!yesBtn || typeof yesBtn.onclick !== 'function') { fail('testAssoDiDenariRerollBug: bottone SÌ del ritiro mancante'); return; }
-  game.act(() => yesBtn.onclick());
-  if (G.inventory.includes('asso_di_denari')) {
-    fail('testAssoDiDenariRerollBug: l\'Asso NON è stato consumato dopo il ritiro');
-  }
-  // il ritiro apre di nuovo l'overlay del dado: completalo
-  const cont2 = game.doc.getElementById('btn-dice-continue');
-  if (typeof cont2.onclick === 'function') game.act(() => cont2.onclick());
-  console.log('  ✅ Asso di Denari: fallimento -> offerta -> ritiro -> consumo, tutto funziona');
-})();
-
-/* ==================== VERIFICA DIRETTA: LA LANTERNA DEL 1899 SENZA MOKA (espansione) ====================
-   BUG REALE individuato (NON corretto qui, solo segnalato — vedi report): os6
-   (js/campaign.js:~1698-1716) NARRA esplicitamente la consegna della Lanterna del 1899
-   ("Oggetto: LANTERNA DEL 1899. Sangue freddo +1.)") anche a chi arriva lì SENZA aver
-   offerto la moka (os4 -> os6 diretto, bypassando os5), ma l'oggetto scena os6 non ha un
-   campo `item: 'lanterna_1899'`: solo os5 (js/campaign.js:1692) lo assegna davvero.
-   Verifichiamo qui l'inventario finale della run dedicata "ossario senza doni". */
-(function testOs6LanternaSenzaMokaBug() {
-  const run = results.find(r => r.ok && /ossario: percorso diretto senza doni/.test(r.scenario.name));
-  if (!run) { fail('testOs6LanternaSenzaMokaBug: run "ossario senza doni" non trovata tra i risultati'); return; }
-  if (!run.log.scenes.includes('os6')) { fail('testOs6LanternaSenzaMokaBug: la run non ha raggiunto os6'); return; }
-  const hasLanterna = (run.log.inventory || []).includes('lanterna_1899');
-  if (hasLanterna) {
-    console.log('  ℹ️ os6: la Lanterna del 1899 risulta assegnata anche senza moka — il bug descritto sopra risulta CORRETTO nel motore.');
-  } else {
-    console.log(`  ⚠️  BUG CONFERMATO (non corretto qui, solo segnalato — vedi commento sopra): passando per os6 SENZA moka, l'inventario finale (${JSON.stringify(run.log.inventory)}) non contiene 'lanterna_1899' nonostante il testo della scena la dichiari ottenuta.`);
-  }
+  if (!checked) fail('spiriti: non sono riuscito ad aprire il menu delle pozioni in combattimento');
+  else console.log('  ✅ Spiriti esclusi dalle prove e dai menu di cura in combattimento');
 })();
 
 /* ==================== ESITO FINALE ==================== */
 
 console.log('\n' + '═'.repeat(60));
 if (failures === 0) {
-  const celleRun = results.filter(r => r.ok).map(r => r.log.scenes.filter(sc => sc === 'x_celle').length).sort((a, b) => a - b);
-  const q = p => celleRun[Math.min(celleRun.length - 1, Math.floor(celleRun.length * p))];
-  console.log(`  ℹ️ Bilanciamento (sconfitte/partita del pilota automatico): mediana ${q(0.5)}, p90 ${q(0.9)}, max ${celleRun[celleRun.length - 1]} — le code lunghe sono i loop di ritentativo del pilota, non l'esperienza umana`);
-  console.log(`✅ TUTTE LE PARTITE SIMULATE COMPLETATE SENZA ERRORI (${results.length} run, ${allScenesSeen.size} scene distinte visitate, ${allEndings.size}/6 finali)`);
+  console.log(`✅ TUTTE LE PARTITE SIMULATE COMPLETATE SENZA ERRORI (${results.length} run, ${allScenesSeen.size} scene distinte visitate, ${allEndings.size}/5 finali)`);
   process.exit(0);
 } else {
   console.log(`❌ ${failures} PROBLEMI RILEVATI su ${results.length} partite simulate`);
   process.exit(1);
 }
-
-function HEROES_ALL() { return ['gaetano', 'natalino', 'claudia', 'federico', 'emanuela']; }
