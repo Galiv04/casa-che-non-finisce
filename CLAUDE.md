@@ -2,11 +2,11 @@
 
 Horror interattivo HARDCORE in italiano per 1-5 giocatori (+ Daniele, che si sblocca giocando).
 **Riusa il motore del Relais di Lord Gregorio** (a sua volta figlio della Corona): la documentazione
-completa di motore, stile e processo vive in `../dnd-corona-di-mezzanotte/` (CLAUDE.md + docs/).
+completa di motore, stile e processo vive nel repo condiviso [Galiv04/dnd-motore](https://github.com/Galiv04/dnd-motore) (`../dnd-motore/docs/`).
 
 - **Live**: https://galiv04.github.io/casa-che-non-finisce/
 - **Design di questo gioco**: [docs/DESIGN.md](docs/DESIGN.md) — struttura, meccaniche nuove, finali, vincoli etici
-- **Motore e guida di produzione**: `../dnd-corona-di-mezzanotte/CLAUDE.md` e `../relais-lord-gregorio/CLAUDE.md`
+- **Motore e guida di produzione**: `../dnd-motore/docs/` e `../relais-lord-gregorio/CLAUDE.md`
 
 ## Cosa cambia rispetto al Relais
 
