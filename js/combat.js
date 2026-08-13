@@ -42,14 +42,16 @@ const Combat = (() => {
         const e = { ...b, key, hp: b.maxHp, idx: i, stunned: false, distracted: false, dead: false,
           attack: { ...b.attack } };
         if (G.difficulty === 'facile') {
-          e.maxHp = Math.max(1, Math.round(e.maxHp * 0.8));
+          e.maxHp = Math.max(1, Math.round(e.maxHp * 0.75));
           e.hp = e.maxHp;
-          e.attack.bonus = Math.max(0, e.attack.bonus - 1);
+          e.attack.bonus = Math.max(0, e.attack.bonus - 2);
+          e.attack.plus = Math.max(0, (e.attack.plus || 0) - 1);
         }
         if (G.difficulty === 'incubo') {
-          e.maxHp = Math.round(e.maxHp * 1.25);
+          e.maxHp = Math.round(e.maxHp * 1.5);
           e.hp = e.maxHp;
-          e.attack.bonus += 1;
+          e.attack.bonus += 2;
+          e.attack.plus = (e.attack.plus || 0) + 2;
         }
         if (porzione < 1) {
           e.maxHp = Math.max(1, Math.round(e.maxHp * porzione));
@@ -73,15 +75,15 @@ const Combat = (() => {
       h.zonkGritUsed = false;
     }
 
-    // passiva di Emanuela: +3 PV a tutti a inizio combattimento
+    // passiva di Emanuela: +2 PV a tutti a inizio combattimento
     const ema = G.party.find(h => h.id === 'emanuela' && !h.down && !h.preso && !h.morto);
     let openLines = [];
     if (porzione < 1) {
       openLines.push(`🩶 <b>Porzioni ridotte</b>: siete ${attivi === 1 ? 'in UNO' : 'in due'}, e la Casa dosa il Grigiore in proporzione — cose meno robuste${attivi === 1 ? ' e meno precise' : ''}.`);
     }
     if (ema) {
-      for (const h of G.party) if (!h.down && !h.preso && !h.morto) h.hp = Math.min(h.maxHp, h.hp + 3);
-      openLines.push(`🧰 <b>Cuore Saldo</b>: Emanuela ha già la borsa Kerastase aperta — +3 PV a tutti. «Respirate. Ci sono io.»`);
+      for (const h of G.party) if (!h.down && !h.preso && !h.morto) h.hp = Math.min(h.maxHp, h.hp + 2);
+      openLines.push(`🧰 <b>Cuore Saldo</b>: Emanuela ha già la borsa Kerastase aperta — +2 PV a tutti. «Respirate. Ci sono io.»`);
     }
 
     // iniziativa (gli spiriti guardano: niente turno, ma restano in scena)
@@ -390,7 +392,7 @@ const Combat = (() => {
     const e = battle.enemies[tIdx];
     // le abilità usano la LORO statistica (es. Sacra Folgore -> SAG), altrimenti quella dell'arma
     const stat = opts.stat || h.attack.stat;
-    let mod = heroMod(h, stat) + 2;
+    let mod = heroMod(h, stat);
     if (battle.isBoss && ((G.flags.daniele_sabota && !G.flags.daniele_in_squadra) || G.flags.manuale_annotato_letto)) mod += 1;
     if (opts.modOverride != null) mod = opts.modOverride;
     Dice.showRoll({

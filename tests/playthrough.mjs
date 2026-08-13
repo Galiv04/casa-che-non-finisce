@@ -340,14 +340,40 @@ function pickAllyForHealing(btns) {
   return allies[0] || btns[0];
 }
 
-function pickMainCombatAction(btns, turnCounter, G) {
+// Nomi delle abilità di cura VERE (type: 'heal'), non un match testuale a caso: alcuni
+// oggetti curativi hanno la parola "cura" nel testo di ambientazione (es. il tronello:
+// "rollato... con cura liturgica") senza essere pensati come pozioni d'emergenza.
+function healAbilityNames(HEROES) {
+  const names = new Set();
+  for (const h of HEROES || []) for (const ab of (h.abilities || [])) if (ab.type === 'heal') names.add(ab.name);
+  return names;
+}
+// Pozioni curative VERE, ordinate dalla più efficace: identificate dal dato di gioco
+// (ITEMS[...].heal), non da un lessico indovinato sull'HTML del bottone. Il tronello
+// di Natalino resta escluso: è il pegno che il Mercante esige per il Cuore di Colore,
+// non una pozione d'emergenza qualunque — un giocatore accorto lo tiene da parte.
+const RESERVED_ITEMS = new Set(['tronello']);
+function healItemsByEffectiveness(ITEMS) {
+  return Object.entries(ITEMS || {})
+    .filter(([id, it]) => it.usable && typeof it.heal === 'number' && it.heal > 0 && !RESERVED_ITEMS.has(id))
+    .sort((a, b) => b[1].heal - a[1].heal)
+    .map(([, it]) => it);
+}
+
+function pickMainCombatAction(btns, turnCounter, G, api) {
   const enabled = btns.filter(b => !b.disabled);
   if (!enabled.length) return btns[0];
   // gli SPIRITI non contano: la morte vera non si cura con le pozioni
   const needHeal = G && G.party.some(h => !h.morto && (h.down || h.hp / h.maxHp < 0.35));
-  if (needHeal) {
-    const healer = enabled.find(b => /Cura/i.test(b.innerHTML) && /^(✨|🧪)/.test(b.innerHTML));
-    if (healer) return healer;
+  if (needHeal && api) {
+    for (const name of healAbilityNames(api.HEROES)) {
+      const b = enabled.find(x => x.innerHTML.startsWith(`✨ ${name} `));
+      if (b) return b;
+    }
+    for (const item of healItemsByEffectiveness(api.ITEMS)) {
+      const b = enabled.find(x => x.innerHTML.startsWith(`🧪 ${item.name} `));
+      if (b) return b;
+    }
   }
   const attack = enabled.find(b => /^⚔/.test(b.innerHTML));
   const abilities = enabled.filter(b => /^✨/.test(b.innerHTML));
@@ -391,7 +417,7 @@ function runCombat(game, scenario, state) {
     } else if (kind === 'ally') {
       chosen = pickAllyForHealing(btns);
     } else {
-      chosen = pickMainCombatAction(btns, turnCounter++, game.getG());
+      chosen = pickMainCombatAction(btns, turnCounter++, game.getG(), game.api);
     }
     if (!chosen) throw new Error(`Nessuna azione selezionabile in combattimento (kind=${kind})`);
     game.act(() => chosen.onclick());

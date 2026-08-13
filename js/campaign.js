@@ -490,15 +490,15 @@ Silenzio. Poi il muro **rutta**. Non c'è un'altra parola: è un rutto, sordo e 
   a9: {
     location: 'pianerottolo',
     caption: 'Il pianerottolo impossibile',
-    text: `In fondo al corridoio infinito, dove per logica non dovrebbe esserci niente — un corridoio inventato non ha bisogno di finire da nessuna parte — c'è una porta. VERDE. Verniciata come quella di Daniele, con lo zerbino sotto ("NON SIETE I BENVENUTI, MA ENTRATE") anche se lo zerbino vero, quello reale, è rimasto ai piedi del muro nel salotto, un corridoio e un'eternità fa.
+    text: `In fondo al corridoio infinito, dove per logica non dovrebbe esserci niente, c'è una porta. VERDE. Verniciata come quella di Daniele, con lo zerbino sotto ("NON SIETE I BENVENUTI, MA ENTRATE") anche se lo zerbino vero è rimasto ai piedi del muro nel salotto, un corridoio e un'eternità fa.
 
 > Federico: "È la nostra. È LA PORTA DI CASA. Come cazzo è arrivata qua in fondo?"
 
 > Claudia: "Non chiedertelo con quella voce, ti si sente la crepa."
 
-La apre. E dietro, invece del salotto da cui siete usciti — c'è il **pianerottolo**. Il vostro pianerottolo, quello vero, di sotto: la porta di Daniele verde-condominio, il citofono, la lampadina fioca che scatta a vuoto due volte prima di accendersi. Tutto identico. Tutto al suo posto.
+La apre. E dietro, invece del salotto da cui siete usciti — c'è il **pianerottolo**. Il vostro pianerottolo, quello vero, di sotto: la porta di Daniele verde-condominio, il citofono, la lampadina fioca che scatta a vuoto due volte prima di accendersi. Tutto identico.
 
-Solo che il pianerottolo, adesso, **è dentro una stanza**. Ha pareti tutt'intorno — la stessa carta da parati del corridoio da cui siete arrivati — e il soffitto è basso, il soffitto di un bilocale, non l'altezza vera di una tromba delle scale. Il rettangolo di cielo che dovrebbe vedersi dal lucernaio, tre piani più in su, è un lucernaio finto, dipinto, con tre stelle sempre nella stessa identica posizione.
+Solo che il pianerottolo, adesso, **è dentro una stanza**. Ha pareti tutt'intorno — la stessa carta da parati del corridoio — e il soffitto è basso, da bilocale, non l'altezza vera di una tromba delle scale. Il lucernaio è finto, dipinto, con tre stelle sempre nella stessa posizione.
 
 > Gaetano: *(la voce sottile di chi sta ricalcolando tutto da capo)* "Il fuori è finito dentro il dentro. Non c'è più un fuori da tornare a cercare. C'è solo... altra casa."
 
@@ -506,7 +506,7 @@ Un rumore di unghie, da qualche parte oltre la nuova parete. Familiare, adesso.
 
 > Natalino: "Rimettiamoci in marcia. Prima che decida di incorniciare pure noi."
 
-Richiudono la porta verde dietro di sé. Non serve più tenerla aperta: la casa l'ha già digerita.`,
+Richiudono la porta verde. Non serve più tenerla aperta: la casa l'ha già digerita.`,
     choices: [
       { text: '🚶 Nel corridoio che non c\'era.', next: 'a7' },
     ],
@@ -657,11 +657,11 @@ Lo schermo muore. L'ultima parola arriva dal buio, solo audio, con dentro un sor
   s8: {
     location: 'salotto',
     caption: 'La chat dei tre giorni',
-    text: `Claudia si è già impossessata del telecomando smart — deformazione professionale, non sa restare tre secondi vicino a uno schermo senza controllarci sopra — e con due tocchi proietta sulla parete accanto alla TV la chat di Daniele. Gli ultimi mesi, tutti, di fila.
+    text: `Claudia si è già impossessata del telecomando smart — deformazione professionale — e con due tocchi proietta sulla parete la chat di Daniele. Gli ultimi mesi, tutti, di fila.
 
 > Claudia: "Prima di andare oltre voglio farvi vedere una cosa. TUTTA, non un frammento. Fidatevi di chi fa scrolling per lavoro."
 
-Scorre lenta. All'inizio è Daniele normalissimo: messaggi lunghi, pieni di virgole, le sue tirate su Cialdini, le prese in giro a Federico condite di note a piè di pagina immaginarie. Poi, mese dopo mese, le righe si accorciano. Le battute si fanno più corte. Le risposte, che erano paragrafi, diventano frasi. Poi parole singole. Poi solo emoji — un pollice, una faccina, sempre la stessa, sempre più tardi nella giornata. Infine, per settimane, sotto ogni messaggio del gruppo: **solo "Visualizzato".** Niente altro. Una spunta blu, unica prova che dall'altra parte c'è ancora qualcuno.
+Scorre lenta. All'inizio è Daniele normalissimo: messaggi lunghi, pieni di virgole, le sue tirate su Cialdini, le prese in giro a Federico. Poi, mese dopo mese, le righe si accorciano. Le risposte, che erano paragrafi, diventano frasi. Poi parole singole. Poi solo emoji — un pollice, una faccina, sempre più tardi nella giornata. Infine, per settimane, sotto ogni messaggio del gruppo: **solo "Visualizzato".** Niente altro. Una spunta blu, unica prova che dall'altra parte c'è ancora qualcuno.
 
 > Federico: *(la voce che si incrina, per la prima volta stanotte davvero)* "L'ho vista, questa roba. L'ho vista succedere IN TEMPO REALE e ho pensato che fosse pigrizia. Che gli girasse. Che—"
 
@@ -669,7 +669,7 @@ Scorre lenta. All'inizio è Daniele normalissimo: messaggi lunghi, pieni di virg
 
 > Gaetano: "Un uomo che scrive romanzi in chat e manda un pollice in su non ha smesso di parlare. Gli hanno tolto le parole di bocca, una a una."
 
-Il gelo nella stanza, per un secondo, lascia il posto a qualcos'altro: la certezza tenera e furiosa che Daniele, fino all'ultimo respiro utile, non ha ceduto un centimetro.
+Il gelo nella stanza lascia il posto a qualcos'altro: la certezza che Daniele, fino all'ultimo respiro utile, non ha ceduto un centimetro.
 
 **(🎨 Colore +1: avere visto il diminuire, e capito che non era resa.)**`,
     gold: 1,
@@ -2442,9 +2442,9 @@ Bene. Che prenda nota.
   u9: {
     location: 'porte',
     caption: 'La porta senza targhetta',
-    text: `C'è una porta che gli altri non vedono. Chi è vivo ci passa davanti e l'occhio gli scivola via, come su un gradino che si conosce a memoria. Ma chi di voi è MORTO stanotte la vede benissimo: bianca, senza targhetta, senza colore sbagliato — perché non è un ricordo rubato. È una porta di SERVIZIO.
+    text: `C'è una porta che gli altri non vedono. Chi è vivo ci passa davanti e l'occhio gli scivola via. Ma chi di voi è MORTO stanotte la vede benissimo: bianca, senza targhetta, senza colore sbagliato — perché non è un ricordo rubato. È una porta di SERVIZIO.
 
-Lo Spirito la attraversa. Da solo. Dall'altra parte c'è una sala d'aspetto: sedie di plastica avvitate a terra, un distributore di caffè spento, riviste su un tavolino con le date illeggibili, e una luce da ambulatorio alle sei di sera. Sulle sedie, altri come voi: trasparenti, pazienti, coi cappotti di mode diverse. Una signora anziana lavora a maglia un filo che non c'è. Un ragazzo con gli occhiali anni Settanta fa un cruciverba senza penna.
+Lo Spirito la attraversa. Da solo. Dall'altra parte c'è una sala d'aspetto: sedie di plastica avvitate a terra, un distributore di caffè spento, riviste con le date illeggibili, e una luce da ambulatorio alle sei di sera. Sulle sedie, altri come voi: trasparenti, pazienti. Una signora anziana lavora a maglia un filo che non c'è. Un ragazzo con gli occhiali anni Settanta fa un cruciverba senza penna.
 
 > La signora: *(senza alzare gli occhi dalla maglia)* "Fresco fresco, eh? Si vede. I nuovi hanno sempre quella faccia da 'dev'esserci un errore'." *(sorride, gentile)* "Siediti, ché qui il tempo non conta. E ascolta la cosa importante, che a noi nessuno l'ha detta e abbiamo perso decenni: IL GRIGIO NON CI VEDE."
 
@@ -2704,19 +2704,19 @@ E il salone RISPONDE. Le luci sopra gli specchi scaldano di un mezzo tono. La pa
   u13: {
     location: 'spiaggia_grigia',
     caption: 'AGOSTO 2019 — La grigliata sbagliata',
-    text: `La porta si apre sul tramonto del quattordici agosto 2019, e per un secondo — un secondo intero, vergognoso, meraviglioso — ci CASCATE.
+    text: `La porta si apre sul tramonto del quattordici agosto 2019, e per un secondo — vergognoso, meraviglioso — ci CASCATE.
 
-La spiaggia. La griglia accesa. Le sedie pieghevoli in cerchio. E VOI: le vostre copie, sedute a ridere, tutti e sei — sei, perché c'è anche Daniele, la copia di Daniele, col libro chiuso sul ginocchio e la lattina in mano, che ride nel punto giusto della battuta. La serata più bella di quell'estate, ricostruita in scala uno a uno.
+La spiaggia. La griglia accesa. Le sedie pieghevoli in cerchio. E VOI: le vostre copie, sedute a ridere, tutti e sei — sei, perché c'è anche Daniele, col libro chiuso sul ginocchio e la lattina in mano, che ride nel punto giusto della battuta. La serata più bella di quell'estate, ricostruita in scala uno a uno.
 
-Poi Claudia — l'occhio assoluto, l'occhio che inquadra per mestiere — si irrigidisce.
+Poi Claudia — l'occhio assoluto — si irrigidisce.
 
 > Claudia: "Fermi. Guardate le mani."
 
-La copia di Federico beve una birra NORMALE. Senza limone. Federico vero emette un verso di disgusto. La copia di Gaetano ha in mano una lager da discount — lui, l'uomo delle IPA. Il tronello tra le dita della copia di Natalino è rollato STORTO, gobbo, una cosa che Natalino vero non produrrebbe nemmeno sotto tortura. La borsa accanto alla copia di Emanuela ha il logo Kerastase SBAGLIATO, le lettere in un ordine quasi giusto. E la copia di Daniele —
+La copia di Federico beve una birra NORMALE. Senza limone. La copia di Gaetano ha in mano una lager da discount — lui, l'uomo delle IPA. Il tronello della copia di Natalino è rollato STORTO, una cosa che Natalino vero non produrrebbe nemmeno sotto tortura. La borsa della copia di Emanuela ha il logo Kerastase SBAGLIATO. E la copia di Daniele —
 
 > Claudia: *(la voce che si incrina)* "— beve Coca ROSSA. Normale. Daniele non tocca la Coca normale da quindici anni. Dice che sa di dentista."
 
-E le risate. Adesso che lo sapete, le sentite: arrivano mezzo secondo DOPO le battute, come un film doppiato male, e sono le risate giuste ma nell'ordine sbagliato — la risata di Emanuela in bocca a Federico, quella di Natalino appiccicata a Gaetano.
+E le risate. Adesso che lo sapete, le sentite: arrivano mezzo secondo DOPO le battute, come un film doppiato male — la risata di Emanuela in bocca a Federico, quella di Natalino appiccicata a Gaetano.
 
 > Claudia: *(tirando fuori il telefono, dove ha gli screenshot di TUTTO, anche del 2019)* "Ha copiato la serata dalle foto. Ma le foto non dicono chi beve cosa. Non dicono PERCHÉ ridevamo." *(alza gli occhi, feroce)* "Glielo diciamo?"`,
     choices: [
@@ -2730,17 +2730,17 @@ E le risate. Adesso che lo sapete, le sentite: arrivano mezzo secondo DOPO le ba
     caption: 'AGOSTO 2019 — Il collaudo dell\'amore',
     text: `> Claudia: "Federico beve SOLO birra al limone, dieci al giorno, dice che è scienza. Gaetano beve IPA e giudica chi non lo fa. Il tronello si rolla DRITTO o Natalino ti disereda. La borsa è Kerastase con l'accento giusto. E Daniele—" *(la voce ferma, da regia)* "—Daniele beve Coca ZERO. Sempre. Solo. Zero."
 
-A ogni errore nominato, la copia corrispondente SI INCEPPA. La birra normale di Federico-copia trema e va a fuoco di grigio. Il tronello storto si sfa. Le risate doppiate male cominciano ad arrivare sempre più in ritardo, un secondo, tre, dieci — finché le copie ridono nel silenzio totale, a bocche aperte, senza suono, e poi nemmeno quello.
+A ogni errore nominato, la copia corrispondente SI INCEPPA. La birra di Federico-copia trema e va a fuoco di grigio. Il tronello storto si sfa. Le risate arrivano sempre più in ritardo — un secondo, tre, dieci — finché le copie ridono nel silenzio totale, a bocche aperte, senza suono.
 
-Resta per ultima la copia di Daniele. Vi guarda. E per un momento dentro gli occhi grigi c'è qualcosa di GENUINAMENTE confuso — la confusione della casa stessa, che parla attraverso la sua fotocopia migliore:
+Resta per ultima la copia di Daniele. Vi guarda. E dentro gli occhi grigi c'è qualcosa di GENUINAMENTE confuso — la confusione della casa stessa, che parla attraverso la sua fotocopia migliore:
 
 > La copia: "Non... capisco. Ho preso ogni dettaglio. Ho mangiato mille serate come questa. Ho le foto, le voci, le sedie, il fumo della griglia. Perché tornate SEMPRE? Cosa c'è nella serata che non è NELLA serata?"
 
 > Emanuela: *(quasi gentile, ed è la gentilezza più spietata della notte)* "Ecco perché perderai."
 
-La copia si dissolve con la domanda ancora addosso. La spiaggia finta si affloscia come un gazebo smontato — e nel punto dove il fuoco finto bruciava grigio, resta un braciere di colore VERO, caldo, piccolo.
+La copia si dissolve con la domanda ancora addosso. La spiaggia finta si affloscia come un gazebo smontato — e dove il fuoco finto bruciava grigio, resta un braciere di colore VERO, piccolo.
 
-Vi sedete intorno cinque minuti. Non ne parlate. Federico alza una birra immaginaria, Gaetano un'IPA immaginaria, e tutti insieme alzate una Coca Zero immaginaria verso qualcuno che non è lì ma sta arrivando, perché venite a prenderlo.
+Vi sedete intorno cinque minuti. Non ne parlate. Federico alza una birra immaginaria, e tutti insieme alzate una Coca Zero immaginaria verso qualcuno che non è lì ma sta arrivando.
 
 > Federico: "Al quattordici agosto. Quello VERO. E al prossimo."
 
@@ -3083,15 +3083,15 @@ Il buio, sotto, inspira. Ed espira. La lucina da campeggio, lontanissima, fa un 
     killRoller: true,
     text: `Il terzo piolo regge. Il quarto regge. Il quinto **cede** — non si spezza: si RITRAE, come una lingua che rientra in bocca — e la cordata di tovaglie si tende con uno schiocco da frusta.
 
-Per un secondo tiene. Sentite il peso dell'amico appeso nel buio, lo sentite nelle braccia e nella schiena, e state già tirando su, state URLANDO e tirando su—
+Per un secondo tiene. Sentite il peso dell'amico appeso nel buio, nelle braccia e nella schiena, e state già tirando su, URLANDO e tirando su—
 
 Poi il buio tira dall'altra parte. Ed è più forte.
 
-Il nodo non si scioglie: si APRE, con gentilezza, come slacciato da dita pazienti. E il rumore che fa un amico che cade nel buio che respira è questo: un fruscio, un colpo lontano, umido. E poi il silenzio. Il buio smette di respirare per un momento, come chi trattiene il fiato per assaporare.
+Il nodo non si scioglie: si APRE, con gentilezza, come slacciato da dita pazienti. E il rumore che fa un amico che cade nel buio è questo: un fruscio, un colpo lontano, umido. Poi il silenzio. Il buio smette di respirare, come chi trattiene il fiato.
 
 Nessuno si muove. Nessuno bestemmia. C'è solo il bordo della botola, le tovaglie flosce, e il vapore dei vostri fiati.
 
-Poi dal buio sale una luce fredda, piccola, che risale la scala **senza toccare i pioli**. È l'amico. È il suo Spirito: trasparente, calmo, con addosso una luce da vecchia TV. Vi guarda dalla scala. Sa. E la faccia di chi resta — quella è la cosa peggiore che la casa vi abbia fatto finora.
+Poi dal buio sale una luce fredda, piccola, che risale la scala **senza toccare i pioli**. È l'amico. Il suo Spirito: trasparente, calmo, con addosso una luce da vecchia TV. Vi guarda dalla scala. Sa. E la faccia di chi resta — quella è la cosa peggiore che la casa vi abbia fatto finora.
 
 > Lo Spirito: "...ok. Ok, niente panico. Sono io, sono qui, e vi giuro che fa meno male di quanto sembra. Il problema è che DA QUI si vedono un sacco di cose, e voi dovete scendere lo stesso. Quindi asciugatevi la faccia, rifate quei nodi DECENTEMENTE... e finiamola, questa storia. Per me."
 
@@ -3192,9 +3192,9 @@ Sul banco, sotto una campana di vetro, una cosa che pulsa piano di tutti i color
 
 > Il Mercante: "Il Trono. Domanda da dodici, questa. Il Colore non basta: i segreti si pagano coi segreti. Raccontatemi una storia VERA. Una che non avete mai raccontato. Io mi nutro anche di quelle, nei mesi magri."
 
-Vi guardate. Poi qualcuno parla — chi, resta tra voi e il sottoscala — e racconta una cosa vera: piccola, scomoda, di quelle che si tengono sotto la lingua per anni. Il Mercante ascolta con tutta la faccia, annuisce, e quando la storia finisce se la mette in una taschina del gilet, piegata come una banconota.
+Vi guardate. Poi qualcuno parla — chi, resta tra voi e il sottoscala — e racconta una cosa vera, piccola, scomoda. Il Mercante ascolta con tutta la faccia, annuisce, e quando la storia finisce se la mette in una taschina del gilet, piegata come una banconota.
 
-> Il Mercante: "Onesta. Sa di vero. Va bene: ascoltate." *(si china, e la lampada da campeggio si abbassa da sola)* "Il vostro demone, quello col volto rubato. Va forte, eh? Immortale, dappertutto, la casa è sua. Ma ogni notte — OGNI notte — deve tornare al **Divano-Trono**, nella Sala della Switch. La vita finta che tiene in loop là sopra non è scenografia: è la sua FLEBO. Si ricarica lì, staccato dal Grigiore, spina alla presa. E in quei minuti..." *(sorride di nuovo, e stavolta il sorriso è quasi umano)* "...in quei minuti è solo una cosa stanca su un divano. **Vulnerabile.** Non ditegli chi ve l'ha detto: è il mio padrone di casa, e l'affitto qui è già un furto."
+> Il Mercante: "Onesta. Sa di vero. Va bene: ascoltate." *(si china, la lampada da campeggio si abbassa da sola)* "Il vostro demone, quello col volto rubato. La casa è sua. Ma ogni notte — OGNI notte — deve tornare al **Divano-Trono**, nella Sala della Switch. La vita finta che tiene in loop là sopra non è scenografia: è la sua FLEBO. Si ricarica lì, staccato dal Grigiore, spina alla presa. E in quei minuti..." *(sorride di nuovo, e stavolta il sorriso è quasi umano)* "...in quei minuti è solo una cosa stanca su un divano. **Vulnerabile.** Non ditegli chi ve l'ha detto: è il mio padrone di casa, e l'affitto qui è già un furto."
 
 > Claudia: "Perché ce lo dici davvero, però? Che ci guadagni?"
 
@@ -3747,15 +3747,15 @@ La mano di qualcuno — di chi, resta tra voi e il sottoscala — vi afferra il 
     caption: 'La cucina accesa — lo stendardo',
     text: `L'idea è di Emanuela, ed è un'idea da generale: *"Questa cucina è morta perché nessuno ci cucina. E allora noi adesso CI CUCINIAMO."*
 
-I fornelli, sotto il grigio, funzionano: la fiamma esce grigia, poi Gaetano la tocca con l'accendino lungo del barbecue e la fiamma **si ricorda di essere arancione.** Da lì è una battaglia, e la combattete come si combatte una battaglia: Claudia al taglio, Federico che apre i barattoli della dispensa e li annusa da sommelier ("questo è pomodoro VERO, si sente che ha sofferto"), Natalino che gestisce le padelle come le forbici giapponesi, Emanuela che comanda, e la ricetta è una sola, ovvia, l'unica possibile: **la parmigiana di Daniele.** Fatta a memoria, a occhio, a sbagli — la vostra versione, quella che lui domani avrà il DOVERE di assaggiare e stroncare.
+I fornelli, sotto il grigio, funzionano: la fiamma esce grigia, poi Gaetano la tocca con l'accendino lungo del barbecue e la fiamma **si ricorda di essere arancione.** Da lì è una battaglia: Claudia al taglio, Federico che apre i barattoli e li annusa da sommelier ("questo è pomodoro VERO, si sente che ha sofferto"), Natalino che gestisce le padelle come le forbici giapponesi, Emanuela che comanda, e la ricetta è una sola, ovvia: **la parmigiana di Daniele.** Fatta a memoria, a occhio, a sbagli — la vostra versione, quella che lui domani avrà il DOVERE di assaggiare e stroncare.
 
-E la cucina si arrende un centimetro alla volta. Il vapore scioglie il freddo. L'odore di frittura invade i ripiani grigi come una truppa di liberazione. Il frigo industriale ronza più piano, quasi imbarazzato. Perfino la cosa nel cassetto delle verdure smette di respirare per annusare.
+La cucina si arrende un centimetro alla volta. Il vapore scioglie il freddo. L'odore di frittura invade i ripiani grigi come una truppa di liberazione. Il frigo ronza più piano, quasi imbarazzato. Perfino la cosa nel cassetto delle verdure smette di respirare per annusare.
 
 > Natalino: "Guardate le piastrelle. GUARDATE. Vicino ai fornelli stanno tornando bianche."
 
 > Claudia: *(fotografando tutto, per la prima volta stanotte non come prova: come ricordo)* "La casa digerisce le case. Ma una cucina accesa non la digerisce nessuno."
 
-Mangiate in piedi, dalle teglie, ustionandovi, ridendo. Non è buona come la sua. È buona come la vostra. Contro il Grigiore, stanotte, è la stessa identica arma.
+Mangiate in piedi, dalle teglie, ustionandovi, ridendo. Non è buona come la sua. È buona come la vostra. Contro il Grigiore, è la stessa arma.
 
 > Federico: "Quando esce, gliela facciamo assaggiare. Dirà che la mozzarella andava asciugata meglio." *(pausa)* "Non vedo l'ora, cazzo."
 
@@ -4096,13 +4096,13 @@ Silenzio.
   m7g1: {
     location: 'sala_switch',
     caption: 'Cinque minuti dei gemelli',
-    text: `Daniele si stacca dal gruppo di un passo, giusto uno, e guarda Federico con la faccia di chi sta per chiedere una cosa che gli costa più di quanto costerebbe ammazzare un mostro.
+    text: `Daniele si stacca dal gruppo di un passo e guarda Federico con la faccia di chi sta per chiedere una cosa che gli costa più di un mostro.
 
 > Daniele: "Cinque minuti. Prima che arrivi quello con la mia faccia peggio pettinata. Cinque minuti, e poi si combatte."
 
-Gli altri si dividono con un tempismo che sembra casuale e non lo è per niente: Gaetano si china sui cavi che escono dalla parete, con un'urgenza tecnica improvvisamente fondamentale; Emanuela apre la borsa Kerastase e la rovescia intera sul pavimento come se contarne il contenuto fosse la priorità della serata; Claudia fotografa il soffitto; Natalino si accende un tronello guardando altrove con una dedizione sospetta. Nessuno controlla davvero niente. Tutti fanno finta benissimo.
+Gli altri si dividono con un tempismo che sembra casuale e non lo è: Gaetano si china sui cavi della parete con un'urgenza tecnica improvvisamente fondamentale; Emanuela rovescia la borsa Kerastase sul pavimento; Claudia fotografa il soffitto; Natalino si accende un tronello guardando altrove con dedizione sospetta. Nessuno controlla davvero niente. Tutti fanno finta benissimo.
 
-I gemelli restano da soli, in mezzo alla moquette che respira più piano, come se anche la casa avesse deciso di dare loro un po' di privacy.
+I gemelli restano da soli. La moquette respira più piano, come se anche la casa avesse deciso di dare loro un po' di privacy.
 
 > Federico: "Allora."
 
@@ -4127,7 +4127,7 @@ Ridono, piano, il tipo di risata che non vuole farsi sentire dagli altri.`,
   m7g2: {
     location: 'sala_switch',
     caption: 'La cosa non detta',
-    text: `Federico si passa una mano sulla faccia — la stessa faccia di Daniele, un po' più tirata dal fumo dello svapo e da vent'anni di call con clienti impossibili — e quando riparla, la voce è quella vera, quella senza pubblico.
+    text: `Federico si passa una mano sulla faccia — la stessa faccia di Daniele, tirata dal fumo dello svapo e da vent'anni di call — e quando riparla, la voce è quella vera, quella senza pubblico.
 
 > Federico: "Ho sempre pensato che tu mi guardassi dall'alto. I soldi, la carriera, le dieci birre al giorno che tu chiami 'autodistruzione con ghiaccio'. Pensavo mi giudicassi."
 
@@ -4143,7 +4143,7 @@ Federico non risponde subito. Quando lo fa, ha gli occhi lucidi e la voce che fi
 
 > Daniele: "Lo so. Fede."
 
-Si abbracciano — un abbraccio brutto, a scatti, con troppe pacche sulla schiena, esattamente come si abbracciano due che hanno passato trent'anni a fingersi più duri di quanto sono. Dall'altra parte della sala, quattro persone continuano a controllare con grandissima attenzione dei cavi che non richiedono nessuna attenzione.
+Si abbracciano — un abbraccio brutto, a scatti, con troppe pacche sulla schiena, come due che hanno passato trent'anni a fingersi più duri di quanto sono. Dall'altra parte della sala, quattro persone controllano con grandissima attenzione cavi che non richiedono nessuna attenzione.
 
 > Emanuela: *(senza voltarsi, la voce che trema un po')* "Questo cavo qui è FASCINOSO. Non lo tocco per altri dieci minuti buoni."
 
@@ -4303,15 +4303,15 @@ E il silenzio di un demone che di solito non chiude mai la bocca è, di tutta la
   z1mono: {
     location: 'cattedrale',
     caption: 'Il monologo di Eleinad',
-    text: `Eleinad non aspetta il vostro passo per parlare. Comincia da solo, alla navata vuota, come chi prova un discorso prima del pubblico vero — e vi lascia ascoltare, perché farvi ascoltare è già un modo di nutrirsi.
+    text: `Eleinad non aspetta il vostro passo per parlare. Comincia da solo, alla navata vuota — e vi lascia ascoltare, perché ascoltare è già un modo di nutrirsi.
 
-> Eleinad: "Sapete da dove vengo? Da NESSUNA parte, ed è la parte più elegante della mia storia. Non sono nato: mi sono ACCUMULATO. Un pomeriggio di pioggia rimandato qui, una serie vista due volte per non decidere cosa guardare dopo lì, un 'ci penso domani' lasciato cadere in un angolo trent'anni fa da qualcun altro, in un'altra casa, molto lontano da questa. Il tempo che la gente non voleva più spendere si è incollato, un briciolo alla volta, finché non ha avuto la forma per alzarsi in piedi. Io sono FATTO di rinvii, tesori. Sono l'interesse composto della pigrizia altrui."
+> Eleinad: "Sapete da dove vengo? Da NESSUNA parte, ed è la parte più elegante della mia storia. Non sono nato: mi sono ACCUMULATO. Un pomeriggio di pioggia rimandato qui, una serie vista due volte lì, un 'ci penso domani' lasciato cadere in un angolo trent'anni fa. Il tempo che la gente non voleva più spendere si è incollato, un briciolo alla volta, finché non ha avuto la forma per alzarsi in piedi. Io sono FATTO di rinvii, tesori. Sono l'interesse composto della pigrizia altrui."
 
-Passeggia lungo la navata, e dove passa i televisori si affievoliscono, rispettosi, come luci di sala prima di un monologo teatrale.
+Passeggia lungo la navata; dove passa, i televisori si affievoliscono come luci di sala a monologo iniziato.
 
 > Eleinad: "Mangio colore. Non anime, che parola volgare — il COLORE: la voglia che una cosa ti faccia venire voglia di un'altra cosa. E Daniele—" *(la voce, per un attimo, quasi si commuove di sé stessa)* "—Daniele era un BANCHETTO. Un uomo che pensa così tanto, che sente così forte, che tiene tutto dentro con quella disciplina da monaco... il colore, in uno così, non si consuma mai. Si ACCUMULA. Aspetta solo un inquilino con più appetito di lui."
 
-Si volta, e per un istante — solo un istante — la faccia rubata sembra quasi sincera.
+Si volta, e la faccia rubata sembra quasi sincera.
 
 > Eleinad: "Non sono il suo lato oscuro. Non fate quell'errore da filosofi della domenica. Sono un parassita con buon gusto, che ha scelto la casa più ricca del palazzo. Tutto qui. Nessuna poesia. Solo fame, e un contratto d'affitto che ho scritto io."
 
