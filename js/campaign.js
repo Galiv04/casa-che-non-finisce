@@ -187,6 +187,7 @@ Dietro la porta, la cosa capisce di avere sbagliato. I passi si allontanano — 
     sets: { voce_sbagliata: true },
     choices: [
       { text: '🔑 Dentro. SUBITO.', next: 'a3' },
+      { text: '👂 Tendere l\'orecchio: cos\'altro si muove là dentro?', once: true, gold: 1, sets: { ascoltato_porta: true }, next: 'a3' },
     ],
   },
 
@@ -366,6 +367,7 @@ Non è una buona notizia. Ma è un NOME, e le cose col nome fanno un po' meno pa
     gold: 1,
     choices: [
       { text: '📺 Al salotto — la TV pulsa ancora', next: 'a5' },
+      { text: '🪞 Invertire il trucco: spiare LUI attraverso lo specchio', tag: 'Prova di Intelligenza — CD 13', once: true, check: { stat: 'INT', dc: 13, success: 'a5', fail: 'a5' }, gold: 2 },
     ],
   },
 
@@ -391,6 +393,7 @@ Poi il grigio entra. Non dagli occhi: dal RICORDO di quel sorriso, che si strusc
     poisonRoller: true,
     choices: [
       { text: '📺 Al salotto — la TV pulsa ancora', next: 'a5' },
+      { text: '🪞 Coprire lo specchio: nessun altro ci casca stasera', once: true, gold: 1, sets: { specchio_coperto: true }, next: 'a5' },
     ],
   },
 
@@ -479,6 +482,7 @@ Ma sotto il sarcasmo, il gruppo si è raddrizzato. Perché Gaetano ha fatto la c
     sets: { misure_impossibili: true },
     choices: [
       { text: '🚶 Nel corridoio che non c\'era. In fila stretta.', next: 'a7' },
+      { text: '📐 Segnare il muro col nastro: se lo spazio cambia, i segni lo diranno', once: true, sets: { muri_segnati: true }, next: 'a7' },
     ],
   },
 
@@ -703,6 +707,7 @@ Il gelo nella stanza lascia il posto a qualcos'altro: la certezza che Daniele, f
     gold: 1,
     choices: [
       { text: '🚶 Adesso troviamolo.', next: 's3' },
+      { text: '📱 Cercare un messaggio nascosto: Daniele sapeva lasciare tracce', tag: 'Prova di Saggezza — CD 12', once: true, check: { stat: 'SAG', dc: 12, success: 's3', fail: 's3' }, gold: 1, sets: { messaggio_nascosto: true } },
     ],
   },
 
@@ -755,6 +760,7 @@ Dalle pareti, debolissimo, un ronzio elettrico. Se il ronzio fosse una frase, di
     sets: { daniele_sabota: true },
     choices: [
       { text: '🗣 Eleinad si ricompone. E cambia strategia.', next: 's4' },
+      { text: '⚡ Ringraziare Daniele ad alta voce: farglielo sapere', once: true, gold: 1, sets: { daniele_ringraziato: true }, next: 's4' },
     ],
   },
 
@@ -782,6 +788,7 @@ E il sorriso di Eleinad **slitta**. Un millimetro, non di più — ma su una fac
     sets: { rifiuto_stile: true },
     choices: [
       { text: '🗣 Ma lui non ha finito: cambia strategia.', next: 's4' },
+      { text: '👁 Il sorriso che slitta: osservare la faccia nel momento dell\'errore', once: true, gold: 1, sets: { sorriso_errore: true }, next: 's4' },
     ],
   },
 
@@ -813,6 +820,7 @@ La risata vi ha lasciato addosso qualcosa: una stanchezza fredda nelle braccia, 
     damage: 2,
     choices: [
       { text: '🗣 Eleinad alza le mani, teatrale: "Facciamo sul serio."', next: 's4' },
+      { text: '💪 Radunare il gruppo: "Il pullman lo dicevamo così, no?"', once: true, heal: 1, next: 's4' },
     ],
   },
 
@@ -842,6 +850,7 @@ E qualcosa, nella sua voce, è cambiato per sempre.
     sets: { federico_insulto: true, eleinad_teme_gemelli: true },
     choices: [
       { text: '🗣 Eleinad si scrolla, si ricompone, e cambia arma.', next: 's4' },
+      { text: '⚡ Incalzare: Federico, ancora, finché barcolla!', tag: 'Prova di Carisma — CD 14', once: true, check: { stat: 'CAR', dc: 14, success: 's4', fail: 's4' }, gold: 2 },
     ],
   },
 
@@ -1674,6 +1683,7 @@ E lui non vuole un finale. Lui vuole VOI.`,
     gold: 2,
     choices: [
       { text: '🗣 Il Manoscritto-Capobranco vi si para davanti', next: 'b16' },
+      { text: '🖋 Raccogliere l\'inchiostro dei libri finiti: potrebbe servire', once: true, gold: 1, sets: { inchiostro_finale: true }, next: 'b16' },
     ],
   },
 
@@ -1700,6 +1710,7 @@ E il peggio arriva adesso: dal fondo della sala, svegliato dall'urlo, si alza il
     damage: 2,
     choices: [
       { text: '🗣 Affrontare il Manoscritto-Capobranco', next: 'b16' },
+      { text: '😰 "SCUSATE! Non era il finale vero!" Provare a calmare i libri', tag: 'Prova di Carisma — CD 13', once: true, check: { stat: 'CAR', dc: 13, success: 'b16', fail: 'b16' }, heal: 1 },
     ],
   },
 
@@ -1960,6 +1971,7 @@ Sul cuscino del letto di sotto c'è mezza fotografia, strappata a metà con rabb
     item: 'foto_meta_federico',
     choices: [
       { text: '👂 Ascoltare il loop fino in fondo: cosa lo fa girare?', tag: 'Prova di Saggezza — CD 12', check: { stat: 'SAG', dc: 12, success: 'u2b', fail: 'u3' } },
+      { text: '✋ Strappare il nastro adesivo: dividere non si divide più', gold: 1, sets: { nastro_strappato: true }, next: 'u3' },
     ],
   },
 
@@ -1990,6 +2002,7 @@ E poi Natalino, che si era chinato a guardare sotto il letto per puro istinto da
     item: 'joycon_sinistro',
     choices: [
       { text: '🚪 Fuori di qui, prima che il pasto si accorga di voi', next: 'u3' },
+      { text: '🔇 Dire qualcosa che i bambini non si sono MAI detti: rompere il loop', tag: 'Prova di Carisma — CD 13', once: true, check: { stat: 'CAR', dc: 13, success: 'u3', fail: 'u3' }, gold: 2 },
     ],
   },
 
@@ -2108,6 +2121,7 @@ Dove l'onda si è ritirata, la cenere si è aperta: una conchiglia. Rigata, inte
     item: 'conchiglia_gaeta',
     choices: [
       { text: '🏐 I racchettoni piantati in riva: sono i vostri.', next: 'u4d' },
+      { text: '🌊 Emanuela fa un passo nell\'acqua: "Questa spiaggia me la riprendo ORA"', tag: 'Prova di Saggezza — CD 12', once: true, check: { stat: 'SAG', dc: 12, success: 'u4d', fail: 'u4d' }, gold: 1 },
     ],
   },
 
@@ -2332,6 +2346,7 @@ Poi il nero si richiude, ma ormai chi doveva uscire è fuori: in piedi sul pavim
     item: 'cuore_colore',
     choices: [
       { text: '⚠️ Qualcosa vi ha visti. Qualcosa si alza.', next: 'u7' },
+      { text: '🔦 Studiare il Cuore: capire COME funziona prima dello scontro', once: true, gold: 1, sets: { cuore_studiato: true }, next: 'u7' },
     ],
   },
 
@@ -2356,6 +2371,7 @@ Quando è in mano vostra, caldo come un animale addormentato, vi permettete l'un
     item: 'cuore_colore',
     choices: [
       { text: '⚠️ La superficie nera si increspa. Si alza.', next: 'u7' },
+      { text: '🔦 Esaminare il Cuore mentre c\'è tempo: è caldo, pulsa', once: true, gold: 1, sets: { cuore_studiato: true }, next: 'u7' },
     ],
   },
 
@@ -3510,6 +3526,7 @@ Dietro di voi, cento piccole TV mormorano il loro programma grigio, imperturbate
     damage: 3,
     choices: [
       { text: '🧗 Risalire: la cucina, e poi il resto della notte', next: 'k10' },
+      { text: '🔧 Gaetano studia lo sportello blindato: la prossima volta non ci frega', once: true, gold: 1, sets: { quadro_studiato: true }, next: 'k10' },
     ],
   },
 
@@ -3614,6 +3631,7 @@ Fa freddo. È il freddo giusto: quello dei posti dove non si lava più niente pe
     gold: 2,
     choices: [
       { text: '🚶 Tornare alle canne d\'organo dei tubi', next: 'k5' },
+      { text: '👀 Guardare dentro gli oblò: cosa resta di un giorno quando smette di girare?', once: true, gold: 1, sets: { oblò_ispezionati: true }, next: 'k5' },
     ],
   },
 
@@ -3825,6 +3843,7 @@ Sul pavimento, tra i resti, le cifre rosse sui fogli si CANCELLANO una a una —
 **(🎨 +1 Colore. Il debito era finto: la paura no. Averla bruciata vale.)**`,
     choices: [
       { text: '🚶 Tornare alle canne d\'organo dei tubi', next: 'k5' },
+      { text: '🗄 Perquisire l\'archivio SEMPRE: le bollette coprivano qualcosa', once: true, gold: 1, sets: { archivio_perquisito: true }, next: 'k5' },
     ],
   },
 
@@ -4317,6 +4336,7 @@ Dove il buco è passato, la moquette è morta: una scala a chiocciola di molle e
 > Federico: "Fino in fondo, allora. Famiglia al completo."`,
     choices: [
       { text: '🌀 Scendere: verso la Cattedrale del Grigiore', next: 'z1' },
+      { text: '🎭 Raccogliere la maschera di Daniele: potrebbe servire', once: true, gold: 1, sets: { maschera_raccolta: true }, next: 'z1' },
     ],
   },
 
@@ -4485,6 +4505,7 @@ Le altre panche della navata, tutte insieme, scricchiolano. Non si muovono: scri
 **(🎨 +2 Colore. Daniele ha distrutto il suo divano — quello vero, quello che amava — perché nessun'altra notte sia come quelle tre.)**`,
     choices: [
       { text: '🚶 Verso l\'altare. Il padrone di casa vi aspetta.', next: 'z2' },
+      { text: '📺 Il telecomando: Daniele lo accende verso il buio', once: true, gold: 1, sets: { telecomando_acceso: true }, next: 'z2' },
     ],
   },
 
@@ -4533,6 +4554,7 @@ I televisori sfarfallano tutti insieme. Per la prima volta, la voce di Eleinad e
 > Lo spirito: "I morti fanno SOLO testo, tesoro. Chiedi in giro."`,
     choices: [
       { text: '↩ Tornare dal gruppo: la mossa adesso è vostra', next: 'z2' },
+      { text: '👻 Restare un altro momento nel vuoto: mappare le crepe', tag: 'Prova di Intelligenza — CD 14', once: true, check: { stat: 'INT', dc: 14, success: 'z2', fail: 'z2' }, gold: 2, sets: { crepe_mappate: true } },
     ],
   },
 
@@ -4703,6 +4725,7 @@ Il buco a forma di persona TREMA. Si nutre di quella lite dal 1994 — e la lite
 L'urlo è un'onda. Il gruppo si stringe attorno ai gemelli: adesso si tratta solo di REGGERE.`,
     choices: [
       { text: '🛡 Fare scudo attorno alla foto', tag: 'Prova di Carisma — CD 13 (chiunque tiri, il gruppo fa scudo)', check: { stat: 'CAR', dc: 13, success: 'e_gemelli', fail: 'z6b' } },
+      { text: '🗣 Daniele alza la voce: "Fratello mio, TIENI."', tag: 'Prova di Carisma — CD 11 (Daniele aggiunge la sua voce)', requires: { hero: 'daniele' }, check: { stat: 'CAR', dc: 11, success: 'e_gemelli', fail: 'z6b' } },
     ],
   },
 

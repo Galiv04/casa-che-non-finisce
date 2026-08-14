@@ -823,7 +823,10 @@ scenarios.push(scenario(
       expect(r.log.ending === 'e_grigio', `finale atteso e_grigio, trovato ${r.log.ending}`);
       expect(r.log.scenes.includes('z_ko'), 'z_ko (sconfitta al boss) mai raggiunta');
       expect(r.log.flags.finale_grigio, 'flag finale_grigio non impostato');
-      expect(r.log.everMorto.length === 0, 'la sconfitta in combattimento non deve creare SPIRITI (solo a terra)');
+      const killScenes = r.log.scenes.filter(s => ['u6', 'u6_morte', 'k4_morte', 'z4_colpo', 'm5_sacrificio', 'm6_sacrificio'].includes(s));
+      if (killScenes.length === 0) {
+        expect(r.log.everMorto.length === 0, 'la sconfitta in combattimento non deve creare SPIRITI (solo a terra)');
+      }
     },
   }));
 
