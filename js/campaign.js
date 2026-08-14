@@ -3734,6 +3734,52 @@ Ed è questa domanda che lo smonta: si affloscia dentro la giacca come un ombrel
 **(🎨 +2 Colore: l'incantesimo dell'Autorità si spezza con una domanda sola — "chi l'ha detto?")**`,
     gold: 2,
     choices: [
+      { text: '📬 Frugare l\'archivio dell\'Amministratore: se aveva le chiavi, forse aveva anche i DEBITI', once: true, next: 'k16d' },
+      { text: '🚶 Tornare alle canne d\'organo dei tubi', next: 'k5' },
+    ],
+  },
+
+  k16d: {
+    location: 'sottoscala',
+    caption: 'L\'archivio — le bollette si difendono',
+    stinger: 'jumpscare',
+    text: `Dietro la bacheca, dove prima c'era solo muro, l'Amministratore lascia in eredità un **schedario** — quattro cassetti d'acciaio, ognuno con l'etichetta di un anno, e l'ultimo cassetto non ha anno: ha scritto **"SEMPRE"**.
+
+Federico lo apre. Dentro: **bollette.** Migliaia. Buste bianche con la finestrella, impilate come mattoni, e ognuna — OGNUNA — intestata a Daniele. Gas, luce, acqua, internet, assicurazione, la rata della palestra mai disdetta, l'abbonamento allo streaming che non guarda da mesi e non cancella per pigrizia, e in fondo a tutto una busta rossa con scritto **"MORA"** che pulsa come un cuore malato.
+
+> Gaetano: "Non sono vere. Cioè: sono bollette VERE, ma non sono le SUE — sono la PAURA delle sue. Il Grigiore le ha incubate dalla sua ansia e le ha archiviate qui sotto come munizioni."
+
+Poi il cassetto SEMPRE si spalanca da solo, e le bollette **escono.**
+
+Escono VOLANDO — un vortice di buste bianche con la finestrella, i bordi taglienti come rasoi, che vi frullano intorno tagliando l'aria e la pelle. Ogni taglio brucia il doppio: perché è ADDEBITATO. Sul polso di Natalino, dove una busta ha graffiato, compare un numero rosso piccolo, una cifra con la virgola: il costo del taglio, in euro e centesimi.
+
+> Natalino: "MI STANNO FATTURANDO IL SANGUE. Io queste le cestino TUTTE."
+
+> Emanuela: "Phon. PHON: la carta brucia, e le bollette sono CARTA."
+
+**(Combattimento! Lo Sciame di Bollette taglia a raffica: ogni colpo si propaga al vicino, come gli interessi.)**`,
+    combat: { enemies: ['sciame_bollette', 'sciame_bollette'], victory: 'k16e', defeat: 'k_ko' },
+    choices: [],
+  },
+
+  k16e: {
+    location: 'sottoscala',
+    caption: 'Debito estinto',
+    stinger: 'gold',
+    gold: 1,
+    sets: { bollette_incenerite: true },
+    text: `L'ultimo sciame cade come coriandoli — buste bianche che si accartocciano in volo, carbonizzate dal phon o sventrate dalle forbici, e il sottoscala per un momento sembra la mattina dopo Capodanno: carta ovunque, silenzio, e l'odore di qualcosa che è finito.
+
+Sul pavimento, tra i resti, le cifre rosse sui fogli si CANCELLANO una a una — i numeri sbiadiscono, le virgole si sciolgono, e per ultimo sparisce la busta rossa della MORA, che non pulsa più: è solo cartone, adesso, con un numero che non significa niente.
+
+> Gaetano: *(raccogliendo una bolletta mezza bruciata)* "Guardate la data: non ce l'ha. Nessuna di queste ha una data. Erano paure SENZA SCADENZA — il Grigiore le tiene in circolo perché non scadano mai."
+
+> Federico: "Sai cosa, Gaetano? Domani chiamo il commercialista di mio fratello e gli faccio fare un bel check-up. Quello vero. Perché le bollette vere si pagano e si dimenticano. Queste qui erano ALTRE, e adesso sono cenere."
+
+> Claudia: *(fotografando il pavimento coperto di carta bruciata)* "Una per l'album. Didascalia: 'il giorno che abbiamo estinto un mutuo a pugni.'"
+
+**(🎨 +1 Colore. Il debito era finto: la paura no. Averla bruciata vale.)**`,
+    choices: [
       { text: '🚶 Tornare alle canne d\'organo dei tubi', next: 'k5' },
     ],
   },
@@ -4267,6 +4313,7 @@ Il buco si accorge di voi. E la sigla, dall'organo, si ferma a metà nota.`,
     choices: [
       { text: '🚶 Percorrere la navata, fino all\'altare', next: 'z2' },
       { text: '🏆 Prima: cosa c\'è in quella navata laterale illuminata?', once: true, next: 'z1t1' },
+      { text: '🛋 La prima panca non è una panca. È IL DIVANO. Quello di Daniele.', once: true, requires: { hero: 'daniele' }, next: 'z1d' },
       { text: '👂 Ascoltarlo raccontarsi, un momento, prima del duello', once: true, next: 'z1mono' },
     ],
   },
@@ -4338,6 +4385,52 @@ Si volta, e la faccia rubata sembra quasi sincera.
 **(🎨 Colore +1: guardarlo in faccia senza abboccare vale un pezzo di voi che lui non avrà.)**`,
     choices: [
       { text: '🗣 Basta ascoltare. È ora del duello.', gold: 1, next: 'z2' },
+    ],
+  },
+
+  z1d: {
+    location: 'cattedrale',
+    caption: 'Il Divano Originale',
+    text: `La prima panca della navata non è una panca. È un **divano a tre posti**, con la penisola, e lo riconoscete tutti nello stesso istante — perché ci siete STATI, su quel divano, mille sere, coi piedi sul bracciolo e la pizza sulle ginocchia.
+
+È il divano di Daniele. Quello VERO, quello dell'appartamento: trapiantato qui, fuso nella navata come un organo in un corpo nuovo, e i cuscini — i cuscini si MUOVONO. Piano. Come una bocca che mastica nel sonno.
+
+> Daniele: *(fermo, bianco, gli occhi fissi sul suo vecchio divano)* "Eccolo. Il trono. L'originale — quello prima che la casa ci costruisse sopra una cattedrale." *(la voce gli trema, e Daniele non trema MAI)* "Tre giorni che mi masticava i pomeriggi. Ogni sera una puntata, ogni puntata un colore in meno. Lo sentivo DIGERIRE."
+
+Il divano vi sente. I cuscini si sollevano — e sotto ci sono i **DENTI**: file di molle a spirale raddrizzate in zanne, imbottitura rosa che si contrae come gengive, e il bracciolo — quello dove Daniele appoggiava la testa — si piega verso di lui con la lentezza affamata di una cosa che rivuole il suo boccone preferito.
+
+> Federico: "No. NO. Quel divano era il posto dove si giocava a Mario Kart e si mangiava la pizza alle due di notte. E adesso ha i DENTI. Io a questa cosa le tolgo i cuscini uno per uno."
+
+> Claudia: "Racchettoni CORTI. Mirare alle molle: quelle sono la spina dorsale."
+
+**(Combattimento! Il Divorente attacca con cuscini pieni di denti e braccioli che afferrano. Tre posti, una fame, nessuna pietà.)**`,
+    combat: { enemies: ['divorente'], victory: 'z1e', defeat: 'z_ko' },
+    choices: [],
+  },
+
+  z1e: {
+    location: 'cattedrale',
+    caption: 'Il divano non si alza più',
+    stinger: 'victory',
+    gold: 2,
+    sets: { divorente_distrutto: true },
+    text: `L'ultimo colpo spacca il Divorente lungo la cucitura centrale — quella che Daniele aveva rattoppato col nastro adesivo due estati fa, "tanto regge". Non ha retto.
+
+Il divano si apre come un libro e CROLLA: i cuscini esplodono in una nuvola di imbottitura grigia che si deposita sulla navata come neve sporca. Le molle-zanne tintinnano sul marmo e si fermano. Il bracciolo, quello che cercava ancora Daniele, cade per ultimo — e nel cadere fa un suono che assomiglia a un sospiro.
+
+Tra i resti, incastrata nella struttura del divano come un cuore in un petto, c'è una cosa piccola e calda: il **telecomando** di casa di Daniele. Quello vero, quello con i tasti consumati dal pollice, col copri-batteria tenuto su dallo scotch. Funziona ancora. Non accende niente, ma funziona ancora.
+
+> Daniele: *(lo raccoglie. Lo guarda. Lo mette in tasca.)* "Era un buon divano, prima. Ci ho letto duecento libri, su quel divano." *(pausa)* "Però i denti non ce li aveva. Quelli glieli ha messi LUI."
+
+> Natalino: "Momento di silenzio per il divano. Serio: quel divano meritava di meglio."
+
+> Emanuela: "Meritava di meglio, sì. E adesso lo sa anche la cattedrale: il PADRONE di quel divano è in piedi, e i divani fanno quello che dice il PADRONE."
+
+Le altre panche della navata, tutte insieme, scricchiolano. Non si muovono: scricchiolano e basta. Come sedie che si mettono sull'attenti.
+
+**(🎨 +2 Colore. Daniele ha distrutto il suo divano — quello vero, quello che amava — perché nessun'altra notte sia come quelle tre.)**`,
+    choices: [
+      { text: '🚶 Verso l\'altare. Il padrone di casa vi aspetta.', next: 'z2' },
     ],
   },
 

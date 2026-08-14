@@ -89,6 +89,8 @@ const IMPRESE = [
   { flag: 'eleinad_vacilla',       icon: '🕳', title: 'Il Sorriso Fuori Asse',        desc: 'Per un momento la maschera è scivolata, e sotto non c\'era niente di pronto. L\'avete fatto vacillare.' },
   { flag: 'gemelli_pace',          icon: '🤝', title: 'Cessate il Fuoco (1994–oggi)', desc: 'Federico e Daniele d\'accordo su una cosa, insieme, ad alta voce. Il demone non aveva un piano per questo.' },
   { flag: 'eleinad_smontato',      icon: '🗣', title: 'Smontato in Tre Passaggi',     desc: 'Daniele ha vinto il Duello finale: fallacia per fallacia, davanti a tutti, con calma chirurgica. Il finale della Parola.' },
+  { flag: 'divorente_distrutto',    icon: '🛋', title: 'Tre Posti e Nessuna Pietà',   desc: 'Il divano di Daniele — quello vero, quello dei libri e della pizza — aveva i denti. Li avete tolti tutti.' },
+  { flag: 'bollette_incenerite',    icon: '📬', title: 'Debito Estinto a Pugni',      desc: 'Le bollette del Grigiore non avevano scadenza. Adesso hanno una data: stanotte.' },
   { flag: 'eleinad_distrutto',     icon: '💥', title: 'Colpisce Sempre il Primo',     desc: 'Il Guscio Blu di Daniele sul nemico più forte, per rispetto della tradizione. Il finale dei Colori.' },
   { flag: 'finale_scambio',        icon: '🕯', title: 'Il Posto Apparecchiato',       desc: 'Qualcuno è rimasto sul Divano perché Daniele uscisse. Il gruppo non ha finito: si torna.' },
 ];
