@@ -15,7 +15,7 @@ const ITEMS = {
   birra_limone:   { name: 'Birra al limone di Federico', desc: 'Della scorta tattica ("ne servono DIECI al giorno, è scienza"). +3 PV e un rutto di conforto che sfida il Grigiore.', usable: true, heal: 3 },
   ipa_gaetano:    { name: 'IPA di Gaetano', desc: 'Luppolo serio per momenti seri. +4 PV e il coraggio amaro di chi legge le etichette.', usable: true, heal: 4 },
   taralli:        { name: 'Taralli di scorta', desc: 'Razionati da Emanuela con criteri militari. +2 PV e un morale insospettabilmente migliore.', usable: true, heal: 2 },
-  tronello:       { name: 'Tronello di riserva', desc: 'Rollato da Natalino con cura liturgica. +5 PV e dieci minuti in cui la Casa fa un po\' meno paura. "Non è vizio, è MANUTENZIONE."', usable: true, heal: 5 },
+  tronello:       { name: 'Tronello di riserva', desc: 'Rollato da Natalino con cura liturgica. Troppo prezioso per fumarselo in fretta: la Casa rispetta le cose fatte con amore. "Non è vizio, è MANUTENZIONE."', usable: false },
   caffe_moka:     { name: 'La moka di Daniele', desc: 'Il caffè di casa sua, nero e VIVO. Ricarica TUTTE le abilità di una persona.', usable: true, recharge: true },
   gocce_dottore:  { name: 'Le Gocce del Dottore', desc: 'La scorta di Daniele, con la ricetta e la sua grafia sui promemoria. Il dottore sa il fatto suo: +6 PV e scioglie il Grigiore dalle vene.', usable: true, heal: 6, cureVeleno: true },
   boccata_colore: { name: 'Boccata di Colore', desc: 'Una fiala del Mercante: dentro c\'è un tramonto di qualcun altro. Cura il GRIGIORE e scalda il resto (+3 PV).', usable: true, heal: 3, cureVeleno: true },
@@ -885,7 +885,7 @@ Milioni di persone. I vostri stessi amici, guardali. Tutti quanti. Tutti.
 
 > Eleinad: "Con calma, eh. Io non ho fretta." *(sorride)* "Io ho VOI."
 
-**(-3 PV: la stanchezza vi entra nelle ossa come acqua fredda.)**`,
+**(-3 PV: la stanchezza vi pesa addosso come piombo tiepido.)**`,
     damage: 3,
     choices: [
       { text: '🗣 Riprovare. Il trucco ha un nome, e lo troverete.', next: 's4' },
