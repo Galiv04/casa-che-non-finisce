@@ -1261,7 +1261,7 @@ if (!EXPECTED_ENDINGS.every(e => allEndings.has(e))) {
   game.act(() => cuoreBtn.onclick());
   if (!G.inventory.includes('cuore_colore')) { fail('morteSpiritoRevive: cuore_colore non in zaino dopo l\'acquisto'); return; }
   if (G.inventory.includes('tronello')) fail('morteSpiritoRevive: il tronello non è stato ceduto al Mercante');
-  if (G.gold !== 8) fail(`morteSpiritoRevive: Colore atteso 8 dopo l'acquisto, trovato ${G.gold}`);
+  if (G.gold !== 9) fail(`morteSpiritoRevive: Colore atteso 9 dopo l'acquisto, trovato ${G.gold}`);
 
   // resurrezione: useRevive popola la modale, applyRevive fa il lavoro (il bottone
   // reale ha l'onclick DENTRO l'HTML, come per l'antidoto: si chiama la funzione)
@@ -1296,7 +1296,7 @@ if (!EXPECTED_ENDINGS.every(e => allEndings.has(e))) {
   if (!btn) { fail('mercanteBoccata: bottone della Boccata assente/disabilitato con 5🎨'); return; }
   game.act(() => btn.onclick());
   if (!G.inventory.includes('boccata_colore')) fail('mercanteBoccata: boccata_colore non in zaino');
-  if (G.gold !== 2) fail(`mercanteBoccata: Colore atteso 2, trovato ${G.gold}`);
+  if (G.gold !== 3) fail(`mercanteBoccata: Colore atteso 3, trovato ${G.gold}`);
   // e la boccata CURA il Grigiore: useAntidote/applyAntidote
   G.party[1].veleno = true;
   game.act(() => game.api.Engine.useAntidote('boccata_colore'));
@@ -1382,7 +1382,7 @@ if (!EXPECTED_ENDINGS.every(e => allEndings.has(e))) {
   game.act(() => E.loadGame(1));
   let G2 = game.getG();
   if (G2.sceneId !== 'a3') fail(`saveLoad: scena attesa a3 dopo loadGame, trovata ${G2.sceneId}`);
-  if (!G2.inventory.includes('manuale_annotato') || G2.gold !== 7) fail('saveLoad: zaino o Colore persi nella ricarica');
+  if (!G2.inventory.includes('manuale_annotato') || G2.gold !== 8) fail('saveLoad: zaino o Colore persi nella ricarica');
   if (G2.party[0].player !== 'Gali') fail('saveLoad: nome del giocatore perso');
   // "altro dispositivo": export → import su slot diverso → load
   const code = E.exportCode(1);
@@ -1391,7 +1391,7 @@ if (!EXPECTED_ENDINGS.every(e => allEndings.has(e))) {
   if (err) { fail('saveLoad: importCode ha rifiutato il proprio codice: ' + err); return; }
   game.act(() => E.loadGame(3));
   G2 = game.getG();
-  if (G2.sceneId !== 'a3' || G2.gold !== 7) fail('saveLoad: stato corrotto dopo il viaggio export/import');
+  if (G2.sceneId !== 'a3' || G2.gold !== 8) fail('saveLoad: stato corrotto dopo il viaggio export/import');
   if (E.importCode('non-un-codice!!!', 3) === null) fail('saveLoad: un codice spazzatura è stato accettato');
   console.log('  ✅ Salvataggio, ricarica, export/import tra slot: stato integro (scena, zaino, Colore, nomi) e spazzatura rifiutata');
 })();

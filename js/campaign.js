@@ -69,6 +69,7 @@ Gaetano guarda il palazzo. È un palazzo qualunque — citofono, cassette della 
 > Gaetano: "O suoniamo e basta. È Daniele, mica un covo. Suoniamo, lui apre in pigiama, ci manda affanculo con affetto e domenica ci ridiamo sopra."
 
 Nessuno si muove. Perché nessuno ci crede, alla domenica.`,
+    gold: 1,
     choices: [
       { text: '🔔 Citofonare. Adesso.', next: 'a1' },
       { text: '👀 Claudia guarda le finestre del terzo piano', tag: 'Prova di Saggezza — CD 10', check: { stat: 'SAG', dc: 10, success: 'a0b', fail: 'a1' } },
@@ -213,6 +214,7 @@ Il corridoio del bilocale è corto: cucina a sinistra, salotto in fondo. Dalla p
 Uno-due-tre-lampo. Uno-due-tre-lampo.
 
 > Claudia: *(a mezza voce)* "Ve l'avevo detto, del ritmo."`,
+    gold: 1,
     choices: [
       { text: '🍳 Prima la cucina — di qua', next: 'a4' },
       { text: '📺 Dritti al salotto, verso la TV', next: 'a5' },
@@ -726,6 +728,7 @@ Ha la faccia di Daniele. Ed è questo il punto: è la faccia di Daniele portata 
 > Eleinad: "Ovvio che no, tesoro: sono la versione migliorata. Stessi contenuti, zero ansie, e finalmente un po' di stile." *(apre la cartellina: dentro, un documento fitto e una penna dall'aria sbagliata)* "Ma parliamo di voi. **Contratto di Soggiorno**: vitto, alloggio, TV sempre accesa, nessuna scadenza, nessuna sveglia, nessuna FATICA, per sempre. Tutto compreso. Firma una, vale cinque. Da quando siete entrati, tecnicamente, siete già morosi — ma sono un padrone di casa di manica larga."
 
 Sorride. Il sorriso arriva agli occhi con un secondo di ritardo, come un servo chiamato col campanello.`,
+    gold: 1,
     choices: [
       { text: '✍️ Firmare. Sembra ragionevole. (SEMBRA.)', next: 's3b' },
       { text: '🎩 Rifiutare con stile: gelo, classe, e nessuna paura visibile', tag: 'Prova di Carisma — CD 12', check: { stat: 'CAR', dc: 12, success: 's3c', fail: 's3d' } },
@@ -869,6 +872,7 @@ La stanchezza, mentre parla, sembra vera. È questo il problema: sembra VOSTRA.
 *(vi torna in mente Daniele, dalla TV: "non ascoltate la mia faccia" — e Daniele, quello vero, dei ragionamenti degli ALTRI non si è mai fidato per principio: "il conteggio delle teste", lo chiamava, "non è un argomento")*
 
 Dov'è il trucco?`,
+    gold: 1,
     choices: [
       { text: '⚖️ RIPROVA SOCIALE: "Milioni di seduti non rendono giusta la sedia."', next: 's4b' },
       { text: '🎓 AUTORITÀ: "E tu chi saresti per dircelo?"', once: true, next: 's4c' },
@@ -1028,6 +1032,7 @@ Poi capite cos'è il fruscìo. Non sono pagine mosse dall'aria. Sono i libri. **
 E poi un libretto sottile, in fondo, sussurra a nessuno: *"...il portellone si chiude, le ruote si staccano da terra..."* — la paura di qualcuno che qui non c'è. Ma c'è stato.
 
 > Emanuela: "Daniele è passato di qua. E questi stronzi rilegati l'hanno letto."`,
+    gold: 1,
     choices: [
       { text: '🚶 Inoltrarsi tra gli scaffali, un passo dopo l\'altro', next: 'b2' },
       { text: '🙉 Tapparsi le orecchie e CORRERE oltre il corridoio dei sussurri', tag: 'Prova di Costituzione — CD 11', check: { stat: 'COS', dc: 11, success: 'b3', fail: 'b2b' } },
@@ -1187,6 +1192,7 @@ Non dormono. Leggono. Gli occhi sono aperti — ma spenti, come schermi in stand
 Uno di loro è diverso. Un uomo sulla cinquantina, vestaglia grigia come gli altri — ma tra le pagine bianche del suo libro tiene un **segnalibro a colori**: un disegno di bambino, sole giallo, casa rossa, plastificato con lo scotch. E la sua mano ci sta sopra. La difende. Anche da addormentato in piedi dentro la propria vita, la difende.
 
 Sul fondo della sala, uno scaffale girevole cigola piano, mezzo aperto su un vano buio. Da dentro viene — giuro — un odore di **crêpes**.`,
+    gold: 1,
     choices: [
       { text: '🤫 Attraversare la sala in silenzio assoluto, tra i tavoli', once: true, tag: 'Prova di Destrezza — CD 12', check: { stat: 'DES', dc: 12, success: 'b7', fail: 'b6b' } },
       { text: '👀 Fermarsi a osservarli: capire COSA leggono', once: true, tag: 'Prova di Saggezza — CD 12', check: { stat: 'SAG', dc: 12, success: 'b5b', fail: 'b6b' } },
@@ -1931,6 +1937,7 @@ Da dietro la porta "1994" arrivano due voci di bambini che litigano. Da "GAETA",
 **(ATTENZIONE: la porta "NON APRIRE" non scherza. Là dentro si può morire DAVVERO — morte vera, di quelle da cui si torna solo come Spirito. Il gioco ve lo dice una volta sola: questa.)**
 
 > Federico: "Ok. Chi vota per la porta che NON dice 'non aprire'?"`,
+    gold: 1,
     choices: [
       { text: '🚪 La porta "1994" — le voci dei bambini', next: 'u2' },
       { text: '🏖 La porta "GAETA" — il silenzio di cenere', next: 'u4' },
@@ -3141,6 +3148,7 @@ Vi guarda in faccia. Uno per uno.
 Il buio, sotto, inspira. Ed espira. La lucina da campeggio, lontanissima, fa un piccolo cenno — su e giù, su e giù — come una mano che chiama.
 
 **(⚠️ AVVISO: la calata è uno snodo a morte vera. Chi fallisce la prova può morire davvero.)**`,
+    gold: 1,
     choices: [
       { text: '🧗 Calarsi in cordata: le tovaglie annodate, i nodi li fa Gaetano', tag: 'Prova di Forza — CD 13 ⚰️', check: { stat: 'FOR', dc: 13, success: 'k5', fail: 'k4_morte' } },
       { text: '🧠 Cercare un\'altra via: una casa così DEVE avere un montavivande', once: true, tag: 'Prova di Intelligenza — CD 13', check: { stat: 'INT', dc: 13, success: 'k5', fail: 'k4b' } },
@@ -3218,6 +3226,7 @@ E ovunque, incastrate tra i tubi come cibo tra i denti: **le cose dimenticate.**
 Avanti, tra le canne d'organo di tubi, la lucina da campeggio adesso è vicina. E accanto alla luce, qualcuno ha steso un banco.
 
 > La voce dal banco: "Clienti! Finalmente. Venite, venite: qui sotto il Colore lo trattiamo IO SOLO."`,
+    gold: 1,
     choices: [
       { text: '🏮 Avvicinarsi al banco con la lampada da campeggio', next: 'k6' },
       { text: '🌀 Seguire un rumore di centrifughe, oltre le canne d\'organo dei tubi', next: 'k11' },
@@ -3242,6 +3251,7 @@ Sul banco, sotto una campana di vetro, una cosa che pulsa piano di tutti i color
 > Il Mercante: "Ah, quello. Quello ripaga i morti, sì. Ma il Colore da solo non basta: serve un oggetto rollato, cucito, comprato CON AMORE. L'affetto fatto a mano, qui sotto, vale oro." *(gli occhi — tutti — puntano il taschino di Natalino)* "Quel tronello, per esempio. Liturgia pura. Lo sento da qui."
 
 > Natalino: "Il tronello no. IL TRONELLO NO."`,
+    gold: 1,
     choices: [
       { text: '🎨 Boccata di Colore — "un sorso d\'estate, cura il Grigiore" (3🎨)', requiresGold: 3, gold: -3, item: 'boccata_colore' },
       { text: '🥤 Coca Zero "d\'annata" — "del suo lotto. Lui capirebbe." (2🎨)', requiresGold: 2, gold: -2, item: 'lattina_zero' },
@@ -4523,6 +4533,7 @@ E la cosa oscena è che per un secondo — un secondo — suona BENE.
 > Federico: "Le trattative sono il mio mestiere, coso. E la prima regola è: chi ha fretta di chiudere, sta perdendo."
 
 Il Grigiore attorno al buco si increspa. Aspetta la vostra mossa.`,
+    gold: 1,
     choices: [
       { text: '🗣 "Smontiamolo. Pezzo per pezzo." — la via della Parola', requires: { hero: 'daniele', item: 'manuale_annotato' }, next: 'z3' },
       { text: '👥 "Federico. Daniele. La foto." — la via dei Gemelli', requires: { flag: 'foto_ricomposta', flag2: 'segreto_gemelli', hero: 'daniele' }, next: 'z6' },
@@ -4572,6 +4583,7 @@ Le panche scricchiolano in segno d'assenso. Un televisore applaude.
 > Daniele: *(piano, a voi, indicando il manuale senza aprirlo)* "Sentito? Io non ho mai detto niente del genere. Ha costruito un pupazzo con la mia paglia e sta menando IL PUPAZZO. Il nome del trucco lo sapete: chiamatelo per nome e guardatelo cadere."
 
 **(Riconoscete la fallacia. Una sola risposta è giusta: si vince ragionando, non tirando.)**`,
+    gold: 1,
     choices: [
       { text: '🗣 "STRAWMAN. Argomento fantoccio: attacchi una cosa che nessuno ha detto."', next: 'z4' },
       { text: '🗣 "AD HOMINEM. Attacchi noi invece dell\'argomento."', once: true, next: 'z3_colpo' },
@@ -4611,6 +4623,7 @@ I due televisori ronzano. Tutto il resto è buio.
 > Daniele: *(guardando i due schermi, poi lo spazio buio tra loro)* "Curioso. Casa mia aveva più di due stanze. La vita pure. Quando uno ti mostra solo due porte... conta le PARETI."
 
 **(Il trucco ha un nome. Sbagliarlo, adesso, costa carissimo.)**`,
+    gold: 1,
     choices: [
       { text: '🗣 "FALSA DICOTOMIA. Le opzioni non sono due: le hai NASCOSTE, le altre."', next: 'z5' },
       { text: '🗣 "AUTORITÀ. Parli come se avessi il diritto di decidere tu le regole."', once: true, next: 'z4_colpo' },
@@ -4658,6 +4671,7 @@ Silenzio. E nel silenzio, Daniele fa un passo avanti. Da solo.
 *(Si volta verso di voi, e ha quasi un sorriso.)*
 
 > Daniele: "Il nome del trucco però ditelo voi. A me guardarlo cadere piace di più."`,
+    gold: 1,
     choices: [
       { text: '🗣 "RICATTO EMOTIVO. La colpa non è un argomento: è un guinzaglio."', next: 'z5b' },
       { text: '🗣 "IMPEGNO E COERENZA. Ci incastri con quello che abbiamo promesso."', once: true, next: 'z5_colpo' },
@@ -5029,6 +5043,7 @@ A sinistra, una porta fatta di **libri** — dorsi grigi, fitti, e da dietro un 
 E sopra tutto, da qualche parte oltre il soffitto, un suono bassissimo e continuo. Come uno schermo acceso in un'altra stanza. Come qualcuno che **guarda qualcosa da tre giorni.**
 
 *Daniele è di là. Da qualche parte, oltre una di queste gole. E la Casa vuole che vi perdiate per strada.*`,
+    gold: 1,
     choices: [
       { text: '📚 La porta dei libri — la Biblioteca che Sussurra', next: 'b1' },
       { text: '🚪 Il corridoio delle porte scolorite', next: 'u1' },
