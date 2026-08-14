@@ -268,7 +268,27 @@ Claudia fotografa il biglietto, poi lo piega e lo rimette nella moka. Regola del
     gold: 1,
     sets: { nota_daniele: true },
     choices: [
+      { text: '☕ Rimontare la moka e fare il caffè di Daniele', once: true, item: 'caffe_moka', next: 'a4c' },
       { text: '📺 Al salotto. Con una ragione in più.', next: 'a5' },
+    ],
+  },
+
+  a4c: {
+    location: 'appartamento',
+    caption: 'Il caffè nero e VIVO',
+    text: `Emanuela rimonta la moka con le mani di chi lo fa tutti i giorni — filtro, caffè dal barattolo, avvita, fuoco. Il fornello si accende al primo colpo, la fiamma azzurra è l'unica cosa a colori dopo le lattine di Coca.
+
+Il caffè gorgheggia su — e il rumore è giusto, è VERO, è una cosa che non può appartenere al Grigiore. Esce nero, denso, profumato di bruciato buono e di mattina vera. La tazzina scotta e il calore è reale.
+
+> Federico: "Non è diventato grigio. Non è grigio."
+
+> Gaetano: "È il caffè di Daniele. Certo che non è grigio."
+
+> Natalino: *(annusando la tazzina da sopra la spalla di Emanuela)* "Fortissimo. Lo fa come mio nonno: se non ti sveglia il sapore, ti sveglia lo spavento."
+
+Lo mettono da parte con cura. Quando servirà — e servirà — quello sarà il caffè che rimette in piedi qualcuno.`,
+    choices: [
+      { text: '📺 Al salotto. Con una ragione in più, e un caffè in più.', next: 'a5' },
     ],
   },
 
