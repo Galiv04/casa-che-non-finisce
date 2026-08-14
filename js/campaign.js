@@ -1230,7 +1230,7 @@ Gli scaffali intorno si piegano verso di voi come spettatori. I libri smettono d
 Vi stanno già assegnando lo scaffale.
 
 > Gaetano: "Ormai è fatta. ABBATTIAMO LA BIBLIOGRAFIA."`,
-    combat: { enemies: ['bibliotecario'], victory: 'b6b_vinto', defeat: 'b_ko' },
+    combat: { enemies: ['bibliotecario'], victory: 'b6b_vinto', defeat: 'b_ko', loot: { gold: 1 } },
   },
 
   b6b: {
@@ -1250,7 +1250,7 @@ Si muovono male, come chi ha dimenticato il proprio corpo in un cassetto. Ma si 
 L'uomo col segnalibro non si alza. Stringe il suo sole giallo e resta seduto, e forse — forse — vi guarda passare con qualcosa che somiglia a un tifo silenzioso.
 
 **(Non uccideteli: sono persone. Basterà respingerli. Ma i loro abbracci grigi pesano come sonno.)**`,
-    combat: { enemies: ['sonnambulo', 'sonnambulo'], victory: 'b7', defeat: 'b_ko' },
+    combat: { enemies: ['sonnambulo', 'sonnambulo'], victory: 'b7', defeat: 'b_ko', loot: { gold: 1 } },
   },
 
   b6b_vinto: {
@@ -2012,7 +2012,7 @@ E parte. L'archivio completo: le frasi peggiori di trent'anni di liti, in ordine
 > Emanuela: *(sfilando lo spray dalla borsa)* "Federico. Non è tuo fratello. È il rutto di chi se l'è mangiato."
 
 **(Il Gemello Sbagliato striscia fuori dall'armadio sulle mani. Troppe mani.)**`,
-    combat: { enemies: ['gemello_sbagliato'], victory: 'u3b', defeat: 'u_ko' },
+    combat: { enemies: ['gemello_sbagliato'], victory: 'u3b', defeat: 'u_ko', loot: { gold: 2 } },
     choices: [],
   },
 
@@ -2083,7 +2083,7 @@ Da vicino è peggio. La bocca non si chiude MAI, nemmeno tra una parola e l'altr
 > Claudia: "Allora si tappa. RACCHETTONI."
 
 **(I racchettoni-lapide si lasciano strappare dalla cenere con un suono di radice. Sono ancora VIVI: il manico caldo, la voglia di colpire intatta.)**`,
-    combat: { enemies: ['monologante'], victory: 'u4b', defeat: 'u_ko' },
+    combat: { enemies: ['monologante'], victory: 'u4b', defeat: 'u_ko', loot: { gold: 1 } },
     choices: [],
   },
 
@@ -2231,7 +2231,7 @@ Il primo si alza dal 21C ruotando sul busto in un modo che i busti non fanno, la
 > Claudia: "Glielo dici dopo. SOTTO!"
 
 **(La Hostess si liscia la divisa e viene a completare l'imbarco.)**`,
-    combat: { enemies: ['hostess', 'manichino_vita'], victory: 'u5b', defeat: 'u_ko' },
+    combat: { enemies: ['hostess', 'manichino_vita'], victory: 'u5b', defeat: 'u_ko', loot: { gold: 1 } },
     choices: [],
   },
 
@@ -2400,7 +2400,7 @@ La Cosa tra gli scogli esce IN VERTICALE, violando la parete d'acqua come se la 
 > Gaetano: *(al suo fianco, pallina in mano)* "Servizio tuo, amore."
 
 **(La Cosa tra gli scogli cala su di voi come un'onda che ha scelto.)**`,
-    combat: { enemies: ['cosa_sommersa'], victory: 'u7b', defeat: 'u_ko' },
+    combat: { enemies: ['cosa_sommersa'], victory: 'u7b', defeat: 'u_ko', loot: { gold: 2, items: ['lattina_zero'] } },
     choices: [],
   },
 
@@ -2700,7 +2700,7 @@ Emanuela sfoglia l'agenda appuntamenti sul banco. Ogni riga, ogni ora, ogni gior
 Il primo manichino si alza dalla poltrona senza slegarsi il telo. Il secondo pure. I bigodini cominciano a SVITARSI da soli, piano, con un rumore di tappi.
 
 > Natalino: "Emanuela. Grembiule." *(se lo annoda come una corazza)* "Il salone è NOSTRO."`,
-    combat: { enemies: ['manichino_vita', 'manichino_vita'], victory: 'u12b', defeat: 'u_ko' },
+    combat: { enemies: ['manichino_vita', 'manichino_vita'], victory: 'u12b', defeat: 'u_ko', loot: { gold: 1 } },
     choices: [],
   },
 
@@ -3041,7 +3041,7 @@ Apre lo zaino. I fogli a quadretti sciamano fuori come vespe: esercizi in bianco
 > Claudia: "Gaetano, amore: stavolta la verifica gliela facciamo NOI."
 
 **(Combattimento! Luca Giunti attacca con richieste all'ultimo minuto, esercizi mai fatti e "me lo rispiega?" a raffica.)**`,
-    combat: { enemies: ['luca_giunti'], victory: 'k2c', defeat: 'k_ko' },
+    combat: { enemies: ['luca_giunti'], victory: 'k2c', defeat: 'k_ko', loot: { gold: 2, items: ['taralli'] } },
     choices: [],
   },
 
@@ -3309,7 +3309,7 @@ Si srotola e si srotola e SI SROTOLA — era piegato come una manichetta perché
 > Emanuela: "Ragazzi, il monologo del regolamento. Questo lo conosco: o lo zittiamo noi o va avanti fino all'articolo quaranta."
 
 **(Combattimento! Il Riscossore riscuote. Il Mercante guarda: per lui è solo amministrazione.)**`,
-    combat: { enemies: ['mercante_guardia'], victory: 'k7c', defeat: 'k_ko' },
+    combat: { enemies: ['mercante_guardia'], victory: 'k7c', defeat: 'k_ko', loot: { gold: 1 } },
     choices: [],
   },
 
@@ -3437,7 +3437,7 @@ I sonnambuli si alzano dalle poltrone senza svegliarsi. Escono in pigiama, in ve
 > Claudia: "È la cosa più triste che farò in vita mia e lo faccio SUBITO."
 
 **(Combattimento! I sonnambuli difendono il loro canale. Non svegliateli: fermateli.)**`,
-    combat: { enemies: ['sonnambulo', 'sonnambulo', 'sonnambulo'], victory: 'k9', defeat: 'k_ko' },
+    combat: { enemies: ['sonnambulo', 'sonnambulo', 'sonnambulo'], victory: 'k9', defeat: 'k_ko', loot: { gold: 1 } },
     choices: [],
   },
 
@@ -3655,7 +3655,7 @@ Davanti alla teca c'è **l'Ufficiale.**
 > Federico: "Menatelo. Menatelo e basta, ho la partita IVA e questo mi offende personalmente."
 
 **(Combattimento! L'Ufficiale timbra a distanza, il sonnambulo difende il vetro. Il barattolo, dentro la teca, fa una luce piccola e tifa per voi.)**`,
-    combat: { enemies: ['mercante_guardia', 'sonnambulo'], victory: 'k14', defeat: 'k_ko' },
+    combat: { enemies: ['mercante_guardia', 'sonnambulo'], victory: 'k14', defeat: 'k_ko', loot: { gold: 1 } },
     choices: [],
   },
 
@@ -3802,7 +3802,7 @@ Escono VOLANDO — un vortice di buste bianche con la finestrella, i bordi tagli
 > Emanuela: "Phon. PHON: la carta brucia, e le bollette sono CARTA."
 
 **(Combattimento! Lo Sciame di Bollette taglia a raffica: ogni colpo si propaga al vicino, come gli interessi.)**`,
-    combat: { enemies: ['sciame_bollette', 'sciame_bollette'], victory: 'k16e', defeat: 'k_ko' },
+    combat: { enemies: ['sciame_bollette', 'sciame_bollette'], victory: 'k16e', defeat: 'k_ko', loot: { gold: 1 } },
     choices: [],
   },
 
@@ -4106,7 +4106,7 @@ Punta il tasto rosso addosso a Federico, e la stanza si riempie di un ronzio che
 > Claudia: "Racchettoni ALTI. Gaetano: come in spiaggia. Quello è solo un telecomando cresciuto male — e noi le cose che volano le SCHIACCIAMO."
 
 **(Difendete il bozzolo: Daniele è a due metri da voi.)**`,
-    combat: { enemies: ['bozzolo_guardiano'], victory: 'm6', defeat: 'm_ko' },
+    combat: { enemies: ['bozzolo_guardiano'], victory: 'm6', defeat: 'm_ko', loot: { gold: 2, items: ['ipa_gaetano'] } },
   },
 
   m5_sacrificio: {
@@ -4293,7 +4293,7 @@ Ha ancora la faccia di Daniele. E per la prima volta da quando lo conoscete, NON
 Eleinad ringhia — e il ringhio ha le voci di tutti quelli che avete deluso, tutte insieme, ed è la cosa peggiore che avete sentito stanotte.
 
 > Emanuela: "Ha finito di parlare. Phon."`,
-    combat: { enemies: ['eleinad_maschera'], victory: 'm9', defeat: 'm_ko' },
+    combat: { enemies: ['eleinad_maschera'], victory: 'm9', defeat: 'm_ko', loot: { gold: 2 } },
   },
 
   m9: {
@@ -4458,7 +4458,7 @@ Il divano vi sente. I cuscini si sollevano — e sotto ci sono i **DENTI**: file
 > Claudia: "Racchettoni CORTI. Mirare alle molle: quelle sono la spina dorsale."
 
 **(Combattimento! Il Divorente attacca con cuscini pieni di denti e braccioli che afferrano. Tre posti, una fame, nessuna pietà.)**`,
-    combat: { enemies: ['divorente'], victory: 'z1e', defeat: 'z_ko' },
+    combat: { enemies: ['divorente'], victory: 'z1e', defeat: 'z_ko', loot: { gold: 2 } },
     choices: [],
   },
 
@@ -4745,7 +4745,7 @@ Il buco a forma di persona scende dall'altare. Il Grigiore gli si raccoglie addo
 > Daniele: "Hai i televisori, i divani e la moquette. Noi abbiamo due racchettoni professionali e una parrucchiera di Gaeta. Non c'è partita, ma non nel senso che credi tu."
 
 **(Tutto ciò che avete conquistato stanotte — la foto, i sabotaggi, i risvegli, la pace, il manuale — scende in campo con voi.)**`,
-    combat: { enemies: ['eleinad_vero'], victory: 'z8', defeat: 'z_ko' },
+    combat: { enemies: ['eleinad_vero'], victory: 'z8', defeat: 'z_ko', loot: { gold: 3 } },
   },
 
   z8: {
