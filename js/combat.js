@@ -73,6 +73,8 @@ const Combat = (() => {
       h.rageRounds = 0;
       h.luckUsed = false;
       h.zonkGritUsed = false;
+      h.latched = false;
+      h._stabilized = false;
     }
 
     // passiva di Emanuela: +2 PV a tutti a inizio combattimento
@@ -413,6 +415,11 @@ const Combat = (() => {
           return heroAttack(hIdx, tIdx, opts);
         }
         if (res.success) {
+          if (G.difficulty !== 'facile' && e.special === 'evasive' && !res.crit && Math.random() < 0.4) {
+            log(`💨 ${e.name} si scompone in pagine — il colpo lo attraversa!`, 'log-info');
+            floatText(e._x + e._size / 2, e._y, 'SCHIVATO', 'float-miss');
+            render(); endHeroAction(); return;
+          }
           const dice = opts.dice || h.attack.dice;
           let dmgRoll = Dice.rollDice(dice[0], dice[1]);
           // abilità: solo il modificatore della loro statistica; arma base: stat + bonus arma
@@ -669,6 +676,9 @@ const Combat = (() => {
     let atkBonus = e.attack.bonus;
     if (G.inventory.includes('ombrellone_gaeta')) atkBonus -= 1; // l'ombrellone di Gaeta: il ricordo del sole fa esitare il Grigiore
     if (battle.isBoss && G.flags.eleinad_vacilla && battle.round <= 2) atkBonus -= 1;
+    if (G.difficulty !== 'facile' && e.special === 'mirror') atkBonus = Math.max(atkBonus, (h.attack.bonus || 0) + 2);
+    const desperate = G.difficulty === 'incubo' && e.hp <= Math.floor(e.maxHp * 0.25);
+    if (desperate) atkBonus += 3;
 
     let die = Dice.roll(20);
     const disadv = battle.smokeRounds > 0 || e.distracted;
@@ -676,17 +686,19 @@ const Combat = (() => {
     e.distracted = false;
 
     let ca = h.ac + (h.defending ? 3 : 0);
+    if (h.latched) { ca -= 2; h.latched = false; }
     const total = die + atkBonus;
-    const crit = die === 20, fumble = die === 1;
+    const crit = die === 20, fumble = die === 1 || (G.difficulty === 'facile' && die === 2);
 
     if (!fumble && (crit || total >= ca)) {
       let dmg = Dice.rollDice(e.attack.dice[0], e.attack.dice[1]).total + e.attack.plus;
       if (crit) dmg += Dice.rollDice(e.attack.dice[0], e.attack.dice[1]).total;
+      if (desperate) dmg += 2;
       // riduzioni
       if (h.rageRounds > 0) dmg = Math.max(1, dmg - 2);
       if (battle.tauntHeroIdx === tIdx) dmg = Math.max(1, Math.floor(dmg / 2));
       h.hp -= dmg;
-      log(`${crit ? '💥 <b>CRITICO!</b> ' : ''}🗡 ${e.name} colpisce ${h.name} con ${e.attack.name}: <b>${dmg} danni</b>.`, crit ? 'log-crit' : 'log-hit');
+      log(`${crit ? '💥 <b>CRITICO!</b> ' : ''}${desperate ? '🔥 ' : ''}🗡 ${e.name} colpisce ${h.name} con ${e.attack.name}: <b>${dmg} danni</b>${desperate ? ' (FURIA DISPERATA!)' : ''}.`, crit ? 'log-crit' : 'log-hit');
       if (typeof Sound !== 'undefined') Sound.play('hit');
       if (h._x != null) floatText(h._x + h._size / 2, h._y, `-${dmg}`, 'float-dmg');
       // il vampiro si nutre dei colpi che mette a segno
@@ -698,9 +710,31 @@ const Combat = (() => {
           if (e._x != null) floatText(e._x + e._size / 2, e._y, `+${drain}`, 'float-heal');
         }
       }
+      if (G.difficulty !== 'facile' && e.special === 'latch' && !h.down) {
+        h.latched = true;
+        log(`🧟 Il ${e.short || e.name} si aggrappa a ${h.name} con dita molli — <b>-2 CA</b> al prossimo attacco!`, 'log-hit');
+      }
+      if (G.difficulty !== 'facile' && e.special === 'poisonOnHit' && !h.veleno && !h.down && Math.random() < 0.3) {
+        h.veleno = true;
+        log(`🥶 La dimostrazione di sicurezza della ${e.short || e.name} si insinua — ${h.name} è <b>INGRIGITO</b>! (-2 a tutto)`, 'log-crit');
+      }
+      if (G.difficulty !== 'facile' && e.special === 'cleave') {
+        const others = G.party.filter((o, i) => i !== tIdx && !o.down && !o.preso);
+        if (others.length > 0) {
+          const splash = others[Math.floor(Math.random() * others.length)];
+          const splashDmg = Math.max(1, Math.floor(dmg / 2));
+          splash.hp -= splashDmg;
+          log(`📬 Lo sciame prosegue — ${splash.name} viene tagliato dalle buste: <b>${splashDmg} danni</b>!`, 'log-hit');
+          if (splash._x != null) floatText(splash._x + splash._size / 2, splash._y, `-${splashDmg}`, 'float-dmg');
+          if (splash.hp <= 0) { splash.hp = 0; splash.down = true; log(`💀 <b>${splash.name} cade a terra!</b>`, 'log-hit'); }
+        }
+      }
       if (h.hp <= 0) {
-        // passiva Zonk
-        if (false) {
+        if (G.difficulty === 'facile' && !h._stabilized) {
+          h._stabilized = true;
+          h.hp = 1;
+          log(`🛡 ${h.name} barcolla ma RESISTE! L'adrenalina lo tiene in piedi con <b>1 PV</b>.`, 'log-heal');
+          if (h._x != null) floatText(h._x + h._size / 2, h._y, 'RESISTE!', 'float-heal');
         } else {
           h.hp = 0; h.down = true;
           log(`💀 <b>${h.name} cade a terra!</b> Serve una cura o una pozione per rialzarlo!`, 'log-hit');

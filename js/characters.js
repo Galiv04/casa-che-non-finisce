@@ -159,7 +159,7 @@ const BESTIARY = {
   },
   sciame_bollette: {
     name: 'Sciame di Bollette', short: 'Sciame', sprite: 'sciame_bollette',
-    maxHp: 16, ac: 15, ai: 'smart', undead: true,
+    maxHp: 16, ac: 15, ai: 'smart', undead: true, special: 'cleave',
     attack: { name: 'Taglio di carta (con more)', bonus: 6, dice: [1, 6], plus: 3 },
     flavor: 'Buste bianche con la finestrella, a migliaia, che volano come vespe. Ogni taglio brucia il doppio: è ADDEBITATO.',
   },
@@ -171,7 +171,7 @@ const BESTIARY = {
   },
   hostess: {
     name: 'La Hostess del Volo Fermo', short: 'Hostess', sprite: 'hostess',
-    maxHp: 24, ac: 15, ai: 'weakest', undead: true,
+    maxHp: 24, ac: 15, ai: 'weakest', undead: true, special: 'poisonOnHit',
     attack: { name: 'Dimostrazione di sicurezza', bonus: 6, dice: [1, 8], plus: 3 },
     flavor: 'Sorride con troppi denti e indica le uscite. Le uscite non ci sono. "Allacciate le cinture. Restiamo a terra PER SEMPRE."',
   },
@@ -189,19 +189,19 @@ const BESTIARY = {
   },
   bibliotecario: {
     name: 'Il Bibliotecario', sprite: 'bibliotecario',
-    maxHp: 32, ac: 15, ai: 'smart', undead: true,
+    maxHp: 32, ac: 15, ai: 'smart', undead: true, special: 'evasive',
     attack: { name: 'Recensione demolitrice', bonus: 6, dice: [1, 10], plus: 3 },
     flavor: 'Fatto di dorsi di libri mai letti. Ti legge ad alta voce i tuoi pensieri peggiori, con citazione della fonte.',
   },
   gemello_sbagliato: {
     name: 'Il Gemello Sbagliato', short: 'Gemello', sprite: 'gemello_sbagliato',
-    maxHp: 32, ac: 15, ai: 'smart', undead: true,
+    maxHp: 32, ac: 15, ai: 'smart', undead: true, special: 'mirror',
     attack: { name: 'La frase che fa più male', bonus: 6, dice: [1, 8], plus: 4 },
     flavor: 'Ha la faccia di Federico e di Daniele insieme, e non sta bene su nessuna delle due. Dice le cose che i gemelli si urlano. Tutte. In ordine.',
   },
   sonnambulo: {
     name: 'Sonnambulo del Grigiore', short: 'Sonnambulo', sprite: 'sonnambulo',
-    maxHp: 20, ac: 13, ai: 'random', undead: true,
+    maxHp: 20, ac: 13, ai: 'random', undead: true, special: 'latch',
     attack: { name: 'Presa molle', bonus: 5, dice: [1, 8], plus: 2 },
     flavor: 'Qualcuno che il Grigiore ha già preso, altrove, in un\'altra casa. Cammina in pigiama, gli occhi come schermi spenti. Non è cattivo. Non è più NIENTE.',
   },
