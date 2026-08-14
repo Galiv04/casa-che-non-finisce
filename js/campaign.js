@@ -5082,6 +5082,7 @@ const CHAPTERS = [
 const DIARY_FLAGS = [
   ['nota_daniele',          'La nota di Daniele in cucina: "NON è una crisi: è un inquilino abusivo. Non ascoltate la mia faccia."'],
   ['daniele_vivo',          'Daniele è VIVO e combatte da dentro: sta nei fusibili, sabota quello che può. Non firmate, non sedetevi, non credete alla sua faccia.'],
+  ['foto_gaeta_vista',      'La foto di Gaeta — il mare, gli amici, tutti bruciati e felici — resiste al Grigiore. I giorni troppo belli sono indigesti, per lui.'],
   ['daniele_sabota',        'I segnali di Daniele: le lattine di Coca Zero — le uniche cose a colori — disposte a freccia. Vi sta guidando LUI.'],
   ['misure_impossibili',    'Il corridoio misura 34 metri in un bilocale. La geometria qui dentro è un\'opinione della Casa.'],
   ['gocce_trovate',         'Le Gocce del Dottore, coi promemoria di Daniele: preso ✓, preso ✓, preso ✓ — fino a tre giorni fa. Si è fermato quando la casa l\'ha preso. Non prima. Il dottore sa il fatto suo.'],

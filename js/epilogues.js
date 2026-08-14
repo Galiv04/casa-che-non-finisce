@@ -86,6 +86,8 @@ const IMPRESE = [
   { flag: 'sonnambuli_svegli',     icon: '⏰', title: 'Sveglia Generale',             desc: 'Tutta la Galleria in piedi, tutti gli schermi spenti riaccesi. Il Grigiore ha perso l\'intera collezione in una notte.' },
   { flag: 'zero_bevuta',           icon: '🥤', title: 'Un Brindisi al Collezionista', desc: 'Una Coca Zero di Daniele, bevuta nella casa che voleva spegnervi. Fredda. A COLORI. Alla sua salute.' },
   { flag: 'dentro_eleinad',        icon: '🫁', title: 'Non È Casa Sua',               desc: 'La casa non è l\'appartamento di Daniele: siete DENTRO Eleinad. E adesso lui sa che lo sapete.' },
+  { flag: 'bozzolo_pausa',          icon: '⏸', title: 'La Regola più Vecchia',         desc: 'Le console hanno il tasto PAUSA. Anche le prigioni fatte di cuscini e cavi. L\'hanno premuto insieme, col joy-con che Daniele aveva nascosto per loro.' },
+  { flag: 'bozzolo_aperto',         icon: '🕸', title: 'Aperto da Dentro',              desc: 'Il bozzolo si apriva solo dall\'interno. Qualcuno ci è entrato sapendo che non sarebbe uscito. Lo spirito, dall\'altra parte, sorrideva.' },
   { flag: 'eleinad_vacilla',       icon: '🕳', title: 'Il Sorriso Fuori Asse',        desc: 'Per un momento la maschera è scivolata, e sotto non c\'era niente di pronto. L\'avete fatto vacillare.' },
   { flag: 'gemelli_pace',          icon: '🤝', title: 'Cessate il Fuoco (1994–oggi)', desc: 'Federico e Daniele d\'accordo su una cosa, insieme, ad alta voce. Il demone non aveva un piano per questo.' },
   { flag: 'eleinad_smontato',      icon: '🗣', title: 'Smontato in Tre Passaggi',     desc: 'Daniele ha vinto il Duello finale: fallacia per fallacia, davanti a tutti, con calma chirurgica. Il finale della Parola.' },
