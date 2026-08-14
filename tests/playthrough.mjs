@@ -835,7 +835,7 @@ scenarios.push(scenario(
 scenarios.push(scenario(
   'morte vera a u6 — spirito, porta dei morti (u9), z2b, e_colori senza resurrezione',
   ['claudia', 'federico', 'natalino'],
-  { u6: 'Immergersi', u6_morte: 'si ritenta', z2: 'Basta parlare' },
+  { u6: 'Immergersi', u6_morte: 'si ritenta', u8: 'Salotto', z2: 'Basta parlare' },
   {
     difficulty: 'facile',
     sequences: {
@@ -880,6 +880,7 @@ scenarios.push(scenario(
     b13: 'RESTITUITI',   // -> b13b, il diario di Rosa
     b7: 'scatola da scarpe', // once -> b17, le tessere dei lettori
     b17: 'scaffale proibito', // -> b8
+    b8: 'specchio',           // la prova INT a b8 (forzata a fallire → b8b, poi successo → b9)
     b8b: 'Riprovare',
     b9: 'segreto fuori', // -> b11 (bibliotecario ancora vivo qui: non lo riaffrontiamo a parole)
     m3: 'Accoppiare il joy-con',

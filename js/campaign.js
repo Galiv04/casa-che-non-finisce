@@ -2306,7 +2306,7 @@ Il Cuore di Colore, in fondo, batte ancora. Adesso sapete anche PER CHI potrebbe
 **(⚰️ Chi ha tirato è MORTO. Cammina con voi come Spirito: niente prove, niente attacchi — ma i morti, in questa casa, vedono porte che i vivi non vedono.)**`,
     killRoller: true,
     choices: [
-      { text: '🌊 L\'acqua ha preso. Non avrà anche il Cuore: si ritenta.', next: 'u6' },
+      { text: '🌊 L\'acqua ha preso. Non avrà anche il Cuore: si ritenta.', once: true, next: 'u6' },
       { text: '🚪 Basta. Via da questa stanza maledetta.', next: 'u1' },
     ],
   },
