@@ -142,18 +142,21 @@ const BESTIARY = {
   topo_grigio: {
     name: 'Topo del Grigiore', short: 'Topo', sprite: 'topo_grigio',
     maxHp: 12, ac: 13, ai: 'weakest', undead: true,
+    special: 'evasive',
     attack: { name: 'Morso di cenere', bonus: 5, dice: [1, 6], plus: 2 },
     flavor: 'Grosso come un gatto, grigio come la polvere sotto i mobili. Mastica le cose a cui tenete. RUMOROSAMENTE.',
   },
   manichino_vita: {
     name: 'Comparsa della Vita Finta', short: 'Comparsa', sprite: 'manichino_vita',
     maxHp: 19, ac: 14, ai: 'random', undead: true,
+    special: 'poisonOnHit',
     attack: { name: 'Abbraccio di cartone', bonus: 5, dice: [1, 8], plus: 3 },
     flavor: 'Una sagoma con un sorriso stampato e i vestiti di qualcuno che conoscete. Recita la parte di un amico. Male.',
   },
   divorente: {
     name: 'Il Divorente', sprite: 'divorente',
     maxHp: 35, ac: 14, ai: 'strongest', undead: true, boss: true,
+    special: 'latch',
     attack: { name: 'Cuscini con dentro i denti', bonus: 6, dice: [1, 10], plus: 4 },
     flavor: 'Il divano. Il DIVANO. Tre posti, penisola, e uno stomaco che digerisce pomeriggi interi. Non è mai stato un mobile.',
   },
@@ -166,6 +169,7 @@ const BESTIARY = {
   monologante: {
     name: 'Il Monologante', sprite: 'monologante',
     maxHp: 30, ac: 13, ai: 'random', undead: true,
+    special: 'cleave',
     attack: { name: 'Aneddoto senza uscita', bonus: 5, dice: [1, 8], plus: 4 },
     flavor: 'Un tizio in polo che parla, parla, PARLA. Non respira mai. Ogni frase ti toglie qualcosa che non sapevi di avere.',
   },
@@ -178,12 +182,14 @@ const BESTIARY = {
   luca_giunti: {
     name: 'Luca Giunti delle 21:00', short: 'Luca', sprite: 'luca_giunti',
     maxHp: 40, ac: 15, ai: 'smart', undead: true, boss: true,
+    special: 'mirror',
     attack: { name: 'Richiesta all\'ultimo minuto', bonus: 7, dice: [2, 6], plus: 3 },
     flavor: 'Uno zaino, un libro di fisica mai aperto, e una domanda eterna: "Prof, domani ho la verifica. Facciamo QUATTRO ORE?" Sono le 21:00. Sono SEMPRE le 21:00.',
   },
   cosa_sommersa: {
     name: 'La Cosa tra gli Scogli', short: 'La Cosa', sprite: 'cosa_sommersa',
     maxHp: 38, ac: 14, ai: 'strongest', undead: true, boss: true,
+    special: 'latch',
     attack: { name: 'Presa dal fondale', bonus: 7, dice: [2, 6], plus: 3 },
     flavor: 'Sta sotto il pelo dell\'acqua nera, dove i piedi non toccano. Ha la pazienza degli scogli e le dita lunghe delle alghe.',
   },
@@ -208,12 +214,14 @@ const BESTIARY = {
   mercante_guardia: {
     name: 'Riscossore del Mercante', short: 'Riscossore', sprite: 'mercante_guardia',
     maxHp: 27, ac: 15, ai: 'smart', undead: true,
+    special: 'evasive',
     attack: { name: 'Pignoramento', bonus: 6, dice: [1, 10], plus: 3 },
     flavor: 'Tre metri di contratto arrotolato con dentro qualcosa che cammina. Il Mercante non fa credito. Il Riscossore lo SPIEGA.',
   },
   bozzolo_guardiano: {
     name: 'Guardiano del Bozzolo', sprite: 'bozzolo_guardiano',
     maxHp: 54, ac: 16, ai: 'smart', undead: true, boss: true,
+    special: 'cleave',
     attack: { name: 'Filo grigio', bonus: 7, dice: [2, 6], plus: 4 },
     flavor: 'Il telecomando universale della casa, cresciuto fino a due metri e mezzo. Ha un tasto solo, grande, rosso: CONTINUA A GUARDARE.',
   },
