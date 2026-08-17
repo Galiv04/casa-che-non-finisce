@@ -39,6 +39,44 @@ const ITEMS = {
   joycon_sinistro: { name: 'Il joy-con sinistro', desc: 'Il pezzo mancante della Switch di Daniele. La Casa l\'aveva nascosto nel 1994. I salvataggi non si cancellano: si SOSPENDONO.', usable: false },
 };
 
+/* ---- Testi ispezionabili (Zaino → 📖 Ispeziona) ---- */
+ITEMS.gocce_dottore.lore = `Il flacone delle Gocce del Dottore, trovato in bagno, tenuto BENE: etichetta dritta, tappo pulito, livello a metà.
+
+Daniele le prendeva. Regolarmente — si vede dal calendarietto a crocette accanto, compilato fino a dodici giorni fa. Non è un dettaglio: è la prova che stava COMBATTENDO, con gli strumenti giusti, da prima che il Grigiore barasse.
+
+Curano l'INGRIGITO (🩶 −2): il grigio le odia, perché funzionano.`;
+ITEMS.cuore_colore.lore = `Un cuore di colore compresso: rosso-arancio-oro, caldo, batte da solo.
+
+Non è un organo — è una RISERVA: tutto il colore che il Grigiore ha spremuto a qualcuno, impacchettato così stretto da diventare materia. Avvicinatelo a una persona: si ACCORDA al suo battito in tre secondi. Cerca un proprietario.
+
+È l'unica cosa in tutta la casa che vuole tornare indietro. Può riaccendere chi si è spento — anche chi si è spento DEL TUTTO.`;
+ITEMS.manuale_annotato.lore = `"LE ARMI DELLA PERSUASIONE" — il libro sul comodino di Daniele, riletto fino a spaccarne la costa.
+
+I margini sono PIENI di appunti a penna, la grafia di Daniele: "questa la usa la TV", "questa mia madre", "questa IO, smettere". E nell'ultima pagina, scritto grosso, sottolineato tre volte:
+
+"Se conosci il trucco, il trucco non funziona. VALE ANCHE PER QUELLO GRANDE."
+
+Non stava leggendo un manuale. Stava preparando un ARSENALE. Nei Duelli di Parole, queste note sono la vostra munizione migliore.`;
+ITEMS.joycon_sinistro.lore = `Il joy-con sinistro di Daniele. Azzurro, con l'adesivo di un fungo mezzo staccato.
+
+La Casa l'aveva nascosto nel 1994 — in una cella che non c'entrava niente — perché è il pezzo MANCANTE: senza sinistro non si gioca, si guarda e basta. E guardare e basta è esattamente la dieta del Grigiore.
+
+I salvataggi non si cancellano: si SOSPENDONO. Riattaccatelo alla console del bozzolo, e si riparte dall'ultimo checkpoint.`;
+ITEMS.lattina_zero.lore = `Una Coca Zero del frigo di Daniele: l'ultima della freccia di lattine — le uniche cose a COLORI in tutta la casa.
+
+Le ha disposte lui, una alla volta, come briciole di Pollicino al contrario: non per ritrovare la strada di casa, ma per farla trovare A VOI. Fredda, rossa, viva. Il Grigiore non è riuscito a toccarle: certe fedeltà quotidiane sono impermeabili.`;
+ITEMS.conchiglia_gaeta.lore = `Una conchiglia di Serapo, estate di qualche anno fa. Sta nella tasca di qualcuno da allora.
+
+Avvicinatela all'orecchio: non fa il rumore del mare — fa il rumore di QUEL giorno di mare: le racchette, le risate, Daniele che vince a racchettoni contro Federico e non lo fa dimenticare per due estati.
+
+I giorni troppo belli sono indigesti, per il Grigiore.`;
+ITEMS.foto_gemelli.lore = `La foto ricomposta: Federico e Daniele da bambini, 1994, in cameretta — PRIMA della lite del nastro adesivo.
+
+Ridono. Della stessa cosa, nello stesso istante, con la stessa faccia in due taglie. Il Grigiore l'aveva strappata a metà, un fratello per pezzo: il litigio dei gemelli è il suo giacimento più antico, e questa foto è la prova che la miniera NON è sempre stata aperta.
+
+Mostratela al momento giusto: certe liti muoiono davanti alle prove.`;
+
+
 /* ============ LA CASA CHE NON FINISCE — BLOCCO A: PROLOGO + SOGLIA ============
    Scene a0-a8 (prologo) + s1-s6 (soglia). Uscita unica fuori dal blocco: h1.
    Valuta: G.gold = COLORE 🎨. Nessuna morte in questo blocco.                  */
