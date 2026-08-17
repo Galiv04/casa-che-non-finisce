@@ -692,7 +692,11 @@ const scenarios = [];
 scenarios.push(scenario(
   'e_parola — Sopravvissuto: Natalino SOLO, biblioteca+porte complete, duello perfetto',
   ['natalino'],
-  { z2: 'Smontiamolo' },
+  {
+    z2: 'Smontiamolo',
+    u2: 'Ascoltare il loop',          // SAG (bias best) -> u2b: il joy-con sinistro
+    m3: 'Accoppiare il joy-con',       // la liberazione col joycon (m4), non l'altra via
+  },
   {
     difficulty: 'facile',
     verify: (r, expect) => {
@@ -1012,6 +1016,7 @@ scenarios.push(scenario(
     m7: 'Che venga',
     u6: 'Ingegnarsi da riva',
     u12b: 'Rimettere in ordine',
+    u14c: 'Tornare davanti al leggio',
     z2: 'Smontiamolo',
     z3: 'STRAWMAN',
     z4: 'FALSA DICOTOMIA',
@@ -1028,7 +1033,7 @@ scenarios.push(scenario(
       m3: 'fail',                // "cercare un'altra via" fallisce apposta -> m4c, il Guardiano anticipato
     },
     sequences: {
-      u1: ['SALA CONTROLLO', 'IBIZA', 'IL SALONE', 'AGOSTO 2019', 'NON APRIRE', 'OBIEZIONE', 'Chiudere col corridoio'],
+      u1: ['SALA CONTROLLO', 'IBIZA', 'IL SALONE', 'AGOSTO 2019', 'NON APRIRE', 'OBIEZIONE', 'IBIZA', 'Chiudere col corridoio'],
       u10: ['chiudere il ticket', 'chiudere il ticket'],
       u11: ['testa alta', 'testa alta'],
       u14: ['AUTORITÀ', 'AD HOMINEM'], // prima il colpo sbagliato (u14c), poi quello giusto (u14b)
@@ -1130,10 +1135,13 @@ section('Simulazione di partite complete (headless)');
 
 const results = [];
 function execute(sc) {
+  // TEST_FILTER=<sottostringa> esegue solo gli scenari il cui nome combacia (debug mirato)
+  if (process.env.TEST_FILTER && !sc.name.includes(process.env.TEST_FILTER)) return { ok: true, skipped: true, log: { scenes: [], combats: 0 } };
   const r = runGame(sc);
   results.push(r);
   const endingTxt = r.ok ? (r.log.ending || '(nessun finale?!)') : 'ERRORE';
   console.log(`  ${r.ok ? '✅' : '❌'} [seed ${sc.seed}] ${sc.name} — scene: ${r.log.scenes.length}, combattimenti: ${r.log.combats}, esito: ${endingTxt}`);
+  if (process.env.TEST_DUMP) console.log(`      ↳ percorso: ${r.log.scenes.join(' > ')}`);
   if (!r.ok) { console.error(`      ↳ ${r.error.split('\n')[0]}`); return r; }
   if (sc.verify) {
     const expect = (cond, msg) => { if (!cond) fail(`[${sc.name}] ${msg}`); };
