@@ -2251,6 +2251,7 @@ Silenzio. La toga, a terra, sembra più piccola di prima. Una taglia da uomo che
 
 **(🎨 Colore +1: l'Avvocato aveva un nome e un record quasi perfetto — e la lezione è cucita nel bavero: è il conteggio che scegli a prenderti o salvarti.)**`,
     gold: 1,
+    sets: { toga_targhetta: true },
     choices: [
       { text: '🚪 Tornare nel corridoio delle porte', next: 'u1' },
     ],
