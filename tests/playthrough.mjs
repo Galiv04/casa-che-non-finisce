@@ -31,7 +31,7 @@ const root = join(__dirname, '..');
 // Ordine di caricamento IDENTICO a index.html (main.js escluso: qui non serve la UI del titolo).
 const FILES = [
   'js/sound.js', 'js/sprites.js', 'js/scenes.js', 'js/characters.js', 'js/campaign.js',
-  'js/epilogues.js', 'js/rules.js', 'js/dice.js', 'js/combat.js', 'js/engine.js',
+  'js/epilogues.js', 'js/rules.js', 'js/dice.js', 'js/combat.js', 'js/minigames.js', 'js/engine.js',
 ];
 const SOURCES = FILES.map(f => ({ name: f, code: readFileSync(join(root, f), 'utf8') }));
 
@@ -559,6 +559,14 @@ function runGame(scenario) {
         if (typeof btn.onclick !== 'function') throw new Error('overlay dado visibile ma bottone "Continua" senza onclick');
         game.act(() => btn.onclick());
         checkInvariants(getG(), `dopo tiro di dado fuori combattimento (scena "${sceneId}")`);
+        continue;
+      }
+
+      if (scene.minigame) {
+        const esito = (scenario.minigames && scenario.minigames[sceneId]) || 'success';
+        const ok = esito !== 'fail';
+        game.act(() => api.Engine.gotoScene(ok ? scene.minigame.success : scene.minigame.fail));
+        checkInvariants(getG(), `dopo minigioco in "${sceneId}"`);
         continue;
       }
 

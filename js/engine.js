@@ -264,6 +264,29 @@ const Engine = (() => {
     // effetti d'ingresso (solo alla prima visita)
     if (firstVisit) {
       if (scene.sets) Object.assign(G.flags, scene.sets);
+      // CHECKPOINT: prima volta che si completa una pista (CHECKPOINT_FLAGS in campaign.js)
+      if (typeof CHECKPOINT_FLAGS !== 'undefined' && scene.sets) {
+        if (!G.checkpointsDone) G.checkpointsDone = [];
+        const nuovo = CHECKPOINT_FLAGS.find(f => scene.sets[f] && !G.checkpointsDone.includes(f));
+        if (nuovo) {
+          G.checkpointsDone.push(nuovo);
+          for (const h of G.party) {
+            if (h.morto) continue;
+            h.hp = h.maxHp; h.down = false;
+            if (G.uses[h.id]) for (const ab of h.abilities) G.uses[h.id][ab.id] = ab.uses;
+          }
+          if (typeof Sound !== 'undefined') Sound.play('heal');
+          setTimeout(() => {
+            const box = $('modal-generic-content');
+            box.innerHTML = `<h2>🎨 PISTA COMPLETATA — Checkpoint</h2>
+              <p style="font-size:20px;line-height:1.6;margin:10px 0">La Casa arretra di un passo e il gruppo tira il fiato: <b>PV al massimo</b> e <b>mosse ricaricate</b>.<br>
+              <span style="color:var(--text-dim)">Le condizioni (🩶 INGRIGITO, 🕸 preso, 👻 spirito) restano: quelle vogliono le loro cure.</span></p>
+              <button class="btn btn-gold" onclick="document.getElementById('modal-generic').classList.add('hidden')">▶ Si continua</button>`;
+            $('modal-generic').classList.remove('hidden');
+            renderPartyBar('party-bar');
+          }, 900);
+        }
+      }
       if (scene.rep) G.flags.reputazione = (G.flags.reputazione || 0) + scene.rep;
       if (scene.gold) G.gold = Math.max(0, G.gold + scene.gold);
       if (scene.goldLoss) G.gold = Math.max(0, G.gold - scene.goldLoss);
@@ -449,6 +472,18 @@ const Engine = (() => {
 
     if (scene.ending) {
       renderEnding(scene);
+      return;
+    }
+
+    if (scene.minigame) {
+      const b = document.createElement('button');
+      b.className = 'choice-btn';
+      b.innerHTML = `🎮 <b>SI GIOCA!</b> <span class="choice-tag">${scene.minigame.tag || 'Un minigioco: il gioco vi spiega le regole.'}</span>`;
+      b.onclick = () => Minigames.start(scene.minigame, ok => {
+        if (ok) { G.stats.checksPassed++; } else { G.stats.checksFailed++; }
+        gotoScene(ok ? scene.minigame.success : scene.minigame.fail);
+      });
+      choicesEl.appendChild(b);
       return;
     }
 

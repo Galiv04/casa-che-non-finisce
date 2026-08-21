@@ -48,6 +48,12 @@ nella Casa" mostra lo stato capitolo per capitolo; la schermata del finale mostr
 Casa non vi ha mostrato" (solo TITOLI: nessuno spoiler) col salto diretto al capitolo giusto.
 **Se si aggiungono scene o capitoli, aggiornare i `prefixes` dei CHAPTERS.**
 
+## Minigiochi e checkpoint (ago 2026)
+
+Il modulo riusabile `js/minigames.js` (copiato dal Relais) aggiunge `scene.minigame` — vedi
+`../dnd-motore/docs/MINIGIOCHI.md` per tipi, API e regole d'uso. `CHECKPOINT_FLAGS`: via_biblioteca/via_porte/via_cucina/daniele_in_squadra. Minigiochi: Traversata dei Lettori (b5, corsa) e Inventario del Mercante (k6, calcolo).
+Il motore cura+ricarica il gruppo alla prima volta di ogni flag in `CHECKPOINT_FLAGS`.
+
 ## Comandi
 
 ```bash

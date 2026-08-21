@@ -39,6 +39,9 @@ const ITEMS = {
   joycon_sinistro: { name: 'Il joy-con sinistro', desc: 'Il pezzo mancante della Switch di Daniele. La Casa l\'aveva nascosto nel 1994. I salvataggi non si cancellano: si SOSPENDONO.', usable: false },
 };
 
+/* Le piste che valgono un CHECKPOINT (cura+ricarica alla prima volta — vedi engine.js) */
+const CHECKPOINT_FLAGS = ['via_biblioteca', 'via_porte', 'via_cucina', 'daniele_in_squadra'];
+
 /* ---- Testi ispezionabili (Zaino → 📖 Ispeziona) ---- */
 ITEMS.gocce_dottore.lore = `Il flacone delle Gocce del Dottore, trovato in bagno, tenuto BENE: etichetta dritta, tappo pulito, livello a metà.
 
@@ -1445,6 +1448,7 @@ Sul fondo della sala, uno scaffale girevole cigola piano, mezzo aperto su un van
       { text: '👀 Fermarsi a osservarli: capire COSA leggono', once: true, tag: 'Prova di Saggezza — CD 12', check: { stat: 'SAG', dc: 12, success: 'b5b', fail: 'b6b' } },
       { text: '🌈 Lo scaffale girevole che odora di crêpes: guardarci dentro', once: true, next: 'b12' },
       { text: '🗄 Una porticina bassa, targa d\'ottone: "ARCHIVIO — DIARI IN CONSULTAZIONE"', once: true, next: 'b13' },
+      { text: '🏃 La sfida di Federico: attraversare di CORSA, saltando i libri-trappola — 🎮 MINIGIOCO', once: true, next: 'mg_corsa_libri' },
       { text: '🚶 Attraversare la sala e basta, senza fermarsi', next: 'b7' },
     ],
   },
@@ -1618,6 +1622,66 @@ Il libro batte una volta sola, caldo, come un applauso timido. Claudia lo posa s
     sets: { titolo_incompiuto_letto: true },
     choices: [
       { text: '🚶 Oltre la frana, verso il fondo della biblioteca', next: 'b7' },
+    ],
+  },
+
+
+  mg_corsa_libri: {
+    location: 'biblioteca',
+    caption: 'La traversata di corsa',
+    text: `> Federico: "Teoria: i Lettori Grigi reagiscono al RUMORE LENTO. Passi felpati, fruscii, esitazioni. Ma una cosa VELOCE e decisa? Non fanno in tempo a catalogarla."
+
+> Gaetano: "La tua teoria ha un campione statistico di zero."
+
+> Federico: "La mia teoria ha FIDUCIA IN SE STESSA. Guardate e imparate."
+
+Il corridoio centrale della sala è lungo, dritto, e disseminato di pile di libri che il Grigiore fa scivolare sul pavimento come trappole pigre. Chi corre, corre da solo: gli altri guardano da dietro lo scaffale, pronti a negare di conoscerlo.
+
+*(🎮 MINIGIOCO — La Traversata: un tasto = salto. Superate le pile di libri senza inciampare tre volte, o la sala intera alzerà gli occhi.)*`,
+    minigame: {
+      type: 'corsa', hero: null,
+      success: 'b5_corsa_ok', fail: 'b5_corsa_ko',
+      tag: 'La Traversata dei Lettori — un tasto, tre inciampi massimo',
+      config: { titolo: '📚 La Traversata dei Lettori', tema: 'libri', ostacoli: 9, velocita: 270, cielo: '#171420', suolo: '#241d28' },
+    },
+  },
+
+  b5_corsa_ok: {
+    location: 'biblioteca',
+    caption: 'La teoria di Federico regge',
+    text: `L'ultima pila di libri passa sotto i piedi, e la corsa finisce contro lo scaffale in fondo con un tonfo attutito e trionfale.
+
+I Lettori Grigi... non hanno alzato la testa. NESSUNO. Il Grigiore ha provato a catalogare la cosa veloce che gli attraversava la sala e ha rinunciato a metà pratica.
+
+> Federico: *(ricomponendosi il colletto, senza fiato ma con dignità)* "Campione statistico: UNO. Percentuale di successo: CENTO. La scienza ringrazia."
+
+> Gaetano: "La scienza ti denuncia. Però... segnato: la velocità decisa lo manda in confusione. Può servire di là."
+
+**(🎨 Colore +2: la teoria di Federico ora è un DATO. E correre, in questa casa, si può.)**`,
+    gold: 2,
+    sets: { corsa_lettori_ok: true },
+    choices: [
+      { text: '🚶 Oltre la sala, verso il fondo della biblioteca', next: 'b7' },
+    ],
+  },
+
+  b5_corsa_ko: {
+    location: 'biblioteca',
+    caption: 'La teoria di Federico inciampa',
+    text: `Terzo inciampo. La pila di libri esplode in un ventaglio di pagine, il rumore rimbalza tra i tavoli — e trentasei teste grigie si ALZANO insieme, con il fruscio di un'unica pagina enorme che si volta.
+
+Non attaccano. Fanno di peggio: FISSANO. Lo sguardo collettivo di una sala di lettura disturbata è un'arma che nessuna palestra prepara ad affrontare.
+
+> Federico: *(a terra tra i libri, senza guardare nessuno)* "La teoria va raffinata."
+
+> Emanuela: *(tirandolo su per un braccio)* "La teoria va SEPPELLITA. Cammina e non toccare più niente."
+
+Uscite dalla sala accompagnati da trentasei paia d'occhi, con la dignità sotto le scarpe e un freddo nuovo addosso.
+
+**(−2 PV a chi è inciampato... cioè a tutti, per solidarietà d'imbarazzo.)**`,
+    damage: 2,
+    choices: [
+      { text: '🚶 Fuori dalla sala, in fila, zitti', next: 'b7' },
     ],
   },
 
@@ -3748,8 +3812,64 @@ Sul banco, sotto una campana di vetro, una cosa che pulsa piano di tutti i color
       { text: '💗 CUORE DI COLORE, prezzo da colleghi — 8🎨 E il tronello. "Lo sconto è sconto." ', once: true, requires: { flag: 'sconto_mercante', item: 'tronello' }, requiresGold: 8, gold: -8, removeItem: 'tronello', item: 'cuore_colore' },
       { text: '🗣 "Il Divano-Trono. Cosa sai del Trono?" — pagare con una storia vera', next: 'k7' },
       { text: '🧰 "Cercate manodopera?" — il Mercante ha l\'aria di uno coi crediti in sospeso', once: true, next: 'k12' },
+      { text: '🧮 "Le torna l\'inventario?" — il Mercante paga chi sa contare (paga 3🎨) — 🎮 MINIGIOCO', once: true, next: 'mg_inventario' },
       { text: '🕶 Fregarlo. Una boccata sparisce dal banco mentre Claudia lo distrae.', once: true, tag: 'Prova di Destrezza — CD 13', check: { stat: 'DES', dc: 13, success: 'k7b', fail: 'k7b_fail' } },
       { text: '🚶 Lasciare il banco: più avanti l\'intercapedine si allarga in una sala', next: 'k8' },
+    ],
+  },
+
+
+  mg_inventario: {
+    location: 'mercante',
+    caption: 'L\'inventario del Mercante',
+    text: `Il Mercante tira fuori un quadernone unto, pieno di colonne che non tornano da anni.
+
+> Il Mercante: "Il Grigiore non sa contare. Sorprendente, eh? Sa TOGLIERE, ma i totali li sbaglia. Se mi chiudete quattro conti su cinque, tre Colore sono vostri. Se sbagliate... be', avrò riso gratis, che quaggiù non è poco."
+
+*(🎮 MINIGIOCO — L'Inventario: cinque conti a tempo, si risponde ad alta voce tutti insieme. Ne servono quattro.)*`,
+    minigame: {
+      type: 'calcolo',
+      success: 'k6_inv_ok', fail: 'k6_inv_ko',
+      tag: 'L\'Inventario del Mercante — 5 conti a tempo, ne servono 4',
+      config: {
+        titolo: '🧮 L\'Inventario del Mercante',
+        secondi: 20,
+        domande: [
+          { q: 'Dodici giorni di consegne, tre pacchi al giorno: quanti pacchi nell\'androne?', r: [ { t: '36', ok: true }, { t: '32', ok: false }, { t: '38', ok: false }, { t: '30', ok: false } ] },
+          { q: 'Otto lavatrici, ogni ciclo macina un giorno: quanti giorni a settimana macina il sottoscala?', r: [ { t: '56', ok: true }, { t: '48', ok: false }, { t: '64', ok: false }, { t: '54', ok: false } ] },
+          { q: 'Il Cuore costa 12🎨, lo sconto è di 4: prezzo da colleghi?', r: [ { t: '8', ok: true }, { t: '9', ok: false }, { t: '7', ok: false }, { t: '6', ok: false } ] },
+          { q: 'Una Coca Zero ogni sera per due settimane: quante lattine nella freccia?', r: [ { t: '14', ok: true }, { t: '12', ok: false }, { t: '16', ok: false }, { t: '15', ok: false } ] },
+          { q: 'Trentasei Lettori Grigi, e UNO ha il segnalibro: quanti leggono la stessa pagina da anni?', r: [ { t: '35', ok: true }, { t: '36', ok: false }, { t: '34', ok: false }, { t: '30', ok: false } ] },
+        ],
+      },
+    },
+  },
+
+  k6_inv_ok: {
+    location: 'mercante',
+    caption: 'L\'inventario torna',
+    text: `Il Mercante ricontrolla, matita tra i denti, e alla fine fa un verso che non gli sentirete mai più fare: un piccolo grugnito di RISPETTO.
+
+> Il Mercante: "Quadra. Quadra TUTTO. Sapete quanti anni erano che il mio quadernone non vedeva un totale giusto?" *(spinge tre grumi di Colore sul bancone, caldi come sassi d'estate)* "La paga. E un consiglio in omaggio, che qui niente è gratis tranne oggi: il Grigiore sbaglia i conti perché ODIA i numeri precisi. Se stanotte arrivate al Trono... contate AD ALTA VOCE. Lo innervosisce da morire."
+
+**(🎨 Colore +3, guadagnato col pallottoliere. E un'arma in più: i numeri precisi, detti forte.)**`,
+    gold: 3,
+    sets: { inventario_mercante: true },
+    choices: [
+      { text: '↩ Al bancone del Mercante', next: 'k6' },
+    ],
+  },
+
+  k6_inv_ko: {
+    location: 'mercante',
+    caption: 'L\'inventario non torna',
+    text: `Il Mercante segue le vostre correzioni con la matita, poi si ferma. Ripercorre. Sospira dal profondo del cappotto.
+
+> Il Mercante: "No. Adesso è SBAGLIATO IN UN MODO NUOVO, che quasi quasi è un talento." *(riprende il quadernone, quasi con tenerezza)* "Niente paga. Ma vi dico una cosa consolante: nemmeno il Grigiore sa contare, e guardate che carriera. Andate, andate. E se vi chiedono chi ha pasticciato la colonna dei riporti... io non vi ho mai visti."
+
+**(Niente Colore stavolta. Il quadernone del Mercante vi sopravviverà a tutti.)**`,
+    choices: [
+      { text: '↩ Al bancone, fischiettando innocenza', next: 'k6' },
     ],
   },
 
@@ -5801,6 +5921,8 @@ const CHAPTERS = [
 
 /* Il Diario della Notte: le conoscenze acquisite, in chiaro. Ordine = visualizzazione. */
 const DIARY_FLAGS = [
+  ['corsa_lettori_ok',      'La Traversata dei Lettori, vinta di slancio: la velocità decisa manda in confusione il catalogo del Grigiore. Teoria di Federico, campione statistico: uno.'],
+  ['inventario_mercante',   'L\'inventario del Mercante, chiuso in cinque: il Grigiore non sa contare, e i numeri precisi detti ad alta voce lo innervosiscono da morire.'],
   ['nota_daniele',          'La nota di Daniele in cucina: "NON è una crisi: è un inquilino abusivo. Non ascoltate la mia faccia."'],
   ['sorriso_errore',        'Claudia ha visto cosa c\'è sotto il sorriso di Eleinad quando slitta: NIENTE. Un vuoto a forma di persona che ha imparato una faccia dalla finestra. Daniele è intero, altrove.'],
   ['cuore_studiato',        'Il Cuore di Colore, studiato: una riserva che CERCA un proprietario. Il Grigiore accumula e non prevede il reso — è il suo punto cieco.'],
