@@ -751,7 +751,8 @@ scenarios.push(scenario(
   {
     difficulty: 'facile',
     sequences: { h1: ['Il corridoio delle porte', 'La porta fredda', 'Seguire il suono'] },
-    checkOutcomes: { z6: 'success' },
+    // z6_eco è la variante di z6 aperta dal flag eleinad_teme_gemelli: stesso scudo, CD più bassa
+    checkOutcomes: { z6: 'success', z6_eco: 'success' },
     verify: (r, expect) => {
       expect(r.log.ending === 'e_gemelli', `finale atteso e_gemelli, trovato ${r.log.ending}`);
       expect(r.log.flags.segreto_gemelli, 'flag segreto_gemelli non impostato (stanza 1994)');
@@ -850,7 +851,7 @@ scenarios.push(scenario(
 scenarios.push(scenario(
   'morte vera a u6 — spirito, porta dei morti (u9), z2b, e_colori senza resurrezione',
   ['claudia', 'federico', 'natalino'],
-  { u6: 'Immergersi', u6_morte: 'si ritenta', u8: 'Salotto', z2: 'Basta parlare' },
+  { u6: 'Immergersi', u6_morte: 'si ritenta', u8: 'Salotto', z2: 'Basta parlare', m3: 'Cercare un\'altra via' },
   {
     difficulty: 'facile',
     sequences: {
@@ -858,7 +859,9 @@ scenarios.push(scenario(
       u1: ['La porta "NON APRIRE"', 'La porta senza targhetta', 'La porta "1994"', 'La porta "IMBARCO"', 'Chiudere col corridoio'],
       z2: ['I morti non ti temono', 'Basta parlare'],
     },
-    checkOutcomes: { u6: ['fail', 'success'] },
+    // m3 va pinnato: senza joy-con la scelta a caso può finire sul taglio a mano
+    // (m5_sacrificio), e questo scenario deve avere UN SOLO morto vero, quello di u6.
+    checkOutcomes: { u6: ['fail', 'success'], m3: 'success' },
     verify: (r, expect) => {
       expect(r.log.ending === 'e_colori', `finale atteso e_colori, trovato ${r.log.ending}`);
       expect(r.log.scenes.includes('u6_morte'), 'u6_morte mai raggiunta (la prova forzata a fallire non è fallita)');
@@ -1024,6 +1027,7 @@ scenarios.push(scenario(
     m7: 'Che venga',
     u6: 'Ingegnarsi da riva',
     u12b: 'Rimettere in ordine',
+    u13: 'Dirlo ad alta voce', // il collaudo dell'amore (u13b): niente uscita in silenzio
     u14c: 'Tornare davanti al leggio',
     z2: 'Smontiamolo',
     z3: 'STRAWMAN',

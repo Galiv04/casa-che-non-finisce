@@ -465,7 +465,29 @@ Non è una buona notizia. Ma è un NOME, e le cose col nome fanno un po' meno pa
     gold: 1,
     choices: [
       { text: '📺 Al salotto — la TV pulsa ancora', next: 'a5' },
-      { text: '🪞 Invertire il trucco: spiare LUI attraverso lo specchio', tag: 'Prova di Intelligenza — CD 13', once: true, check: { stat: 'INT', dc: 13, success: 'a5', fail: 's7_ko' }, gold: 2 },
+      { text: '🪞 Invertire il trucco: spiare LUI attraverso lo specchio', tag: 'Prova di Intelligenza — CD 13', once: true, check: { stat: 'INT', dc: 13, success: 's7d', fail: 's7_ko' }, gold: 2 },
+    ],
+  },
+
+  s7d: {
+    location: 'appartamento',
+    caption: 'Il camerino dello specchio',
+    sets: { camerino_visto: true },
+    text: `Gaetano ribalta il trucco: si mette di traverso allo specchio, conta i fotogrammi al contrario, e in quel secondo e quattro decimi di ritardo — nel buco di tempo in cui il riflesso non è ancora tornato in posa — guarda DALL'ALTRA PARTE.
+
+E dall'altra parte c'è un salotto. QUESTO salotto: stessa disposizione, stesso divano, stessa TV. Solo scolorito di un tono, come la fotocopia di una fotocopia. E in mezzo, girato verso il vetro, c'è LUI.
+
+Non sta spiando. Sta **PROVANDO**. Fa il sorriso di Daniele e lo cancella. Lo rifà mezzo centimetro più su. Lo cancella. Alza un sopracciglio come fa Daniele quando ha già vinto una discussione, si guarda, non è soddisfatto, riprova. Otto volte lo stesso sorriso, come un attore in camerino la sera del debutto.
+
+> Gaetano: *(la voce che gli si secca in gola)* "Ragazzi. Non ci sta studiando noi. Sta studiando LUI. Si sta imparando la faccia di Daniele davanti a uno specchio come uno si impara una lingua straniera."
+
+> Claudia: "Otto tentativi per un sorriso. OTTO. Vuol dire che non gli viene. Vuol dire che non gli verrà MAI."
+
+> Natalino: "Quindi sotto quella faccia c'è uno che si esercita di nascosto perché ha il terrore di essere sgamato." *(sputa per terra, nel salotto di un amico, e nessuno lo rimprovera)* "Bene. Lo sgamiamo."
+
+**(🎨 Colore +2: avete visto il camerino del mostro. Un mostro che prova le espressioni allo specchio è un mostro che PUÒ sbagliarle.)**`,
+    choices: [
+      { text: '📺 Al salotto — la TV pulsa ancora', next: 'a5' },
     ],
   },
 
@@ -872,7 +894,7 @@ Il gelo nella stanza lascia il posto a qualcos'altro: la certezza che Daniele, f
     gold: 1,
     choices: [
       { text: '🚶 Adesso troviamolo.', next: 's3' },
-      { text: '📱 Cercare un messaggio nascosto: Daniele sapeva lasciare tracce', tag: 'Prova di Saggezza — CD 12', once: true, check: { stat: 'SAG', dc: 12, success: 's8b', fail: 's8_ko' }, gold: 1, sets: { messaggio_nascosto: true } },
+      { text: '📱 Cercare un messaggio nascosto: Daniele sapeva lasciare tracce', tag: 'Prova di Saggezza — CD 12', once: true, check: { stat: 'SAG', dc: 12, success: 's8b', fail: 's8_ko' }, gold: 1 },
     ],
   },
 
@@ -892,6 +914,7 @@ Il gelo nella stanza lascia il posto a qualcos'altro: la certezza che Daniele, f
 Le luci del salotto — solo quelle — calano e risalgono. Una volta. Come un cenno.
 
 **(Il messaggio nascosto diceva FUSIBILI: Daniele è nell'impianto, e adesso ve l'ha detto LUI.)**`,
+    sets: { messaggio_nascosto: true },
     choices: [
       { text: '🚶 Adesso troviamolo.', next: 's3' },
     ],
@@ -966,7 +989,34 @@ Dalle pareti, debolissimo, un ronzio elettrico. Se il ronzio fosse una frase, di
     sets: { daniele_sabota: true },
     choices: [
       { text: '🗣 Eleinad si ricompone. E cambia strategia.', next: 's4' },
-      { text: '⚡ Ringraziare Daniele ad alta voce: farglielo sapere', once: true, gold: 1, sets: { daniele_ringraziato: true }, next: 's4' },
+      { text: '⚡ Ringraziare Daniele ad alta voce: farglielo sapere', once: true, gold: 1, sets: { daniele_ringraziato: true }, next: 's3f' },
+    ],
+  },
+
+  s3f: {
+    location: 'salotto',
+    caption: 'Grazie, Daniele',
+    text: `Federico non parla al soffitto e non parla alla TV esplosa. Si gira verso la parete — verso l'impianto, verso i fusibili, verso il punto della casa dove suo fratello ha detto di essere — e lo dice normale, come si dice a uno che sta in un'altra stanza.
+
+> Federico: "Grazie, Dani. La TV era la tua, mi dispiace."
+
+Le luci del salotto sfarfallano. **Due volte.**
+
+> Emanuela: "Ha risposto."
+
+> Gaetano: "Due lampi. Su un canale radio, due lampi vogliono dire 'ricevuto'."
+
+> Natalino: *(alla parete, ad alta voce, come si grida a un vicino sul balcone)* "PREGO DI CHE! Ce ne facciamo un'altra di TV, quella era pure vecchia!"
+
+Tre lampi, stavolta. Uno lunghissimo. Se un impianto elettrico potesse ridere, somiglierebbe molto a questo.
+
+> Eleinad: *(da dietro i denti, e la maschera non regge la frase)* "Smettete. Di. Parlargli."
+
+> Claudia: *(dolcissima, verso la parete)* "Ah, ti dà fastidio? Buono a sapersi. **CIAO DANIELE!**"
+
+**(🎨 Colore +1: gli avete detto grazie ad alta voce e lui ha risposto con le luci. Il padrone di casa lo odia.)**`,
+    choices: [
+      { text: '🗣 Eleinad si ricompone. E cambia strategia.', next: 's4' },
     ],
   },
 
@@ -1391,7 +1441,28 @@ Vi rialzate diversi. Le parole, adesso, le vedete arrivare.
     gold: 2,
     choices: [
       { text: '🚶 Verso la sala di lettura, con le note ancora in testa', next: 'b5' },
-      { text: '📖 Un\'ultima pagina: Daniele ha sottolineato qualcosa TRE volte', once: true, gold: 1, sets: { nota_tripla: true }, next: 'b5' },
+      { text: '📖 Un\'ultima pagina: Daniele ha sottolineato qualcosa TRE volte', once: true, gold: 1, sets: { nota_tripla: true }, next: 'b3c' },
+    ],
+  },
+
+  b3c: {
+    location: 'biblioteca',
+    caption: 'Sottolineato tre volte',
+    text: `L'ultima pagina del Cialdini di Daniele non è di Cialdini. È sua. Una riga sola, in stampatello grosso, e sotto **tre righe di sottolineatura**: tre penne diverse, tre inchiostri diversi — uno che è tornato su quella frase tre volte, in tre momenti, per essere sicuro di crederci ancora.
+
+*"Se conosci il trucco, il trucco non funziona. **VALE ANCHE PER QUELLO GRANDE.**"*
+
+> Claudia: "'Quello grande.' Non 'quelli'. QUELLO. Al singolare."
+
+> Gaetano: "Non sospettava: SAPEVA. E si stava preparando. Questa non è una nota di studio, ragazzi. È un ordine operativo lasciato a chi arrivava dopo."
+
+> Federico: *(passa il dito sulle tre sottolineature, una per volta, come si conta un battito)* "Tre volte. Mio fratello ha sottolineato tre volte perché la terza era per NOI."
+
+> Natalino: "E allora impariamocelo, cazzo. Tutto quanto, dalla prima pagina."
+
+**(🎨 Colore +1: "Se conosci il trucco, il trucco non funziona. VALE ANCHE PER QUELLO GRANDE." Adesso lo sapete anche voi.)**`,
+    choices: [
+      { text: '🚶 Verso la sala di lettura, con la frase in testa', next: 'b5' },
     ],
   },
 
@@ -1453,7 +1524,7 @@ E lì, a metà dell'ultima riga, la grafia cambia. Si fa più larga, più libera
   b5: {
     location: 'biblioteca',
     caption: 'La sala di lettura — i Lettori Grigi',
-    text: `La sala di lettura è vasta e silenziosa come una sala d'attesa dell'eternità. Ai tavoli, sotto lampade verdi che non scaldano niente, siedono i **Lettori Grigi**: una dozzina di figure in pigiama e vestaglia, immobili, con davanti libri aperti dalle pagine completamente **bianche**.
+    text: `La sala di lettura è vasta e silenziosa come una sala d'attesa dell'eternità. Ai tavoli, sotto lampade verdi che non scaldano niente, siedono i **Lettori Grigi**: trentasei figure in pigiama e vestaglia, immobili, con davanti libri aperti dalle pagine completamente **bianche**.
 
 Non dormono. Leggono. Gli occhi sono aperti — ma spenti, come schermi in standby, e si muovono da sinistra a destra, riga dopo riga, su pagine dove non c'è scritto NIENTE.
 
@@ -1753,7 +1824,30 @@ Nessuno dice niente. Federico tiene il foglietto un secondo di troppo prima di r
     item: 'd20_daniele',
     choices: [
       { text: '📕 Ora la biografia. Strappare la catena di carta', next: 'b8' },
-      { text: '🎲 Lanciare il d20 una volta, per scaramanzia: se esce 20, è un buon segno', once: true, gold: 1, sets: { d20_lanciato: true }, next: 'b8' },
+      { text: '🎲 Lanciare il d20 una volta, per scaramanzia: se esce 20, è un buon segno', once: true, gold: 1, sets: { d20_lanciato: true }, next: 'b7c' },
+    ],
+  },
+
+  b7c: {
+    location: 'biblioteca',
+    caption: 'Il d20 che aspettava',
+    text: `Federico lo tira per terra, sul pavimento della biblioteca maledetta, senza cerimonie. Il dado rotola per tre metri, sbatte contro il dorso di un'enciclopedia che si ritrae offesa, e si ferma.
+
+**DICIASSETTE.**
+
+> Federico: "Diciassette. Ma vaffanculo."
+
+> Claudia: "Perché, è brutto?"
+
+> Federico: *(con la faccia di uno preso alle spalle)* "È il diciassette. È il suo compleanno. È il numero che chiama sempre, a qualunque cosa giochi, dalla tombola al fantacalcio — 'perché il diciassette porta sfortuna agli ALTRI'." *(raccoglie il dado e lo stringe in pugno)* "Prima volta che questo dado rotola in vita sua. E fa il numero suo."
+
+> Natalino: *(piano)* "Allora non l'hai tirato tu."
+
+Nessuno risponde. Federico si rimette il d20 in tasca — nella tasca interna, quella dei documenti.
+
+**(🎨 Colore +1: diciassette. Non era un buon segno: era una FIRMA.)**`,
+    choices: [
+      { text: '📕 Ora la biografia. Strappare la catena di carta', next: 'b8' },
     ],
   },
 
@@ -1951,7 +2045,28 @@ Uscite nel Salotto-Cattedrale con un manuale, un segreto, e i nomi giusti in boc
     gold: 1,
     choices: [
       { text: '🏛 Tornare al Salotto-Cattedrale', next: 'h1' },
-      { text: '📖 Un libro è caduto dallo scaffale: la copertina è a COLORI', once: true, gold: 1, sets: { libro_colori: true }, next: 'h1' },
+      { text: '📖 Un libro è caduto dallo scaffale: la copertina è a COLORI', once: true, gold: 1, sets: { libro_colori: true }, next: 'b11b' },
+    ],
+  },
+
+  b11b: {
+    location: 'biblioteca',
+    caption: 'Il catalogo dei colori',
+    text: `Il libro è caduto aperto, a faccia in su, e la copertina è a COLORI — la prima cosa a colori vista qui dentro dopo lo scaffale D-1994. È un catalogo tipografico di sfumature: rettangolini stampati, uno accanto all'altro, con il nome sotto.
+
+È aperto sulla pagina dei blu. E su un rettangolino, uno solo, c'è un cerchio a penna e una nota a margine nella grafia del gemello:
+
+*"QUESTO. Blu Serapo, ore 19:10, agosto. Se un giorno mi serve un colore da tenere in tasca, è questo."*
+
+> Claudia: *(confronta il rettangolino con la foto di Gaeta sul telefono, e non le serve un secondo)* "È identico. È IDENTICO. Ha trovato il suo mare in un campionario da tipografia e l'ha cerchiato a penna."
+
+> Gaetano: "Si è scelto un colore da tenere in tasca. PRIMA che qualcuno provasse a portargli via tutti gli altri." *(chiude il libro e se lo mette sotto il braccio, senza chiedere il permesso alla biblioteca)* "Questa non è nostalgia. È PREPARAZIONE."
+
+> Federico: "Mio fratello. Che si fa la scorta di blu."
+
+**(🎨 Colore +1: nel catalogo dei colori, un blu cerchiato a penna — Serapo, ore 19:10. Daniele si era fatto la scorta.)**`,
+    choices: [
+      { text: '🏛 Tornare al Salotto-Cattedrale', next: 'h1' },
     ],
   },
 
@@ -2603,7 +2718,26 @@ Dove l'onda si è ritirata, la cenere si è aperta: una conchiglia. Rigata, inte
     item: 'conchiglia_gaeta',
     choices: [
       { text: '🏐 I racchettoni piantati in riva: sono i vostri.', next: 'u4d' },
-      { text: '🌊 Emanuela fa un passo nell\'acqua: "Questa spiaggia me la riprendo ORA"', tag: 'Prova di Saggezza — CD 12', once: true, check: { stat: 'SAG', dc: 12, success: 'u4d', fail: 'u4_ko' }, gold: 1 },
+      { text: '🌊 Emanuela fa un passo nell\'acqua: "Questa spiaggia me la riprendo ORA"', tag: 'Prova di Saggezza — CD 12', once: true, check: { stat: 'SAG', dc: 12, success: 'u4e', fail: 'u4_ko' }, gold: 1 },
+    ],
+  },
+
+  u4e: {
+    location: 'spiaggia_grigia',
+    caption: 'GAETA — L\'acqua fredda giusta',
+    text: `Emanuela entra fino alle caviglie, poi fino al ginocchio, in un mare che da tre giorni è una lastra. E il mare **reagisce**.
+
+Prima le si stringe addosso: freddo vero, freddo di maggio, quello che fa bestemmiare e ridere insieme. Poi, dal punto esatto dove ha messo i piedi, parte un cerchio — un'onda circolare che si allarga verso l'orizzonte, piano, ostinata, e dove passa la lastra di vetro sporco si increspa e **torna acqua**.
+
+> Emanuela: *(senza voltarsi, le braccia larghe)* "Si è ricordato di me. Stronzi. SI È RICORDATO DI ME."
+
+> Gaetano: *(guardando il cerchio allargarsi, e la voce gli trema di matematica)* "Un'onda circolare su un fluido fermo. È un sasso buttato dentro al contrario: non è l'acqua che accoglie il sasso, è il sasso che sveglia l'acqua."
+
+Il cerchio arriva all'orizzonte e non torna indietro. Da qualche parte, oltre, per un istante si sente una risacca VERA.
+
+**(🎨 Colore +1: un mare morto ha battuto ciglio. Emanuela non lo racconterà a nessuno, e lo racconterà a tutti.)**`,
+    choices: [
+      { text: '🏐 I racchettoni piantati in riva: sono i vostri.', next: 'u4d' },
     ],
   },
 
@@ -2674,7 +2808,29 @@ Non c'è bisogno di dire chi sono "loro". La pallina, in mano ai due pro, non è
     item: 'pallina_racchettoni',
     choices: [
       { text: '🚪 Tornare nel corridoio delle porte', next: 'u1' },
-      { text: '🌊 Restare un momento: l\'onda ha lasciato qualcosa sulla battigia', once: true, gold: 1, sets: { battigia_vista: true }, next: 'u1' },
+      { text: '🌊 Restare un momento: l\'onda ha lasciato qualcosa sulla battigia', once: true, gold: 1, next: 'u4f' },
+    ],
+  },
+
+  u4f: {
+    location: 'spiaggia_grigia',
+    caption: 'GAETA — Quello che l\'onda ha lasciato',
+    sets: { battigia_vista: true },
+    text: `Dove l'onda si è ritirata la cenere è bagnata, e la battigia ha una riga scura come tutte le battigie del mondo. Vi accucciate a guardarla, perché su quella spiaggia l'avete fatto mille volte.
+
+Sulla riga ci sono: quattro conchiglie rotte, un pezzo di plastica azzurra levigato in vent'anni di mare, un portachiavi a forma di racchetta da spiaggia — e **un'impronta di piede**. Una sola. Quarantaquattro, tallone affondato, direzione: verso l'acqua.
+
+> Claudia: "Quarantaquattro. Daniele porta il quarantaquattro."
+
+> Gaetano: "Ed è FRESCA. Impronta fresca su cenere bagnata da due minuti. Il che è impossibile, perché lui sta quattro piani più in alto dentro un bozzolo." *(si alza, si pulisce le mani sui jeans, e per la prima volta da quando è entrato in questa casa sorride)* "A meno che non stia girando i posti suoi mentre il padrone di casa guarda altrove."
+
+> Emanuela: *(mette il piede accanto all'impronta, il suo trentotto dentro quel quarantaquattro)* "È passato da qui. Ha guardato il suo mare. Poi è risalito a fare danni nei fusibili."
+
+> Natalino: "Fratello mio, un giorno mi spieghi come si fa."
+
+**(🎨 Colore +1: sulla battigia c'è un'impronta del quarantaquattro, fresca. Daniele gira ancora la sua Casa.)**`,
+    choices: [
+      { text: '🚪 Tornare nel corridoio delle porte', next: 'u1' },
     ],
   },
 
@@ -2771,7 +2927,33 @@ Quando tornate verso la porta, il corridoio dell'aereo è più CORTO. Sensibilme
 > Federico: *(la foto in tasca, sul petto)* "Bene. Facciamole venire lo sfratto."`,
     choices: [
       { text: '🚪 Fuori, verso il corridoio delle porte', next: 'u1' },
-      { text: '📋 I fogli di volo nella tasca del 19A: qualcuno ha scritto qualcosa', once: true, gold: 1, sets: { foglio_volo_letto: true }, next: 'u1' },
+      { text: '📋 I fogli di volo nella tasca del 19A: qualcuno ha scritto qualcosa', once: true, gold: 1, next: 'u5e' },
+    ],
+  },
+
+  u5e: {
+    location: 'cabina',
+    caption: 'IMBARCO — I fogli di volo del 19A',
+    sets: { foglio_volo_letto: true },
+    text: `Nella tasca del sedile 19A, dietro la rivista di bordo che pubblicizza destinazioni che non esistono, ci sono tre fogli di volo. Moduli veri: nome, destinazione, motivo del viaggio. Due sono vuoti.
+
+Il terzo è compilato. Grafia piccola e nervosa, stampatello, penna premuta forte:
+
+*"NOME: non me lo ricordo più. DESTINAZIONE: casa. MOTIVO DEL VIAGGIO: mi aspettano. — 19A, giorno quattromila e qualcosa."*
+
+Sotto, in mezzo al modulo, una colonna di trattini. Migliaia. Uno per giorno, finché la penna ha smesso di scrivere — e i trattini continuano, incisi a secco, per altre due colonne.
+
+> Claudia: *(li conta per venti secondi, poi si ferma)* "Un passeggero. Uno che non è mai atterrato e ha continuato a segnare i giorni comunque."
+
+> Natalino: "Ma quello è il posto di Daniele."
+
+> Gaetano: "No. Quello è il posto che la Casa DÀ a chi ha paura di volare." *(guarda le file infinite di manichini)* "Prima di Daniele c'è stato qualcun altro, su questo sedile. E dopo Daniele ci sarebbe stato un altro ancora."
+
+> Emanuela: "E invece stanotte l'aereo lo svuotiamo noi."
+
+**(🎨 Colore +1: sul 19A c'era già stato qualcuno. Segnava i giorni. Nessuno è venuto a prenderlo. Voi sì.)**`,
+    choices: [
+      { text: '🚪 Fuori, verso il corridoio delle porte', next: 'u1' },
     ],
   },
 
@@ -3109,7 +3291,29 @@ Sul messaggio delle 21:00, Gaetano digita con due dita, lentamente, la risposta 
     gold: 2,
     choices: [
       { text: '🚪 Tornare nel corridoio delle porte', next: 'u1' },
-      { text: '🖥 I monitor di sfondo: uno trasmette ancora qualcosa', once: true, gold: 1, sets: { monitor_segreto: true }, next: 'u1' },
+      { text: '🖥 I monitor di sfondo: uno trasmette ancora qualcosa', once: true, gold: 1, next: 'u10d' },
+    ],
+  },
+
+  u10d: {
+    location: 'cabina',
+    caption: 'SALA CONTROLLO — Il monitor di servizio',
+    sets: { monitor_segreto: true },
+    text: `Sulla parete di monitor restano solo traiettorie spente. Tutti tranne uno: in basso a destra, piccolo, cornice di plastica ingiallita. Quello non trasmette satelliti.
+
+Trasmette **Daniele**. Su un divano. Che sorride, beve una cola senza marca, vince una gara senza avversari. Poi riparte da capo.
+
+> Claudia: *(si accovaccia davanti allo schermino, e la voce le esce con un rumore che nessuno le aveva mai sentito)* "Quindici secondi. È un loop di quindici secondi. E questo monitor sta in una stanza all'altro capo della casa."
+
+> Gaetano: "È un monitor di SERVIZIO. Come quelli in regia, o all'ingresso di un cantiere: serve a chi lavora qui per controllare che il pezzo forte funzioni." *(batte due dita sulla cornice)* "Ragazzi. Tutta questa casa è personale di servizio. E il pezzo forte è LUI, in diretta, ventiquattro ore su ventiquattro."
+
+> Federico: "Quindi c'è un posto dove lo trasmettono DAL VIVO."
+
+> Gaetano: "C'è un posto dove lo trasmettono dal vivo. E noi ci andiamo."
+
+**(🎨 Colore +1: un monitor di servizio trasmette Daniele in loop. Ogni stanza di questa casa guarda lo stesso, unico programma.)**`,
+    choices: [
+      { text: '🚪 Tornare nel corridoio delle porte', next: 'u1' },
     ],
   },
 
@@ -3188,7 +3392,29 @@ Dietro la discoteca c'è la "spiaggia": un fondale DIPINTO, luci finte, un mare 
     item: 'spray_kerastase',
     choices: [
       { text: '🚪 Tornare nel corridoio delle porte', next: 'u1' },
-      { text: '🍸 Dietro il bancone: una bottiglia ha ancora il colore', once: true, gold: 1, sets: { bottiglia_colore: true }, next: 'u1' },
+      { text: '🍸 Dietro il bancone: una bottiglia ha ancora il colore', once: true, gold: 1, next: 'u11d' },
+    ],
+  },
+
+  u11d: {
+    location: 'spiaggia_grigia',
+    caption: 'IBIZA — La bottiglia in fondo alla mensola',
+    sets: { bottiglia_colore: true },
+    text: `Dietro il bancone, in fondo alla mensola dei liquori grigi — dove il braccio arriva solo se ti sporgi tutta — c'è una bottiglia che non è grigia.
+
+Limoncello. Fatto in casa, in una bottiglia di vetro riciclata, tappo di sughero tagliato a mano, etichetta di carta scritta a pennarello: **"AGOSTO — NON APRIRE DA SOLI"**.
+
+> Emanuela: *(la tira fuori e la guarda controluce: il giallo dentro è così acceso che fa male agli occhi)* "Questa non è del 2004. Questa viene da una cucina. Da una cucina VERA, dove qualcuno ha grattato scorze per due ore di seguito."
+
+> Natalino: "E chi l'ha messa qui?"
+
+> Emanuela: "Uno che è passato prima di noi e sapeva dove si nasconde la roba buona: **in fondo**. Sempre in fondo, dove il grigio non si sporge." *(se la infila in borsa, tra le garze)* "'Non aprire da soli'. Tranquillo, chiunque tu sia. Non è nel nostro stile."
+
+> Claudia: "Fotografo l'etichetta. Se stanotte ne usciamo, quella grafia la cerchiamo."
+
+**(🎨 Colore +1: una bottiglia a colori, nascosta in fondo da qualcuno che sapeva. Non siete i primi a combattere qua dentro.)**`,
+    choices: [
+      { text: '🚪 Tornare nel corridoio delle porte', next: 'u1' },
     ],
   },
 
@@ -3539,7 +3765,31 @@ La mangiate in piedi, al freddo, con le mani. È la cosa più buona che abbiate 
     sets: { parmigiana_daniele: true },
     choices: [
       { text: '🥤 Ora la freccia di lattine. Fino in fondo.', next: 'k3' },
-      { text: '📝 Il post-it: girarlo — c\'è scritto qualcosa anche dietro', once: true, gold: 1, sets: { postit_retro: true }, next: 'k3' },
+      { text: '📝 Il post-it: girarlo — c\'è scritto qualcosa anche dietro', once: true, gold: 1, next: 'k1d' },
+    ],
+  },
+
+  k1d: {
+    location: 'cucina_fredda',
+    caption: 'Il retro del post-it',
+    sets: { postit_retro: true },
+    text: `Claudia gira il post-it. Sul retro c'è la stessa grafia, ma più veloce: scritta dopo, di corsa, con la penna premuta così forte da bucare la carta in due punti.
+
+*"Se leggete questo, io non sono in cucina. TAPPETO. →↓"*
+
+Una freccia a destra. Poi una freccia in GIÙ.
+
+> Federico: "Che cazzo vuol dire 'tappeto giù'—"
+
+> Gaetano: *(già in ginocchio, che tira il tappeto per un angolo)* "Vuol dire che sotto il tappeto c'è una BOTOLA. E che tuo fratello l'ha trovata prima di noi. E che ce l'ha lasciata aperta."
+
+Sotto il tappeto: una fessura quadrata nel pavimento, i bordi sporchi di ditate. Chiusa. Ma non chiusa a chiave.
+
+> Claudia: *(rimette il post-it in tasca, dal lato della parmigiana)* "Ha scritto la cena davanti e le istruzioni dietro. Prima ci ha nutriti, poi ci ha dato la mappa. In quest'ordine. Tipico suo."
+
+**(🎨 Colore +1: sotto il tappeto c'è una botola, e Daniele ve l'ha segnata sul retro di un post-it.)**`,
+    choices: [
+      { text: '🥤 Ora la freccia di lattine. Fino in fondo.', next: 'k3' },
     ],
   },
 
@@ -3640,7 +3890,31 @@ Sorride. E si dissolve così, sorridendo, promosso, libero.
     sets: { luca_promosso: true },
     choices: [
       { text: '🥤 Tornare alla freccia di lattine', next: 'k1' },
-      { text: '📐 Il libro di fisica: Gaetano lo sfoglia e trova un esercizio svolto DA DANIELE', once: true, gold: 1, sets: { esercizio_daniele: true }, next: 'k1' },
+      { text: '📐 Il libro di fisica: Gaetano lo sfoglia e trova un esercizio svolto DA DANIELE', once: true, gold: 1, next: 'k2d' },
+    ],
+  },
+
+  k2d: {
+    location: 'cucina_fredda',
+    caption: 'L\'esercizio a matita — pagina 214',
+    sets: { esercizio_daniele: true },
+    text: `Il libro di fisica di Luca Giunti resta per terra, aperto. Gaetano lo raccoglie per deformazione professionale — e si blocca a pagina 214. Moti armonici. Esercizio 7.
+
+È svolto. A matita, nel margine larghissimo, con una grafia che Federico riconosce prima ancora di leggerla.
+
+*"Molla, k = 40 N/m, massa 0,5 kg. T = 2π√(m/k) ≈ 0,70 s."* E sotto, più piccolo, completamente fuori tema: *"cioè torna al punto di partenza ogni sette decimi di secondo. Per sempre. Senza stancarsi. VOGLIO ESSERE UNA MOLLA."*
+
+> Gaetano: *(che questa pagina l'ha spiegata duecento volte e non l'aveva mai letta così)* "Non è un esercizio. È uno che ha capito la formula e poi ci ha messo dentro se stesso. E il passaggio è pure GIUSTO, il che è la parte che mi commuove professionalmente."
+
+> Federico: "Quando l'ha scritto?"
+
+> Gaetano: "Non c'è la data. Ma la matita è mia: è una di quelle che lasciavo a casa sua quando gli spiegavo statistica." *(chiude il libro, piano)* "Quindi anni fa. Quindi già allora si allenava a tornare."
+
+> Emanuela: "Allora ce lo riprendiamo, che deve tornare a rompere il cazzo sulle molle."
+
+**(🎨 Colore +1: un esercizio svolto a matita, e una nota fuori tema che vale più della soluzione.)**`,
+    choices: [
+      { text: '🥤 Tornare alla freccia di lattine', next: 'k1' },
     ],
   },
 
@@ -3836,7 +4110,32 @@ Sul banco, sotto una campana di vetro, una cosa che pulsa piano di tutti i color
       { text: '🧰 "Cercate manodopera?" — il Mercante ha l\'aria di uno coi crediti in sospeso', once: true, next: 'k12' },
       { text: '🧮 "Le torna l\'inventario?" — il Mercante paga chi sa contare (paga 3🎨) — 🎮 MINIGIOCO', once: true, next: 'mg_inventario' },
       { text: '🕶 Fregarlo. Una boccata sparisce dal banco mentre Claudia lo distrae.', once: true, tag: 'Prova di Destrezza — CD 13', check: { stat: 'DES', dc: 13, success: 'k7b', fail: 'k7b_fail' } },
+      { text: '👁 Il Mercante ha smesso di sorridere. Sostenere lo sguardo.', requires: { flag: 'furto_riuscito', notFlag: 'furto_a_libro' }, next: 'k6_furto' },
       { text: '🚶 Lasciare il banco: più avanti l\'intercapedine si allarga in una sala', next: 'k8' },
+    ],
+  },
+
+  k6_furto: {
+    location: 'mercante',
+    caption: 'Il conto del collega',
+    sets: { furto_a_libro: true },
+    text: `Tornate al banco e il Mercante non dice niente. È questo, il problema.
+
+Ha smesso di sorridere con generosità eccessiva. Ha rimesso la bilancia in bolla — dritta, perfetta, un rimprovero di ottone — e adesso vi guarda. TUTTA la faccia insieme, tutti gli occhi distribuiti male, fermi su di voi come una batteria di fari.
+
+> Il Mercante: "Ammiro il mestiere. Sinceramente." *(la voce è cordiale e non c'entra niente col resto della faccia)* "Rubare a chi ruba è la forma più pura di rispetto professionale. Dentro di me vi ho applaudito."
+
+> Claudia: "E fuori?"
+
+> Il Mercante: "Fuori tengo i libri." *(apre il quadernone unto a una pagina nuova e ci scrive due righe a matita, senza guardare)* "Una Boccata. Segnata a debito, con la data di stanotte. Non vi mando il Riscossore, tesori: siete colleghi." *(chiude il quaderno con un colpo secco)* "Vi mando la FATTURA. Prima o poi. Quando vi fa più male."
+
+> Natalino: *(a denti stretti, allontanandosi)* "Che è peggio del Riscossore."
+
+> Gaetano: "Molto peggio. Il Riscossore arriva e finisce. Una fattura aperta te la porti in giro."
+
+**(Il furto è a libro contabile, con la data di stanotte. Il Mercante non vi odia: vi ha ARCHIVIATI.)**`,
+    choices: [
+      { text: '↩ Tornare al banco e fare come se niente fosse', next: 'k6' },
     ],
   },
 
@@ -3860,7 +4159,7 @@ Sul banco, sotto una campana di vetro, una cosa che pulsa piano di tutti i color
           { q: 'Dodici giorni di consegne, tre pacchi al giorno: quanti pacchi nell\'androne?', r: [ { t: '36', ok: true }, { t: '32', ok: false }, { t: '38', ok: false }, { t: '30', ok: false } ] },
           { q: 'Otto lavatrici, ogni ciclo macina un giorno: quanti giorni a settimana macina il sottoscala?', r: [ { t: '56', ok: true }, { t: '48', ok: false }, { t: '64', ok: false }, { t: '54', ok: false } ] },
           { q: 'Il Cuore costa 12🎨, lo sconto è di 4: prezzo da colleghi?', r: [ { t: '8', ok: true }, { t: '9', ok: false }, { t: '7', ok: false }, { t: '6', ok: false } ] },
-          { q: 'Una Coca Zero ogni sera per due settimane: quante lattine nella freccia?', r: [ { t: '14', ok: true }, { t: '12', ok: false }, { t: '16', ok: false }, { t: '15', ok: false } ] },
+          { q: 'Sei giorni di fila, due Coca Zero a sera: quante lattine nella freccia?', r: [ { t: '12', ok: true }, { t: '14', ok: false }, { t: '10', ok: false }, { t: '16', ok: false } ] },
           { q: 'Trentasei Lettori Grigi, e UNO ha il segnalibro: quanti leggono la stessa pagina da anni?', r: [ { t: '35', ok: true }, { t: '36', ok: false }, { t: '34', ok: false }, { t: '30', ok: false } ] },
         ],
       },
@@ -4192,7 +4491,29 @@ E da tutta la Galleria, uno dopo l'altro, i risvegliati si voltano verso di voi.
     sets: { sonnambuli_svegli: true },
     choices: [
       { text: '🧗 Risalire: la cucina, e poi il resto della notte', next: 'k10' },
-      { text: '👋 La signora in vestaglia: ha qualcosa da dirvi', once: true, gold: 1, sets: { signora_consiglio: true }, next: 'k10' },
+      { text: '👋 La signora in vestaglia: ha qualcosa da dirvi', once: true, gold: 1, next: 'k9d' },
+    ],
+  },
+
+  k9d: {
+    location: 'galleria',
+    caption: 'Il consiglio della signora in vestaglia',
+    sets: { signora_consiglio: true },
+    text: `La signora in vestaglia si avvicina al vetro rotto della sua teca e vi fa cenno di abbassarvi, come si fa coi nipoti quando c'è da dire la cosa importante.
+
+> La signora: "Voi lo andate a cercare, quello grande. Si vede. Allora sentite una vecchia che ci ha dormito dentro." *(si stringe la vestaglia al collo)* "Non combattetelo coi pugni, il grigio. Coi pugni ci va a nozze: i pugni sono roba che si stanca."
+
+> Federico: "E con cosa, allora?"
+
+> La signora: "Con i **NOMI**. Il grigio odia chi ha un nome, perché il nome è un colore che non sbiadisce. Qua sotto per anni sono stata 'quella della quaranta-due'. Stanotte quel ragazzo là" *(indica Gaetano)* "ha tirato una leva e io sono tornata a essere **ADELE**. Sentite come suona? Suona che esisto."
+
+> Emanuela: *(che si è già asciugata gli occhi due volte facendo finta di no)* "Adele. Piacere. Emanuela."
+
+> La signora: "Piacere mio, tesoro." *(le stringe la mano, e la mano è tiepida)* "Adesso andate. E a quello là in cima diteglielo in faccia, il suo nome. Vedrete che gli si storta la bocca."
+
+**(🎨 Colore +1: il grigio si combatte coi NOMI. Adele, quaranta-due, non la dimenticherete.)**`,
+    choices: [
+      { text: '🧗 Risalire: la cucina, e poi il resto della notte', next: 'k10' },
     ],
   },
 
@@ -4261,7 +4582,31 @@ Sdraiati sul pavimento della cucina fredda, a pancia in su, ansimando. La botola
     sets: { via_cucina: true },
     choices: [
       { text: '🏛 Tornare al Salotto-Cattedrale', next: 'h1' },
-      { text: '🧊 La cucina fredda: adesso che la botola è chiusa, c\'è qualcosa di nuovo sul bancone', once: true, gold: 1, sets: { cucina_dopo_botola: true }, next: 'h1' },
+      { text: '🧊 La cucina fredda: adesso che la botola è chiusa, c\'è qualcosa di nuovo sul bancone', once: true, gold: 1, next: 'k10b' },
+    ],
+  },
+
+  k10b: {
+    location: 'cucina_fredda',
+    caption: 'Omaggio della ditta',
+    stinger: 'item',
+    sets: { cucina_dopo_botola: true },
+    item: 'boccata_colore',
+    text: `Sul bancone della cucina fredda, dove dieci minuti prima non c'era niente, c'è un pacchetto. Carta da macellaio, spago, e sopra — appoggiato con cura da orefice — un cartoncino unto:
+
+*"OMAGGIO DELLA DITTA. Voi non avete visto niente della mia contabilità, io non ho visto niente delle vostre mani. — Il M."*
+
+Dentro il pacchetto: una fiala tiepida di **Boccata di Colore**. E un tarallo. Un tarallo solo, di quelli buoni.
+
+> Natalino: "Ci ha mandato un regalo. Una cosa con sei mani e un socio che si chiama RISCOSSORE ci ha mandato un regalo."
+
+> Gaetano: "Non è un regalo. È un patto di non belligeranza redatto in linguaggio commerciale. Il che lo rende più affidabile di un regalo."
+
+> Emanuela: *(si mette la fiala in borsa, poi spacca il tarallo in cinque pezzi identici a occhio, perché è brava)* "Va bene comunque. Stanotte prendo alleati anche brutti."
+
+**(Nello zaino: una Boccata di Colore, omaggio della ditta. 🎨 +1 Colore. La cucina, vista da sotto, ha cambiato idea su di voi.)**`,
+    choices: [
+      { text: '🏛 Tornare al Salotto-Cattedrale', next: 'h1' },
     ],
   },
 
@@ -4692,7 +5037,31 @@ Sullo schermo, il Daniele finto beve un altro sorso di niente. Da qualche parte 
 > Natalino: "Andiamo a cambiare canale."`,
     choices: [
       { text: '📺 Oltre lo schermo: dentro la Sala della Switch', next: 'm2' },
-      { text: '👁 Contare i loop: il sorriso, la cola, la vittoria. Quante volte prima che il prossimo cominci?', once: true, gold: 1, sets: { loop_contato: true }, next: 'm2' },
+      { text: '👁 Contare i loop: il sorriso, la cola, la vittoria. Quante volte prima che il prossimo cominci?', once: true, gold: 1, next: 'm1b' },
+    ],
+  },
+
+  m1b: {
+    location: 'sala_switch',
+    caption: 'Quindici secondi',
+    sets: { loop_contato: true },
+    text: `Claudia tira su il cronometro del telefono e conta ad alta voce, e gli altri contano con lei, perché davanti a una cosa così contare insieme è l'unica cosa che si può fare.
+
+**Quindici secondi.** Sorriso, cola, vittoria vuota. Da capo. Ogni quindici secondi esatti, senza una variazione, senza un fotogramma diverso.
+
+> Claudia: "Quindici. In un giorno fanno cinquemilasettecentosessanta cicli. In tre giorni—"
+
+> Gaetano: "Diciassettemiladuecentottanta." *(non ha nemmeno tirato fuori il telefono)*
+
+Silenzio. Sulla parete di luce, il Daniele finto sorride per la diciassettemiladuecentottantunesima volta.
+
+> Federico: *(che non alza la voce, e per questo fa più paura di quando la alza)* "Diciassettemila volte gli ha fatto fare la stessa faccia. A mio fratello. A uno che non ha mai ripetuto due volte la stessa battuta perché 'le battute si consumano'."
+
+> Emanuela: "Contato. Bene. Adesso si smette di contare e si SPEGNE."
+
+**(🎨 Colore +1: più di diciassettemila cicli in tre giorni. Il conto esatto è la prima cosa che gli fa male.)**`,
+    choices: [
+      { text: '📺 Oltre lo schermo: dentro la Sala della Switch', next: 'm2' },
     ],
   },
 
@@ -4986,8 +5355,98 @@ Silenzio.
 
 > Daniele: "Casa mia è finita tre giorni fa. Sessanta metri quadri, finivano eccome. Guardatevi intorno: la moquette respira. I cavi sono vene. Il divano è un trono perché è il CUORE." *(vi guarda, uno a uno)* "Siamo DENTRO di lui. E lui lo sa, che l'abbiamo capito. Sta arrivando."`,
     choices: [
-      { text: '⚔ Che venga.', next: 'm8' },
+      { text: '🐚 "Tieni. Il mare vero, dentro." — dargli la conchiglia di Gaeta', requires: { item: 'conchiglia_gaeta', notFlag: 'regalo_conchiglia' }, next: 'm7c' },
+      { text: '🍽 "Ti abbiamo tenuto un piatto." — la parmigiana lasciata in frigo', requires: { flag: 'piatto_per_daniele', notFlag: 'regalo_piatto' }, next: 'm7d' },
+      { text: '📷 "Guarda che ti abbiamo portato." — la foto di Gaeta staccata dal muro', requires: { flag: 'foto_gaeta_salvata', notFlag: 'regalo_foto' }, next: 'm7e' },
       { text: '👬 Concedere ai gemelli cinque minuti, da soli, prima di combattere', once: true, next: 'm7g1' },
+      { text: '⚔ Che venga.', next: 'm8' },
+    ],
+  },
+
+  m7c: {
+    location: 'sala_switch',
+    caption: 'La conchiglia, consegnata',
+    gold: 1,
+    heal: 3,
+    sets: { regalo_conchiglia: true },
+    text: `Emanuela tira fuori la conchiglia di Gaeta e la mette in mano a Daniele senza dire niente, perché certe consegne si fanno in silenzio.
+
+> Daniele: "E questa?"
+
+> Emanuela: "Ce l'ha data la tua spiaggia. Quella che ti ha rubato. Mettila all'orecchio e sta' zitto."
+
+Lui la alza. E la faccia gli fa una cosa che nessuno di voi gli aveva mai visto fare: si **arrende**. Occhi chiusi, spalle giù, la bocca aperta di mezzo centimetro.
+
+> Daniele: *(con gli occhi ancora chiusi)* "Si sentono le racchette. E qualcuno che urla 'FUORI!' e ha torto." *(pausa)* "Ero io che urlavo. Avevo torto io."
+
+> Federico: "Avevi torto tu."
+
+> Daniele: *(riapre gli occhi, e sono accesi come non li vedete da tre giorni di schermi)* "Quella cosa mi ha fatto guardare una vita finta a quindici secondi per volta. E voi mi portate quattro secondi di mare VERO." *(si infila la conchiglia in tasca e la tiene stretta con la mano da fuori)* "Adesso combatto meglio. MOLTO meglio."
+
+**(🎨 +1 Colore e +3 PV a tutti: la conchiglia è consegnata. Daniele ha un pezzo di Serapo in tasca, e il Grigiore lo sente.)**`,
+    choices: [
+      { text: '🍽 "Ti abbiamo tenuto un piatto." — la parmigiana lasciata in frigo', requires: { flag: 'piatto_per_daniele', notFlag: 'regalo_piatto' }, next: 'm7d' },
+      { text: '📷 "Guarda che ti abbiamo portato." — la foto di Gaeta staccata dal muro', requires: { flag: 'foto_gaeta_salvata', notFlag: 'regalo_foto' }, next: 'm7e' },
+      { text: '↩ Il briefing riprende: sta arrivando.', next: 'm7' },
+    ],
+  },
+
+  m7d: {
+    location: 'sala_switch',
+    caption: 'Il piatto tenuto da parte',
+    gold: 1,
+    heal: 4,
+    sets: { regalo_piatto: true },
+    text: `Emanuela apre la borsa Kerastase e tira fuori il piatto coperto di stagnola — quello lasciato in frigo "per quando Daniele torna" — e glielo appoggia sulle ginocchia.
+
+> Emanuela: "L'abbiamo fatta noi. Non è come la tua. Mangia e taci."
+
+Daniele solleva la stagnola. Guarda. La parmigiana è **ancora calda**, e in questa casa niente è caldo.
+
+> Daniele: "La mozzarella andava asciugata meglio."
+
+> Federico: "TE L'AVEVO DETTO. GLIELO AVEVO DETTO, A LEI!"
+
+> Daniele: *(che ha già la bocca piena e parla comunque, perché è lui)* "Federico, sta' zitto. È buonissima." *(a Emanuela, serio, la forchetta a mezz'aria)* "Avete cucinato dentro casa SUA. Avete acceso i fuochi in una cucina che lui aveva spento. Vi rendete conto di cosa gli avete fatto?"
+
+> Gaetano: "Dillo tu."
+
+> Daniele: "Gli avete fatto vedere che si può. In casa sua." *(finisce il piatto in quaranta secondi netti)* "Andiamo a spegnerlo."
+
+**(🎨 +1 Colore e +4 PV a tutti: il piatto tenuto da parte è arrivato a destinazione. Era ancora CALDO. In questa casa niente è caldo.)**`,
+    choices: [
+      { text: '🐚 "Tieni. Il mare vero, dentro." — dargli la conchiglia di Gaeta', requires: { item: 'conchiglia_gaeta', notFlag: 'regalo_conchiglia' }, next: 'm7c' },
+      { text: '📷 "Guarda che ti abbiamo portato." — la foto di Gaeta staccata dal muro', requires: { flag: 'foto_gaeta_salvata', notFlag: 'regalo_foto' }, next: 'm7e' },
+      { text: '↩ Il briefing riprende: sta arrivando.', next: 'm7' },
+    ],
+  },
+
+  m7e: {
+    location: 'sala_switch',
+    caption: 'La foto che resiste',
+    gold: 2,
+    sets: { regalo_foto: true },
+    text: `Claudia tira fuori la foto di Gaeta — quella staccata dal muro del corridoio, quella che sbiadiva più piano di tutte — e la gira verso Daniele.
+
+Il mare. Il sole cattivo delle due. Emanuela che ride a bocca aperta, tutti mezzi bruciati e felici. E lui, sullo sfondo, addormentato sotto l'ombrellone con un libro sulla faccia.
+
+> Daniele: *(la prende con due dita, come si prende una cosa che scotta)* "Questa era appesa nel corridoio."
+
+> Claudia: "Nel corridoio SUO. Ha appeso le nostre vacanze in casa tua e le ha guardate sbiadire come si guarda la carne che frolla."
+
+> Daniele: "E allora perché questa non è sbiadita?"
+
+> Emanuela: "Perché quel giorno nessuno voleva tornare a casa. Manco tu, che odi la sabbia."
+
+Daniele guarda la foto per cinque secondi interi. Poi la piega in due, con cura, lungo un margine dove non c'è nessuno, e se la mette nella tasca del petto.
+
+> Daniele: "Va bene. Adesso ho una cosa da fargli vedere anch'io."
+
+**(🎨 +2 Colore: la foto che resiste è in mano a Daniele, nella tasca del petto. Quella non gliela mangia.)**`,
+    choices: [
+      { text: '🐚 "Tieni. Il mare vero, dentro." — dargli la conchiglia di Gaeta', requires: { item: 'conchiglia_gaeta', notFlag: 'regalo_conchiglia' }, next: 'm7c' },
+      { text: '🍽 "Ti abbiamo tenuto un piatto." — la parmigiana lasciata in frigo', requires: { flag: 'piatto_per_daniele', notFlag: 'regalo_piatto' }, next: 'm7d' },
+      { text: '↩ Il briefing riprende: sta arrivando.', next: 'm7' },
     ],
   },
 
@@ -5222,6 +5681,34 @@ Si volta, e la faccia rubata sembra quasi sincera.
     choices: [
       { text: '🗣 Basta ascoltare. È ora del duello.', gold: 1, next: 'z2' },
       { text: '🧠 Memorizzare ogni parola: le sue debolezze sono nel suo monologo', once: true, sets: { monologo_studiato: true }, next: 'z2' },
+      { text: '🪞 "C\'è un buco nel curriculum." — sbattergli in faccia la contraddizione', requires: { flag: 'segreto_specchio' }, once: true, next: 'z1contro' },
+    ],
+  },
+
+  z1contro: {
+    location: 'cattedrale',
+    caption: 'Il buco nel curriculum',
+    gold: 2,
+    sets: { contraddizione_smascherata: true },
+    text: `Il monologo finisce, il silenzio è pronto per gli applausi — e invece prende la parola Claudia, che di mestiere trova il pixel fuori posto.
+
+> Claudia: "Scusa. Un attimo. C'è un buco nel curriculum."
+
+> Eleinad: "...prego?"
+
+> Claudia: "In biblioteca c'è la tua biografia. L'abbiamo letta allo specchio: quella scritta da uno che ti conosceva bene." *(tira fuori il telefono, perché ovviamente l'ha fotografata)* "Lì c'è scritto che sei un RIFLESSO. Uno rimasto attaccato a uno specchio perché un tizio ci si è fermato davanti troppo a lungo. E adesso invece ci racconti l'interesse composto della pigrizia altrui." *(alza gli occhi dallo schermo)* "Quale delle due, tesoro?"
+
+Nella cattedrale, per la prima volta stanotte, il silenzio è IMBARAZZATO.
+
+> Federico: "Ah, ho capito: la seconda suona meglio." *(allarga le braccia)* "Prima eri un riflesso, ora sei un ACCUMULO. Menti pure sul curriculum. Sei un piazzista che si gonfia il ruolo al colloquio: 'gestivo un team'. Gestivi un DIVANO."
+
+> Eleinad: *(e la voce, per una frazione, esce senza l'eco)* "Sono... entrambe le cose."
+
+> Gaetano: "No. Le origini sono UNA. Se non sai da dove vieni, non sei antico: sei solo VECCHIO." *(un passo avanti)* "E le cose vecchie si buttano."
+
+**(🎨 Colore +2: l'avete beccato a mentire sulla propria storia. Chi si gonfia il curriculum ha paura del colloquio.)**`,
+    choices: [
+      { text: '🗣 Basta ascoltare. È ora del duello.', next: 'z2' },
     ],
   },
 
@@ -5268,7 +5755,33 @@ Le altre panche della navata, tutte insieme, scricchiolano. Non si muovono: scri
 **(🎨 +2 Colore. Daniele ha distrutto il suo divano — quello vero, quello che amava — perché nessun'altra notte sia come quelle tre.)**`,
     choices: [
       { text: '🚶 Verso l\'altare. Il padrone di casa vi aspetta.', next: 'z2' },
-      { text: '📺 Il telecomando: Daniele lo accende verso il buio', once: true, gold: 1, sets: { telecomando_acceso: true }, next: 'z2' },
+      { text: '📺 Il telecomando: Daniele lo accende verso il buio', once: true, gold: 1, next: 'z1f' },
+    ],
+  },
+
+  z1f: {
+    location: 'cattedrale',
+    caption: 'Un comando solo in memoria',
+    sets: { telecomando_acceso: true },
+    text: `Daniele punta il telecomando verso il buio in fondo alla navata e preme l'accensione, così, per vedere che succede. Non si accende niente. Ma lo schermino — quello piccolo dei modelli universali — si illumina di verde.
+
+In memoria c'è un comando solo. Uno. E la cronologia dice: ripetuto per anni. Sempre di notte. Sempre alla stessa ora.
+
+**"RIMANDA."**
+
+> Daniele: *(lo gira tra le dita e ride di una risata brutta)* "Questo tasto non esiste. Non su un telecomando. L'ha aggiunto LUI, e l'ha premuto LUI: guardate l'ora. Tutte le notti alle tre e dieci — che è l'ora in cui io DORMIVO."
+
+> Gaetano: *(scorre la cronologia, e la faccia gli si indurisce)* "Confermo. È un timer. Un timer che qualcuno faceva scattare da fuori, addosso a una casa che dormiva."
+
+> Claudia: "Quindi non era lui che rimandava."
+
+> Daniele: "No. Era lui che me la rimandava INDIETRO, la vita, un pezzo per notte." *(alza il telecomando verso l'altare, come si alza un bicchiere in faccia a qualcuno)* "Bene. Adesso il tasto è mio. Rimanda TU."
+
+E lo schermino, da solo, una lettera alla volta, cambia scritta: **"ADESSO."**
+
+**(🎨 Colore +1: in memoria un comando solo — RIMANDA — premuto ogni notte alle tre e dieci, da fuori. Adesso il telecomando dice un'altra cosa.)**`,
+    choices: [
+      { text: '🚶 Verso l\'altare. Il padrone di casa vi aspetta.', next: 'z2' },
     ],
   },
 
@@ -5389,7 +5902,27 @@ I televisori sfarfallano tutti insieme. Per la prima volta, la voce di Eleinad e
 > Lo spirito: "I morti fanno SOLO testo, tesoro. Chiedi in giro."`,
     choices: [
       { text: '↩ Tornare dal gruppo: la mossa adesso è vostra', next: 'z2' },
-      { text: '👻 Restare un altro momento nel vuoto: mappare le crepe', tag: 'Prova di Intelligenza — CD 14', once: true, check: { stat: 'INT', dc: 14, success: 'z2', fail: 'z2_ko' }, gold: 2, sets: { crepe_mappate: true } },
+      { text: '👻 Restare un altro momento nel vuoto: mappare le crepe', tag: 'Prova di Intelligenza — CD 14', once: true, check: { stat: 'INT', dc: 14, success: 'z2c', fail: 'z2_ko' }, gold: 2 },
+    ],
+  },
+
+  z2c: {
+    location: 'cattedrale',
+    caption: 'La mappa delle crepe',
+    sets: { crepe_mappate: true },
+    text: `Lo spirito rientra nel ritaglio e stavolta ci resta. Trenta secondi. Quaranta. Poi riemerge camminando all'indietro, come chi esce da una stanza tenendo d'occhio la porta.
+
+> Lo spirito: "Ho contato. Dietro l'altare il vuoto non è liscio: è **crepato**. Undici crepe grandi, tutte che partono dal ritaglio e salgono, e in fondo a ognuna c'è un pezzo di qualcuno." *(pausa)* "Ho riconosciuto una vestaglia. Non chiedetemi di chi."
+
+> Gaetano: *(già disegnando col dito sul marmo)* "Undici, e vanno verso l'alto. Quindi il ritaglio non è la bocca: è la crepa PRINCIPALE. Le altre dieci sono i punti dove si è rotto da solo, sotto il proprio peso."
+
+> Lo spirito: "E c'è la regola, sentitela bene: le crepe si aprono se lo guardi DI SBIECO. Frontale si chiudono, si fanno muro, ti mangiano il colpo. Di taglio restano aperte come bocche. Ha la stessa fame delle sue crepe, e la fame non sa fingere."
+
+> Claudia: *(gira il racchettone di quarantacinque gradi)* "Mai fissarlo in faccia. Come i monitor rotti." *(mezzo sorriso)* "Da fotografa vi dico che è la notizia migliore della serata: la luce buona è SEMPRE di taglio."
+
+**(🎨 Colore +2: undici crepe mappate. Mai frontale — sempre di sbieco.)**`,
+    choices: [
+      { text: '↩ Tornare dal gruppo: la mossa adesso è vostra', next: 'z2' },
     ],
   },
 
@@ -5562,8 +6095,32 @@ Il buco a forma di persona TREMA. Si nutre di quella lite dal 1994 — e la lite
 
 L'urlo è un'onda. Il gruppo si stringe attorno ai gemelli: adesso si tratta solo di REGGERE.`,
     choices: [
+      { text: '🧠 "L\'hai già detto con paura: TU SEI IL GEMELLO." — ricordarglielo', requires: { flag: 'eleinad_teme_gemelli' }, once: true, next: 'z6_eco' },
       { text: '🛡 Fare scudo attorno alla foto', tag: 'Prova di Carisma — CD 13 (chiunque tiri, il gruppo fa scudo)', check: { stat: 'CAR', dc: 13, success: 'e_gemelli', fail: 'z6b' } },
       { text: '🗣 Daniele alza la voce: "Fratello mio, TIENI."', tag: 'Prova di Carisma — CD 11 (Daniele aggiunge la sua voce)', requires: { hero: 'daniele' }, check: { stat: 'CAR', dc: 11, success: 'e_gemelli', fail: 'z6b' } },
+    ],
+  },
+
+  z6_eco: {
+    location: 'cattedrale',
+    caption: 'L\'aveva già detto con paura',
+    gold: 1,
+    text: `Federico non alza la foto. La tiene bassa, contro il petto, e fa una cosa più cattiva: **ricorda**.
+
+> Federico: "Sai qual è la cosa che mi tengo di stanotte? Non il contratto. Non il divano. La tua VOCE. Quando ti ho insultato di là, hai perso il ritmo per mezzo secondo e hai detto: 'Tu. TU sei il GEMELLO.'" *(pausa)* "L'hai detto come si dice il nome di una malattia. L'hai detto con PAURA."
+
+I televisori, tutti insieme, abbassano il volume di un gradino. Nessuno ha toccato niente.
+
+> Daniele: *(spalla contro spalla col fratello)* "Eccola. Stessa faccia, stessa risata, e per trent'anni ci siamo usati come coltelli. Il tuo giacimento." *(alza la foto)* "Chiuso per esaurimento."
+
+> Eleinad: *(e la voce esce piccola: la prima cosa piccola che gli sentite fare)* "...non siete uguali. Non lo siete MAI stati."
+
+> Federico: "Su questo hai ragione! È l'unica cosa vera che hai detto stanotte." *(sorride, e non è un bel sorriso)* "Lui è meglio. E siamo d'accordo pure su questo. Prova a mangiarci ADESSO."
+
+**(🎨 Colore +1: gliel'avete ricordato con le sue stesse parole. La sua paura ha un nome, ed è il vostro cognome.)**`,
+    choices: [
+      { text: '🛡 Fare scudo attorno alla foto, adesso che vacilla', tag: 'Prova di Carisma — CD 12 (il gruppo fa scudo)', check: { stat: 'CAR', dc: 12, success: 'e_gemelli', fail: 'z6b' } },
+      { text: '🗣 Daniele alza la voce: "Fratello mio, TIENI."', tag: 'Prova di Carisma — CD 10 (Daniele aggiunge la sua voce)', requires: { hero: 'daniele' }, check: { stat: 'CAR', dc: 10, success: 'e_gemelli', fail: 'z6b' } },
     ],
   },
 
@@ -5698,6 +6255,12 @@ E se qualcuno di voi camminava come luce, adesso non più: il colore che torna a
 
 La porta d'ingresso RIAPPARE. Dietro, l'alba: e i colori fanno MALE agli occhi, nel senso buono — il rosa sguaiato, l'arancione maleducato, il cielo che non si vergogna di niente.
 
+E se stanotte uno di voi è passato dalla sala d'aspetto dei morti — sedie di formica, una signora che sferruzza un filo che non c'è, un ragazzo curvo su un cruciverba — adesso si ferma sul pianerottolo col telefono in mano, e cerca. *Settantaquattro orizzontale, sei lettere: "ciò che resta quando nessuno ti nomina più".* La casella non voleva GRIGIO. Voleva un NOME.
+
+> Chi c'è stato: *(verso la porta che si sta richiudendo, ad alta voce, scandendo)* "TERESA. Ti chiami TERESA, signora. L'ho detto qua fuori, e adesso lo sanno tutti."
+
+Dentro, per un secondo, qualcuno smette di sferruzzare.
+
 Daniele esce per primo. Si volta a guardare il suo bilocale tornato bilocale.
 
 > Daniele: "Devo cambiare divano."
@@ -5724,6 +6287,8 @@ Un'ora dopo: il bar sotto casa, sei caffè, una Zero. E il primo litigio POST-vi
 E allora si richiude. Come un libro. Le pagine grigie che si accostano piano, la copertina che cala, il buco a forma di persona che diventa una fessura, poi una riga, poi un niente ordinato — e la casa si sgonfia attorno a quel niente fino a tornare un bilocale con la porta al suo posto e l'alba dietro la porta.
 
 E il colore, tornando al mondo, ripassa a saldare i conti: se qualcuno di voi era luce, torna CARNE — e viene travolto dall'abbraccio più disordinato della storia del pianerottolo.
+
+E se stanotte uno di voi è passato dalla sala d'aspetto dei morti, sul pianerottolo si ferma un attimo col telefono in mano: *settantaquattro orizzontale, sei lettere, "ciò che resta quando nessuno ti nomina più".* Non era GRIGIO. Era **TERESA** — e viene detto ad alta voce verso la porta che si chiude, scandito, come si fanno i nomi che contano. Dentro, un ferro da maglia si ferma a metà punto.
 
 Una settimana dopo, il salotto di Daniele è ridipinto — l'hanno fatto in sei, male, con più vernice sui gemelli che sulle pareti. E sopra il divano NUOVO, appesa con quattro pezzi di nastro adesivo perché nessuno è andato a comprare una cornice e ormai è una questione di principio, c'è LEI: la foto intera, la piega al centro come una cicatrice ben chiusa.
 
@@ -5935,7 +6500,31 @@ E la Casa — questo lo notate tutti — per tre minuti interi **non muove nient
 **(Una pallina in tasca a Gaetano: là dentro è un'arma. Colore +1.)**`,
     choices: [
       { text: '↩ Il braccio è caldo. Si torna a fare sul serio.', next: 'h1' },
-      { text: '🎾 Un ultimo scambio: il muro della cattedrale ha un segno che non c\'era', once: true, gold: 1, sets: { segno_muro: true }, next: 'h1' },
+      { text: '🎾 Un ultimo scambio: il muro della cattedrale ha un segno che non c\'era', once: true, gold: 1, next: 'h5' },
+    ],
+  },
+
+  h5: {
+    location: 'salotto',
+    caption: 'Il segno sul muro',
+    sets: { segno_muro: true },
+    text: `Il segno sta a due metri d'altezza, sulla parete nord della navata, e tre minuti fa non c'era: nessuno di voi ha mai visto questa Casa lasciare una prova.
+
+È un cerchio. GIALLO. La pallina.
+
+Un tondo di vernice gialla, grande esattamente come la pallina, stampato sul grigio come un timbro — e da lì partono quattro crepe sottilissime verso l'alto, come quando un sasso becca un parabrezza.
+
+> Gaetano: *(ci mette un dito sopra, poi si guarda il dito)* "Ha lasciato il colore ADDOSSO. La pallina ha scaricato giallo sul muro. Il muro l'ha assorbito e si è CREPATO."
+
+> Claudia: "Quindi non è che non digerisce il colore. È che il colore, dentro, gli fa danno STRUTTURALE."
+
+> Gaetano: "Esatto. E noi ne abbiamo una borsa piena." *(fa un passo indietro, misura il cerchio a occhio, se lo segna sul telefono)* "Ricordatevi questo punto: se stanotte serve un buco in un muro di questa casa, si tira una pallina."
+
+> Natalino: "Il mio contributo alla scienza sarà lanciare cose gialle alle pareti. Sono in pace con questo."
+
+**(🎨 Colore +1: il colore non lo nutre — lo CREPA. E i vostri colori sono armi da lancio.)**`,
+    choices: [
+      { text: '↩ Il braccio è caldo. Si torna a fare sul serio.', next: 'h1' },
     ],
   },
 
@@ -5965,7 +6554,31 @@ Silenzio. Di quello buono, stavolta.
 **(+3 PV. L'ultima voce non era di nessuno di voi. Nessuno lo commenta. Ma il piano resta il piano.)**`,
     choices: [
       { text: '↩ In piedi. Daniele aspetta.', next: 'h1' },
-      { text: '👂 Quella voce dal muro: qualcuno dice il piano', once: true, gold: 1, sets: { voce_muro: true }, next: 'h1' },
+      { text: '👂 Quella voce dal muro: qualcuno dice il piano', once: true, gold: 1, next: 'h6' },
+    ],
+  },
+
+  h6: {
+    location: 'salotto',
+    caption: 'La voce dentro il muro',
+    sets: { voce_muro: true },
+    text: `Natalino non si alza. Resta seduto contro la parete, l'orecchio appoggiato al grigio come si fa da bambini con la conchiglia, e alza una mano: *zitti*.
+
+C'è una voce. Dentro il muro, a quaranta centimetri dalla sua testa, bassissima. Non urla, non chiede aiuto. **Ripassa il vostro piano.**
+
+> La voce dentro il muro: *(un sussurro dozzinale, la cadenza tutta sbagliata)* "...entriamo, lo riprendiamo, usciamo. Entriamo, lo riprendiamo, usciamo. E domenica grigliata da me. Stile Pasquetta."
+
+> Emanuela: *(gelida)* "Quella è la frase di Gaetano. Parola per parola."
+
+> Natalino: "Sì. Ma la dice MALE." *(stacca l'orecchio dal muro, piano, e si alza)* "Sentite dove mette l'accento su 'grigliata'? Come uno che ha letto la parola e non ha mai mangiato niente in vita sua."
+
+> Gaetano: "Sta imparando il copione. Ci ascolta e RIPASSA — come faceva allo specchio." *(guarda la parete con un disprezzo tranquillo)* "Bene. Allora stanotte il piano lo cambiamo all'ultimo secondo, e non ad alta voce."
+
+> Claudia: "Da adesso i piani si scrivono. Sul mio telefono. Nessuno li dice."
+
+**(🎨 Colore +1: la Casa ripassa il vostro piano dentro i muri. Da stanotte il piano si scrive, non si dice.)**`,
+    choices: [
+      { text: '↩ In piedi. Daniele aspetta.', next: 'h1' },
     ],
   },
 
@@ -6020,8 +6633,8 @@ const DIARY_FLAGS = [
   ['archivio_perquisito',   'L\'archivio del Mercante, perquisito: ogni debito aveva un nome e ogni nome un piano del palazzo. La contabilità del Grigiore, nero su bianco.'],
   ['maschera_raccolta',     'La maschera di Eleinad, raccolta da terra dopo che è caduta: pesa NIENTE. Tutto quel terrore, e in mano è cartapesta grigia.'],
   ['divorente_distrutto',   'Il Divorente non si alza più: il divano che mangiava pomeriggi è tornato un divano. Comodo, pure — ma adesso si ALZA, la gente, quando vuole.'],
-  ['telecomando_acceso',    'Il telecomando universale del Divorente, recuperato acceso: sullo schermino, un solo comando in memoria, ripetuto per anni. "RIMANDA."'],
-  ['crepe_mappate',         'Le crepe del vuoto dietro l\'altare, mappate di sbieco dagli spiriti: il Grigiore ha la stessa fame delle sue crepe. Mai fissarlo frontale.'],
+  ['telecomando_acceso',    'Il telecomando del Divorente, recuperato acceso: in memoria un comando solo, "RIMANDA.", premuto ogni notte alle tre e dieci — da FUORI, mentre in casa si dormiva. Non era Daniele che rimandava: era il Grigiore che gli rimandava indietro la vita.'],
+  ['crepe_mappate',         'Le crepe del vuoto dietro l\'altare, mappate dagli spiriti: undici, tutte verso l\'alto, aperte solo se lo si guarda DI SBIECO. Frontale si fanno muro e ti mangiano il colpo. Il Grigiore ha la stessa fame delle sue crepe, e la fame non sa fingere.'],
   ['racchettoni_pronti',    'Il riscaldamento stile Gaeta: racchettoni in cattedrale, palleggio di riscaldamento compreso. Il colore, prima di combattere, si SCALDA.'],
   ['bivacco_fatto',         'Il bivacco per terra — MAI sul divano — nel cuore della casa nemica: taralli, turni di guardia, e la regola d\'oro: comodi mai, insieme sempre.'],
   ['daniele_vivo',          'Daniele è VIVO e combatte da dentro: sta nei fusibili, sabota quello che può. Non firmate, non sedetevi, non credete alla sua faccia.'],
@@ -6040,7 +6653,7 @@ const DIARY_FLAGS = [
   ['indizio_spiriti',       'Il Grigiore non può toccare ciò che è già stato perso: gli SPIRITI passano ovunque, e vedono le porte che i vivi non vedono.'],
   ['segreto_trono',         'SEGRETO: Eleinad ogni notte DEVE tornare al Divano-Trono nella Sala della Switch, a ricaricarsi di vita finta. Lì, staccato dal Grigiore, è vulnerabile.'],
   ['sonnambuli_svegli',     'I Sonnambuli della Galleria sono SVEGLI. Camminano ancora piano, ma adesso sanno da che parte stare.'],
-  ['zero_bevuta',           'La prima Zero da libero: Daniele l\'ha scolata in sette secondi ed è tornato LUI al settanta per cento. Il restante trenta è rancore utilissimo.'],
+  ['zero_bevuta',           'La prima Zero da libero: Daniele l\'ha scolata in quattro secondi, a occhi chiusi, come un rito — ed è tornato LUI al settanta per cento. Il restante trenta è rancore utilissimo.'],
   ['dentro_eleinad',        'IL TWIST: questa non è casa di Daniele. La moquette respira, le pareti digeriscono. Siete DENTRO Eleinad. La geografia è anatomia.'],
   ['eleinad_vacilla',       'Gli spiriti l\'hanno attraversato e hanno riferito: Eleinad VACILLA. I suoi primi colpi saranno più deboli.'],
   ['via_biblioteca',        'La via della Biblioteca è aperta: il Manuale è vostro.'],
@@ -6052,13 +6665,13 @@ const DIARY_FLAGS = [
   ['partita_salvata',       'Avete salvato la partita di Mario Kart di Daniele: mezzo giro, congelato a metà curva. Quando tornerà, la troverà lì ad aspettarlo.'],
   ['stelle_finte_contate',  'Tre stelle dipinte nel lucernaio finto del pianerottolo impossibile: contate, memorizzate. Il cielo vero ne ha molte di più, e lo rivedrete.'],
   ['specchio_coperto',      'Lo specchio del bagno è coperto col telo della doccia: il riflesso in ritardo non vi guarderà più. Almeno da lì.'],
-  ['cenere_studiata',       'Un pizzico di cenere grigia: non è cenere vera. Non brucia. Non puzza. È grigio pressato in forma di cosa morta — e forse non è mai stata viva.'],
+  ['cenere_studiata',       'La cenere grigia, aperta dalla torcia: dentro ci sono ancora ruggine, verde bottiglia, blu elettrico — pressati. Il Grigiore non distrugge: ACCUMULA, e ciò che è accumulato si può riprendere. Se c\'è un magazzino c\'è un inventario, e se c\'è un inventario si può fare un RESO.'],
   ['foto_gaeta_salvata',    'Avete staccato la foto di Gaeta dalla parete: il mare, gli amici, Emanuela che ride. Questa il Grigiore non la mangia — la tenete VOI.'],
   ['punto_inceppato_segnato','Il punto esatto dove Eleinad si è inceppato: "Milioni di persone lo fanno." Quando usa quel trucco, sapete dove si rompe.'],
   ['porte_misurate',        'Gaetano ha misurato le tre porte: la Biblioteca è la più larga, la Cucina la più stretta. Le dimensioni raccontano le priorità della casa.'],
   ['segnalibro_toccato',    'Il segnalibro a colori tra i libri di un Lettore Grigio: un disegno di bambino, sole giallo e casa rossa. Lo proteggeva anche nel sonno. Lo avete toccato, e ha resistito.'],
   ['titolo_incompiuto_letto','Il libro-cuore del Bibliotecario: "I CINQUE CHE..." — il titolo mai finito. Non l\'ha mai saputo nemmeno lui, per cosa fossero i cinque.'],
-  ['d20_lanciato',          'Il d20 di Daniele, lanciato una volta per scaramanzia. Un dado blu e bianco che aspettava da anni il suo turno — e adesso ha cominciato a girare.'],
+  ['d20_lanciato',          'Il d20 di Daniele, lanciato per la prima volta in vita sua: DICIASSETTE. Il numero suo — il compleanno, quello che chiama sempre "perché porta sfortuna agli ALTRI". Il dado ha aspettato anni e alla prima occasione ha firmato.'],
   ['riga_aggiunta_rosa',    'Nel diario di Rosa avete aggiunto una riga: "Cinque che tornano, e tornano, e tornano." Perché è quello che fate.'],
   ['ultimo_capitolo_letto', 'Le ultime parole del Capobranco prima di chiudersi: "FINE. (Più o meno.)" Si può mollare a metà ed essere felici. Tranne che per Daniele.'],
   ['treccia_portafortuna',  'La treccia di segnalibri recisa da Natalino: intrecciata come un portafortuna. Un trofeo professionale.'],
@@ -6070,31 +6683,37 @@ const DIARY_FLAGS = [
   ['piedistallo_distrutto', 'Il piedistallo della teca "I SEI" è in pezzi: non rimane niente su cui rimontare il trofeo. La collezione di Eleinad ha un buco permanente.'],
   ['monologo_studiato',     'Avete ascoltato Eleinad senza abboccare e memorizzato ogni parola. Le sue debolezze sono nel suo monologo: fame, vanità, un contratto d\'affitto che ha scritto lui.'],
   ['cerchio_completo',      'Gli altri si sono stretti in cerchio per aspettare i gemelli: Gaetano, Emanuela, Claudia, Natalino. Quando Federico e Daniele tornano, il cerchio è completo. Sei.'],
-  ['nastro_sparito',        'Il nastro rosso sulla porta della galleria: c\'era, poi non c\'era più. La Casa sposta le sue decorazioni quando non la guardate.'],
-  ['battigia_vista',        'La spiaggia grigia oltre la porta: battigia di cenere, onde lentissime. Un mare che ha dimenticato i colori.'],
+  ['nastro_sparito',        'Nella cameretta del 1994, dopo la pace: il nastro adesivo che divideva il pavimento in due metà NON C\'È PIÙ. Il litigio non è stato cancellato, è stato CHIUSO — e la Casa ha dovuto ritirare il suo attrezzo.'],
+  ['battigia_vista',        'Sulla battigia di cenere, dove l\'onda si è ritirata: conchiglie rotte, un portachiavi a forma di racchetta e un\'impronta FRESCA del quarantaquattro, rivolta verso l\'acqua. Daniele gira ancora la sua Casa.'],
   ['foglio_volo_letto',     'I fogli di volo nella tasca del sedile 19A: qualcuno ci ha scritto sopra, una grafia piccola e nervosa. Un passeggero che non è mai atterrato.'],
   ['conchiglia_per_daniele', 'Una conchiglia dalla spiaggia grigia: la tenete per Daniele. Il mare vero suona diverso, e glielo farete sentire.'],
-  ['consiglio_spiriti',     'Il consiglio degli Spiriti: chi è già stato perso vede le porte che i vivi non vedono. I morti della Casa sono dalla vostra parte.'],
-  ['monitor_segreto',       'Il monitor nascosto dietro la parete della cucina: trasmette lo stesso loop della Sala della Switch, ma più piccolo. Un monitor di servizio. La cucina SPIAVA il trono.'],
+  ['consiglio_spiriti',     'Il consiglio della sala d\'aspetto: da spiriti non si esce, si RIENTRA. Serve che un vivo che ti vuole bene punti su di te qualcosa di suo — non un pensiero: un GESTO, dato gratis. E ogni carta messa da parte è un DEBITO che il demone spera vi scordiate.'],
+  ['monitor_segreto',       'Nella Sala Controllo, in basso a destra, un monitor di SERVIZIO: trasmette Daniele in loop, quindici secondi per volta. Ogni stanza di questa casa guarda lo stesso, unico programma — e da qualche parte, in alto, lo trasmettono DAL VIVO.'],
   ['bottiglia_colore',      'Una bottiglia di colore, nascosta in fondo a un cassetto della cucina: qualcuno l\'ha messa lì prima di voi. Qualcuno che sapeva dove cercare.'],
   ['salone_benedetto',      'Il salone di Natalino, quello vero — ricordato dalla porta numero 7: i clienti, il profumo di lacca, le forbici giapponesi. Natalino ha benedetto questa memoria e l\'ha strappata al grigio.'],
-  ['braciere_agosto',       'Il braciere della cucina, riacceso: fiamma viva, calore vero, e l\'odore di agosto — quello delle grigliate con gli amici. Il Grigiore odia l\'estate.'],
-  ['toga_targhetta',        'La toga del Ciambellano con la targhetta: un nome, un ruolo, una gerarchia. Anche i mostri della cucina hanno un organigramma.'],
-  ['pianta_salvata',        'La pianta del basilico, salvata dal freddo della cucina: l\'unica cosa verde in un posto dove verde non esiste. Innaffiata con l\'acqua della bottiglia.'],
-  ['segno_muro',            'Un segno sul muro del sottoscala: graffi di unghie, tutti nella stessa direzione. Qualcuno ha provato a uscire, da quella parte. Non ce l\'ha fatta, ma ha segnato la via.'],
-  ['voce_muro',             'Una voce dal muro del sottoscala, bassissima: non parole, solo il TONO di qualcuno che chiede aiuto. L\'avete sentita. Non l\'avete dimenticata.'],
-  ['libro_colori',          'Il libro dei colori nella stanza sommersa: un catalogo di sfumature, aperto sulla pagina del blu di Gaeta. Lo stesso blu della foto che resiste.'],
-  ['cucina_dopo_botola',    'Siete risaliti dalla cucina attraverso la botola: la cucina fredda, vista da sotto, è un\'altra cosa. Le tubature sono vive — e respirano.'],
-  ['postit_retro',          'Il post-it sul retro del menu della cucina: la grafia di Daniele, una freccia verso il basso. Sapeva della botola. L\'ha lasciata aperta per voi.'],
-  ['esercizio_daniele',     'L\'esercizio di Daniele nella cameretta: un foglio a quadretti con scritto "5 COSE BELLE DI OGGI", compilato fino a tre giorni fa. L\'ultimo giorno: "1. Federico ha chiamato."'],
-  ['nota_tripla',           'La nota tripla: tre foglietti attaccati insieme con lo scotch, tre grafie diverse. Daniele, Federico, e una terza che non riconoscete — ma la Casa sì.'],
-  ['occhio_pozzetto',       'L\'occhio nel pozzetto della doccia della cameretta: vi ha guardato dal basso, fermo, per due secondi esatti. Poi è sparito nello scarico. Non era un occhio umano.'],
+  ['braciere_agosto',       'Dove bruciava il fuoco finto del ferragosto rubato è rimasto un braciere di colore VERO: cinque minuti seduti intorno, senza parlarne, e un brindisi con la Coca Zero immaginaria — "al quattordici agosto. Quello vero. E al prossimo."'],
+  ['toga_targhetta',        'La targhetta cucita nella toga: era l\'Avvocato del Grigio, novantasei cause vinte su novantasette. La seconda riga — quella dell\'unica persa — se l\'era ricamata da solo. Il Grigiore non l\'ha preso per la causa perduta: per le novantasei che ha smesso di contare.'],
+  ['pianta_salvata',        'La pianta della Casa, ricostruita dal fumo del tronello e ridisegnata a memoria da Claudia sul telefono: corridoi, stanze, e in cima un rettangolo grande con dentro un rettangolo piccolo — uno schermo davanti a un divano.'],
+  ['segno_muro',            'Il segno sul muro della cattedrale, dopo il palleggio: un cerchio di vernice gialla e quattro crepe che partono da lì. Il colore non lo nutre — gli fa danno STRUTTURALE. E voi ne avete una borsa piena.'],
+  ['voce_muro',             'La voce dentro il muro del salotto, a quaranta centimetri dall\'orecchio di Natalino: ripassava il VOSTRO piano, parola per parola, con l\'accento tutto sbagliato. Da stanotte i piani si scrivono, non si dicono.'],
+  ['libro_colori',          'Il catalogo tipografico dei colori, caduto in biblioteca e aperto sui blu: un rettangolino cerchiato a penna dal gemello — "Blu Serapo, ore 19:10, agosto. Un colore da tenere in tasca." Si era fatto la scorta prima che gliela chiedessero.'],
+  ['cucina_dopo_botola',    'Sul bancone della cucina fredda, comparso dal niente: un omaggio della ditta — una Boccata di Colore, un tarallo e un cartoncino unto. "Voi non avete visto niente della mia contabilità, io non ho visto niente delle vostre mani. — Il M."'],
+  ['postit_retro',          'Il retro del post-it della parmigiana, scritto di corsa e premendo fino a bucare la carta: "Se leggete questo, io non sono in cucina. TAPPETO. →↓" Sotto il tappeto c\'è una botola, e Daniele l\'ha lasciata aperta per voi.'],
+  ['esercizio_daniele',     'Nel libro di fisica di Luca Giunti, pagina 214: l\'esercizio dei moti armonici svolto a matita da Daniele — passaggio giusto — e una nota fuori tema, "torna al punto di partenza ogni sette decimi di secondo, per sempre, senza stancarsi. VOGLIO ESSERE UNA MOLLA."'],
+  ['nota_tripla',           'L\'ultima pagina del Manuale, sottolineata TRE volte con tre penne diverse: "Se conosci il trucco, il trucco non funziona. VALE ANCHE PER QUELLO GRANDE." La terza sottolineatura era per voi.'],
+  ['occhio_pozzetto',       'Il congelatore a pozzetto della cucina fredda: dentro, un blocco di spesa VERA che si è mosso e vi ha indicato una crepa in alto, da cui filtra luce verde. Perfino il mostro nel freezer tifa per voi.'],
   ['piatto_per_daniele',    'Un piatto preparato per Daniele: la parmigiana di Emanuela, porzione da fame vera. Quando lo troverete, sarà ancora caldo.'],
-  ['programma_svelato',     'Il programma della serata di Eleinad, trovato dietro il televisore: ha previsto tutto tranne una cosa — che sareste venuti in sei.'],
-  ['teca_nome_letto',       'Il nome inciso sulla teca più grande della cattedrale: "I SEI." Ha già deciso come chiamare la sua collezione. Non gli avete dato il tempo di completarla.'],
-  ['signora_consiglio',     'Il consiglio della Signora del Tavolo 4: "Non combattere il grigio con i pugni. Combattilo con i NOMI. Il grigio odia chi ha un nome, perché il nome è un colore che non sbiadisce."'],
+  ['programma_svelato',     'Cosa dava, il programma grigio: NIENTE. Solo la sigla, sempre la sigla, per anni — perché aspettare una cosa bella non sembra tempo perso. Il Grigiore non incatena: ACCOMODA. E la poltrona era comodissima.'],
+  ['teca_nome_letto',       'La targhetta della teca più grande della Galleria: "RINO — piano terra, interno 2. Rideva alle repliche." E sotto: "Acquisito per abbandono: nessuno lo chiamava da 3 anni, 2 mesi, 11 giorni." La Casa non rapisce: RACCOGLIE.'],
+  ['signora_consiglio',     'Il consiglio di ADELE, la signora in vestaglia della Galleria — per anni "quella della quaranta-due": "Non combattere il grigio coi pugni: i pugni si stancano. Combattilo coi NOMI. Il grigio odia chi ha un nome, perché il nome è un colore che non sbiadisce."'],
   ['biografia_sfogliata',   'Avete sfogliato la biografia di Eleinad senza specchio: figure, schemi, frammenti. Non tutto, ma abbastanza per sapere che il demone ha una STORIA — e le storie hanno un finale.'],
   ['nome_gridato',          'Avete chiamato Daniele per nome, FORTE, mentre il bozzolo si apriva. La voce è un colore che nessun filamento può filtrare.'],
+  ['camerino_visto',        'Lo specchio, guardato dal SUO lato: un salotto grigio identico a questo, e lui davanti al vetro che PROVA le espressioni di Daniele — otto tentativi per un sorriso. Un mostro che si esercita di nascosto è un mostro che può sbagliare.'],
+  ['contraddizione_smascherata', 'Eleinad si contraddice sulla propria origine: prima un riflesso rimasto attaccato a uno specchio, poi "l\'interesse composto della pigrizia altrui". Mente pure sul curriculum — e chi si gonfia il ruolo al colloquio ha paura del colloquio.'],
+  ['furto_a_libro',         'Il Mercante ha messo la Boccata rubata a libro contabile, con la data di stanotte: niente Riscossore, "siete colleghi". Arriverà una FATTURA, quando fa più male. Il Grigiore non odia: ARCHIVIA.'],
+  ['regalo_conchiglia',     'La conchiglia di Gaeta, consegnata a Daniele nella Sala della Switch: quattro secondi di mare vero contro tre giorni di vita finta. Se l\'è messa in tasca e la tiene stretta con la mano da fuori.'],
+  ['regalo_piatto',         'Il piatto tenuto da parte, consegnato: parmigiana ancora CALDA in una casa dove niente è caldo. Verdetto ufficiale di Daniele: "la mozzarella andava asciugata meglio". Poi l\'ha finito in quaranta secondi.'],
+  ['regalo_foto',           'La foto di Gaeta, quella che resiste, consegnata a Daniele: se l\'è piegata lungo un margine vuoto e messa nella tasca del petto. "Adesso ho una cosa da fargli vedere anch\'io."'],
 ];
 
 /* Mappa del mondo: le zone della Casa (per il canvas della mappa).
