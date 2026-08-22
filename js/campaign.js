@@ -37,6 +37,7 @@ const ITEMS = {
   d20_daniele:     { name: 'Il d20 di Daniele', desc: 'Dal suo set da gioco di ruolo mai usato ("un giorno li porto a giocare a D&D"). UNA volta, permette di RITIRARE una prova fallita: il gioco ve lo proporrà al momento giusto.', usable: false },
   conchiglia_gaeta: { name: 'Conchiglia di Gaeta', desc: 'Il rumore del mare VERO, dentro una conchiglia grigia. Portata all\'orecchio di una cosa del Grigiore: 1d6 danni e svantaggio, perché il mare è l\'ultimo colore che resiste. Un uso: poi il suono si spegne.', combat: { dice: [1, 6], holy: true, distract: true, distractText: ' — il mare dentro la conchiglia lo pietrifica!' }, icon: '🐚' },
   joycon_sinistro: { name: 'Il joy-con sinistro', desc: 'Il pezzo mancante della Switch di Daniele. La Casa l\'aveva nascosto nel 1994. I salvataggi non si cancellano: si SOSPENDONO.', usable: false },
+  maschera_daniele: { name: 'La maschera di Eleinad', desc: 'Cartapesta grigia col volto di Daniele, caduta quando ha smesso di fingere. Da un lato è una faccia; dall\'altro, lucida, RIFLETTE. Chi la alza davanti al demone gli mostra cos\'è.', usable: false, lore: `Pesa niente. È questo che colpisce: tutto quel terrore, e in mano sono trenta grammi di cartapesta grigia.\n\nDal lato interno, dove ha aderito per settimane a un volto che non era il suo, la superficie si è fatta liscia e lucida come uno specchio da borsetta. Ci si vede benissimo. Ci si vede TROPPO bene: ci si vede come si è, non come si vorrebbe.\n\nEcco perché Eleinad non la indossa più: alla fine, a forza di rubare una faccia, lo specchio guarda anche DENTRO. E là dentro non c'era nessuno.` },
 };
 
 /* Le piste che valgono un CHECKPOINT (cura+ricarica alla prima volta — vedi engine.js) */
@@ -5098,7 +5099,7 @@ Dove il buco è passato, la moquette è morta: una scala a chiocciola di molle e
 > Federico: "Fino in fondo, allora. Famiglia al completo."`,
     choices: [
       { text: '🌀 Scendere: verso la Cattedrale del Grigiore', next: 'z1' },
-      { text: '🎭 Raccogliere la maschera di Daniele: potrebbe servire', once: true, gold: 1, sets: { maschera_raccolta: true }, next: 'z1' },
+      { text: '🎭 Raccogliere la maschera di Daniele: leggera come cartapesta, e riflette come un vetro', once: true, gold: 1, item: 'maschera_daniele', sets: { maschera_raccolta: true }, next: 'z1' },
     ],
   },
 
@@ -5306,7 +5307,63 @@ Il Grigiore attorno al buco si increspa. Aspetta la vostra mossa.`,
       { text: '👥 "Federico. Daniele. La foto." — la via dei Gemelli', requires: { flag: 'foto_ricomposta', flag2: 'segreto_gemelli', hero: 'daniele' }, next: 'z6' },
       { text: '⚔ "Basta parlare." — la via della Forza', next: 'z7' },
       { text: '🕯 Ascoltare l\'offerta fino in fondo', next: 'z9' },
+      { text: '🛋 "Il TRONO, Eleinad. Sappiamo del divano." — staccare la spina alla sua ricarica', requires: { flag: 'segreto_trono' }, once: true, next: 'z_trono' },
+      { text: '🪞 Alzare la maschera come uno specchio e chiamarlo col suo nome VERO', requires: { flag: 'segreto_specchio', item: 'maschera_daniele' }, once: true, next: 'z_nome_vero' },
       { text: '👻 "I morti non ti temono." — la scelta degli Spiriti', requires: { spirit: true }, next: 'z2b' },
+    ],
+  },
+
+
+  z_trono: {
+    location: 'cattedrale',
+    caption: 'La spina del Trono',
+    text: `> Gaetano: *(un passo avanti, e per una volta non ha la voce dell'ingegnere: ha quella di chi ha letto la bolletta)* "Il Divano-Trono. Nella Sala della Switch. Ogni notte torni là a RICARICARTI, perché la vita finta non si accumula: si consuma. Il Mercante ce l'ha detto in cambio di una storia vera — che è più di quanto tu abbia mai pagato per qualcosa."
+
+Il buco a forma di persona si ferma. Non si increspa: si FERMA, come un elettrodomestico a cui qualcuno ha appena nominato il numero di serie.
+
+> Eleinad: *(e la voce, per la prima volta, ha una sfumatura che assomiglia al panico amministrativo)* "Il divano è... comodo. È un dettaglio. Un DETTAGLIO d'arredamento—"
+
+> Emanuela: "È la tua PRESA DI CORRENTE, tesoro. E noi siamo cinque persone che stanotte hanno staccato ottanta cavi."
+
+Claudia solleva il telefono e inquadra il punto esatto: nel salotto-cattedrale, dietro l'altare, si vede il filo grigio che scende dal buco e sparisce nel pavimento — verso la Sala della Switch, verso il divano.
+
+> Daniele: *(sottovoce, e ride piano, incredulo)* "Quello è il MIO divano. Si è seduto sul mio divano per ricaricarsi mentre io stavo appeso ai cavi." *(alza la voce)* "SCENDI DAL MIO DIVANO."
+
+Il filo grigio, sotto le vostre suole, si TENDE. Qualcosa, di là, ha appena cominciato a perdere carica.
+
+**(🎨 Colore +3: la ricarica di Eleinad è esposta. Nello scontro finale combatterà a batteria scarica — i suoi colpi partiranno più deboli e la sua rigenerazione non funzionerà.)**`,
+    gold: 3,
+    sets: { trono_esposto: true, eleinad_vacilla: true },
+    choices: [
+      { text: '⚔ Adesso: il tavolo da gioco è vostro', next: 'z2' },
+    ],
+  },
+
+  z_nome_vero: {
+    location: 'cattedrale',
+    caption: 'Il nome vero, allo specchio',
+    text: `Federico alza la maschera. Non davanti alla propria faccia: davanti a QUELLA di Eleinad — col lato lucido girato verso il buco, come si porge uno specchio a chi ha qualcosa fra i denti.
+
+> Federico: "Guardati. Guardati BENE, perché stasera è l'ultima occasione." *(la mano non trema, e questa è la cosa che spaventa Eleinad più di tutto)* "'Eleinad'. Che nome fantastico. Terrificante. Antico. L'hai scelto tu, vero? Davanti a uno specchio, come i ragazzini col nome d'arte."
+
+Nella superficie lucida della cartapesta, il buco a forma di persona si riflette. E il riflesso — il riflesso DI un riflesso — è la cosa più vuota che abbiate mai visto: una faccia che non c'è che guarda una faccia che non c'è.
+
+> Federico: "Sei DANIELE scritto al contrario. Non un demone antico: un ANAGRAMMA. Ti sei fatto il nome con le lettere di un altro perché non ne avevi di tuoi. E adesso lo dico ad alta voce, davanti a tutti, così tutta la casa lo sente—"
+
+*(e lo dice: sillaba per sillaba, al rovescio, il nome vero)*
+
+**"D-A-N-I-E-L-E. Sei il riflesso di MIO FRATELLO. E mio fratello È QUI, in piedi, accanto a me."**
+
+Il buco EMETTE un suono. Non un urlo: uno stridere di vetro sotto pressione. La maschera, nella mano di Federico, si crepa a metà — e nella crepa, per un istante, si vede il salotto vero: il divano, la Switch, una lattina di Coca Zero. Casa.
+
+> Daniele: *(accanto al fratello, la voce ferma)* "Piacere. Daniele. QUELLO CON IL CORPO."
+
+**(🎨 Colore +3: il demone è stato NOMINATO davanti a testimoni. Ha perso il nome rubato — e con quello, l'aggancio su Daniele: comincerà lo scontro già ferito.)**`,
+    gold: 3,
+    removeItem: 'maschera_daniele',
+    sets: { nome_vero_detto: true, eleinad_vacilla: true },
+    choices: [
+      { text: '⚔ Al tavolo da gioco — con un demone senza nome', next: 'z2' },
     ],
   },
 
@@ -5944,6 +6001,8 @@ const CHAPTERS = [
 
 /* Il Diario della Notte: le conoscenze acquisite, in chiaro. Ordine = visualizzazione. */
 const DIARY_FLAGS = [
+  ['trono_esposto',         'La presa di corrente di Eleinad: il Divano-Trono nella Sala della Switch, dove torna ogni notte a ricaricarsi di vita finta. "SCENDI DAL MIO DIVANO."'],
+  ['nome_vero_detto',       'Il nome del demone, detto al rovescio davanti a testimoni: non un demone antico, un ANAGRAMMA. E la maschera si è crepata a metà.'],
   ['corsa_lettori_ok',      'La Traversata dei Lettori, vinta di slancio: la velocità decisa manda in confusione il catalogo del Grigiore. Teoria di Federico, campione statistico: uno.'],
   ['inventario_mercante',   'L\'inventario del Mercante, chiuso in cinque: il Grigiore non sa contare, e i numeri precisi detti ad alta voce lo innervosiscono da morire.'],
   ['nota_daniele',          'La nota di Daniele in cucina: "NON è una crisi: è un inquilino abusivo. Non ascoltate la mia faccia."'],

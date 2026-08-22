@@ -155,6 +155,19 @@ const Combat = (() => {
       battle.enemies.forEach(e => { if (!e.dead) e.distracted = true; });
       log(`👥 Federico e Daniele, spalla a spalla, D'ACCORDO SU QUALCOSA per la prima volta dal 1994. Il Grigiore non ha una casella per questo evento: esita (primo attacco con svantaggio).`, 'log-heal');
     }
+    if (battle.isBoss && G.flags.trono_esposto) {
+      // la ricarica è esposta: la Fame di vita finta parte a batteria scarica
+      const boss = battle.enemies.find(e => e.boss && !e.dead);
+      if (boss) {
+        boss.hp = Math.max(1, boss.hp - 8);
+        boss.lifesteal = false;
+        log(`🛋 Il filo grigio che porta al Divano-Trono è ESPOSTO: Eleinad parte a batteria scarica (<b>-8 PV</b>) e non può più rigenerarsi rubando vita.`, 'log-crit');
+      }
+    }
+    if (battle.isBoss && G.flags.nome_vero_detto) {
+      battle.enemies.forEach(e => { if (!e.dead) { e.attack.bonus = Math.max(0, e.attack.bonus - 2); e.distracted = true; } });
+      log(`🪞 Il nome rubato è stato detto al ROVESCIO davanti a testimoni: il demone non sa più chi è (<b>-2 ai suoi colpi</b>, primo attacco con svantaggio).`, 'log-heal');
+    }
     if (battle.isBoss && G.flags.manuale_annotato_letto) log(`📖 Avete letto le note di Daniele sul Manuale: conoscete i trucchi del nemico PRIMA che li usi. <b>+1 a tutti i vostri tiri!</b>`, 'log-heal');
 
     setTimeout(() => { banner.classList.add('hidden'); nextTurn(); }, 1600);
