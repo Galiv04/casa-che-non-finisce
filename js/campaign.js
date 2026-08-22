@@ -45,7 +45,7 @@ const CHECKPOINT_FLAGS = ['via_biblioteca', 'via_porte', 'via_cucina', 'daniele_
 /* ---- Testi ispezionabili (Zaino → 📖 Ispeziona) ---- */
 ITEMS.gocce_dottore.lore = `Il flacone delle Gocce del Dottore, trovato in bagno, tenuto BENE: etichetta dritta, tappo pulito, livello a metà.
 
-Daniele le prendeva. Regolarmente — si vede dal calendarietto a crocette accanto, compilato fino a dodici giorni fa. Non è un dettaglio: è la prova che stava COMBATTENDO, con gli strumenti giusti, da prima che il Grigiore barasse.
+Daniele le prendeva. Regolarmente — si vede dal calendarietto a crocette accanto, compilato fino a tre giorni fa — il giorno esatto in cui la casa se l'è preso. Non è un dettaglio: è la prova che stava COMBATTENDO, con gli strumenti giusti, da prima che il Grigiore barasse.
 
 Curano l'INGRIGITO (🩶 −2): il grigio le odia, perché funzionano.`;
 ITEMS.cuore_colore.lore = `Un cuore di colore compresso: rosso-arancio-oro, caldo, batte da solo.
@@ -861,7 +861,7 @@ Scorre lenta. All'inizio è Daniele normalissimo: messaggi lunghi, pieni di virg
 
 > Federico: *(la voce che si incrina, per la prima volta stanotte davvero)* "L'ho vista, questa roba. L'ho vista succedere IN TEMPO REALE e ho pensato che fosse pigrizia. Che gli girasse. Che—"
 
-> Emanuela: "Fede. Non era pigrizia. Guarda le date: coincidono con quelle delle Gocce. Qualcosa gli stava mangiando le parole una alla volta, e lui ha resistito FINO ALL'ULTIMA. 'Visualizzato' non è arrendersi. È restare, con quel poco di fiato che gli lasciavano."
+> Emanuela: "Fede. Non era pigrizia. Guarda le date: coincidono con gli ordini di COLORE — la lampada, i pennarelli, il poster. Qualcosa gli stava mangiando le parole una alla volta, e lui ha resistito FINO ALL'ULTIMA. 'Visualizzato' non è arrendersi. È restare, con quel poco di fiato che gli lasciavano."
 
 > Gaetano: "Un uomo che scrive romanzi in chat e manda un pollice in su non ha smesso di parlare. Gli hanno tolto le parole di bocca, una a una."
 
@@ -871,7 +871,28 @@ Il gelo nella stanza lascia il posto a qualcos'altro: la certezza che Daniele, f
     gold: 1,
     choices: [
       { text: '🚶 Adesso troviamolo.', next: 's3' },
-      { text: '📱 Cercare un messaggio nascosto: Daniele sapeva lasciare tracce', tag: 'Prova di Saggezza — CD 12', once: true, check: { stat: 'SAG', dc: 12, success: 's3', fail: 's8_ko' }, gold: 1, sets: { messaggio_nascosto: true } },
+      { text: '📱 Cercare un messaggio nascosto: Daniele sapeva lasciare tracce', tag: 'Prova di Saggezza — CD 12', once: true, check: { stat: 'SAG', dc: 12, success: 's8b', fail: 's8_ko' }, gold: 1, sets: { messaggio_nascosto: true } },
+    ],
+  },
+
+  s8b: {
+    location: 'salotto',
+    caption: 'Le maiuscole fuori posto',
+    text: `Claudia riparte dall'inizio, e stavolta non legge le frasi: legge le LETTERE. Perché negli ultimi messaggi lunghi di Daniele c'è una cosa che uno come lui non farebbe MAI: maiuscole fuori posto. *"va tutto Bene"*, *"ci Sento poco"*, *"sto solo rIposando"*...
+
+> Claudia: "Non sono errori. NIENTE è un errore, in uno che sottolinea in tre colori." *(le isola una per una, le mette in colonna, gira lo schermo verso il gruppo)*
+
+**F U S I B I L I.**
+
+> Gaetano: "'Io sono nei fusibili.' Ce l'ha scritto per MESI. In chiaro, in faccia a tutti. Aspettava solo qualcuno che leggesse in colonna."
+
+> Federico: *(alla parete, ad alta voce)* "Ricevuto, fratello. Con tre mesi di ritardo, ma ricevuto."
+
+Le luci del salotto — solo quelle — calano e risalgono. Una volta. Come un cenno.
+
+**(Il messaggio nascosto diceva FUSIBILI: Daniele è nell'impianto, e adesso ve l'ha detto LUI.)**`,
+    choices: [
+      { text: '🚶 Adesso troviamolo.', next: 's3' },
     ],
   },
 
@@ -5408,7 +5429,7 @@ Nessuno di voi si muove per un secondo che dura un'ora. Poi Daniele raccoglie il
 
 La dicotomia crolla e Eleinad smette di fingere. I televisori si accendono TUTTI, e su tutti c'è la stessa immagine: Daniele. Sul divano. Tra un anno, tra dieci, solo, grigio, con la vostra assenza attorno come polvere.
 
-> Eleinad: "E va bene. Parliamo del futuro, visto che vi piace tanto. Ve lo portate via, stanotte, il vostro trofeo. E poi? Poi tornate alle vostre vite, ai vostri lunedì, e lui torna al suo divano. E RICADRÀ. Lo sapete che ricadrà. E quando succederà — quando la chat tornerà muta — sarà COLPA VOSTRA. Di voi che stanotte avete fatto gli eroi e domani non avrete tempo per un caffè. Potete vivere con questo peso? Potete USCIRE da quella porta sapendo cosa gli state facendo?"
+> Eleinad: "E va bene. Parliamo del futuro, visto che vi piace tanto. Ve lo portate via, stanotte, il vostro trofeo. E poi? Poi tornate alle vostre vite, ai vostri lunedì, e lui torna al suo divano. E IL GRIGIO RISALE. Il grigio risale SEMPRE, come l'umidità nei muri. E quando risalirà — quando un giovedì qualunque nessuno avrà tempo per un messaggio — sarà COLPA VOSTRA. Di voi che stanotte avete fatto gli eroi e domani non avrete tempo per un caffè. Potete vivere con questo peso? Potete USCIRE da quella porta sapendo cosa gli state facendo?"
 
 Silenzio. E nel silenzio, Daniele fa un passo avanti. Da solo.
 
@@ -5722,6 +5743,8 @@ Natalino ha un tronello in mano che non accende. Claudia non fotografa. Federico
 > Eleinad: *(da nessuna parte, da ogni parte, sazio)* "Shhh. Comodi. C'è una maratona, stanotte. C'è una maratona TUTTE le notti."
 
 Qualcuno di voi, forse, pensa ancora di alzarsi. Tra un episodio e l'altro. Tra questo e il prossimo. Dal prossimo, sicuro.
+
+E c'è una cosa che Eleinad non vi dirà mai, perché non riesce a spiegarsela: le dita di Daniele, sul bracciolo, BATTONO ancora. Piano. A intervalli. Punto-linea-punto. Nessuno le ascolta più — ma non hanno smesso. In questa stanza c'è uno che si arrende peggio di tutti gli altri, e lo sta facendo alla sua maniera: senza mollare la discussione a metà.
 
 Fuori, il sole sorge su una città a colori. Dentro, la luce blu non cambia mai.
 
