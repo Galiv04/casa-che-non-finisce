@@ -53,6 +53,14 @@ const Combat = (() => {
           e.attack.bonus += 2;
           e.attack.plus = (e.attack.plus || 0) + 2;
         }
+        /* PIETÀ: impostata da Engine.riprendiDaCheckpoint. Ogni ritorno da un
+           checkpoint stanca anche chi vi ha steso. */
+        if (G.pieta) {
+          e.maxHp = Math.max(1, Math.round(e.maxHp * (1 - G.pieta)));
+          e.hp = e.maxHp;
+          e.attack.bonus = Math.max(0, e.attack.bonus - (G.pieta >= 0.24 ? 2 : 1));
+          e.attack.plus = Math.max(0, (e.attack.plus || 0) - (G.pieta >= 0.24 ? 2 : 1));
+        }
         if (porzione < 1) {
           e.maxHp = Math.max(1, Math.round(e.maxHp * porzione));
           e.hp = e.maxHp;
@@ -81,6 +89,9 @@ const Combat = (() => {
     // passiva di Emanuela: +2 PV a tutti a inizio combattimento
     const ema = G.party.find(h => h.id === 'emanuela' && !h.down && !h.preso && !h.morto);
     let openLines = [];
+    if (G.pieta) {
+      openLines.push(`🕯 <b>Rifarvi da capo costa fatica anche al Grigiore</b>: siete già tornati indietro ${G.stats.checkpointRitorni} volt${G.stats.checkpointRitorni > 1 ? 'e' : 'a'}, e chi vi ha steso è più stanco di allora (<b>−${Math.round(G.pieta * 100)}% PV e ai suoi colpi</b>).`);
+    }
     if (porzione < 1) {
       openLines.push(`🩶 <b>Porzioni ridotte</b>: siete ${attivi === 1 ? 'in UNO' : 'in due'}, e la Casa dosa il Grigiore in proporzione — cose meno robuste${attivi === 1 ? ' e meno precise' : ''}.`);
     }

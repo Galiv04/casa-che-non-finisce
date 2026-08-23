@@ -157,7 +157,7 @@ const BESTIARY = {
     name: 'Il Divorente', sprite: 'divorente',
     maxHp: 35, ac: 14, ai: 'strongest', undead: true, boss: true,
     special: 'latch',
-    attack: { name: 'Cuscini con dentro i denti', bonus: 6, dice: [1, 10], plus: 4 },
+    attack: { name: 'Cuscini con dentro i denti', bonus: 6, dice: [1, 4], plus: 2 },
     flavor: 'Il divano. Il DIVANO. Tre posti, penisola, e uno stomaco che digerisce pomeriggi interi. Non è mai stato un mobile.',
   },
   sciame_bollette: {
@@ -183,14 +183,14 @@ const BESTIARY = {
     name: 'Luca Giunti delle 21:00', short: 'Luca', sprite: 'luca_giunti',
     maxHp: 40, ac: 15, ai: 'smart', undead: true, boss: true,
     special: 'mirror',
-    attack: { name: 'Richiesta all\'ultimo minuto', bonus: 7, dice: [2, 6], plus: 3 },
+    attack: { name: 'Richiesta all\'ultimo minuto', bonus: 7, dice: [1, 4], plus: 2 },
     flavor: 'Uno zaino, un libro di fisica mai aperto, e una domanda eterna: "Prof, domani ho la verifica. Facciamo QUATTRO ORE?" Sono le 21:00. Sono SEMPRE le 21:00.',
   },
   cosa_sommersa: {
     name: 'La Cosa tra gli Scogli', short: 'La Cosa', sprite: 'cosa_sommersa',
     maxHp: 38, ac: 14, ai: 'strongest', undead: true, boss: true,
     special: 'latch',
-    attack: { name: 'Presa dal fondale', bonus: 7, dice: [2, 6], plus: 3 },
+    attack: { name: 'Presa dal fondale', bonus: 7, dice: [1, 4], plus: 2 },
     flavor: 'Sta sotto il pelo dell\'acqua nera, dove i piedi non toccano. Ha la pazienza degli scogli e le dita lunghe delle alghe.',
   },
   bibliotecario: {
@@ -222,19 +222,19 @@ const BESTIARY = {
     name: 'Guardiano del Bozzolo', sprite: 'bozzolo_guardiano',
     maxHp: 54, ac: 16, ai: 'smart', undead: true, boss: true,
     special: 'cleave',
-    attack: { name: 'Filo grigio', bonus: 7, dice: [2, 6], plus: 4 },
+    attack: { name: 'Filo grigio', bonus: 7, dice: [1, 4], plus: 2 },
     flavor: 'Il telecomando universale della casa, cresciuto fino a due metri e mezzo. Ha un tasto solo, grande, rosso: CONTINUA A GUARDARE.',
   },
   eleinad_maschera: {
     name: 'Eleinad, il Volto Rubato', short: 'Eleinad', sprite: 'eleinad',
     maxHp: 61, ac: 17, ai: 'smart', undead: true, boss: true, lifesteal: true,
-    attack: { name: 'Argomento Fantoccio', bonus: 8, dice: [2, 8], plus: 3 },
+    attack: { name: 'Argomento Fantoccio', bonus: 8, dice: [1, 4], plus: 2 },
     flavor: 'La faccia di Daniele portata come una maschera di carnevale, un millimetro fuori asse. Sorride quando non dovrebbe. Cita le fonti. Le fonti siete voi.',
   },
   eleinad_vero: {
     name: 'ELEINAD', short: 'ELEINAD', sprite: 'eleinad_vero',
     maxHp: 81, ac: 17, ai: 'smart', undead: true, boss: true, lifesteal: true,
-    attack: { name: 'Il Grigiore in persona', bonus: 9, dice: [2, 8], plus: 4 },
+    attack: { name: 'Il Grigiore in persona', bonus: 9, dice: [1, 4], plus: 2 },
     flavor: 'Sotto la maschera: il contrario esatto di una persona. Un buco a forma di Daniele che parla con la voce di tutti quelli che avete deluso.',
   },
 };

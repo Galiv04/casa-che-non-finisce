@@ -826,6 +826,23 @@ const Engine = (() => {
      lo tiene lei — e la modale vi dice PER NOME cosa vi manca.
      Torna false se non c'è nessun checkpoint: in quel caso vale la sconfitta scritta. */
   function riprendiDaCheckpoint() {
+    /* PIETÀ PROGRESSIVA. Senza questo, un gruppo troppo debole per uno scontro
+       rimbalza fra il checkpoint e la sconfitta all'infinito: nelle partite
+       simulate la Casa ha rimandato il bot sullo stesso boss 225 volte. Ogni
+       ritorno toglie il 12% delle forze a chi vi ha steso, fino a un terzo, e il
+       log del combattimento lo DICE. Il gioco cede, non il giocatore. */
+    if (G) {
+      G.stats = G.stats || {};
+      G.stats.checkpointRitorni = (G.stats.checkpointRitorni || 0) + 1;   // a vita: serve alle imprese
+      /* Il conto che CONTA è per SCONTRO, non a vita: in una notte da quaranta
+         combattimenti cadere cinque volte in punti diversi è normale, non un loop.
+         Quello che va scontato — e sorvegliato — è rimbalzare sullo STESSO scontro. */
+      const _scontro = G.lastCombatSceneId || G.sceneId || '?';
+      G.stats.ritorniPerScontro = G.stats.ritorniPerScontro || {};
+      G.stats.ritorniPerScontro[_scontro] = (G.stats.ritorniPerScontro[_scontro] || 0) + 1;
+      G.pieta = Math.min(0.34, G.stats.ritorniPerScontro[_scontro] * 0.12);
+    }
+
     const cp = G && G.lastCheckpoint;
     if (!cp || !cp.snapshot) return false;
     let s;
