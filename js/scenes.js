@@ -14,9 +14,24 @@ const Scenes = (() => {
     };
   }
 
-  function shade(hex, f) {
-    const n = parseInt(hex.slice(1), 16);
-    let r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+  /* shade(colore, fattore) — schiarisce o scurisce.
+     Accetta SIA '#rrggbb' SIA 'rgb(r,g,b)', e questo non è un vezzo: shade()
+     restituisce 'rgb(...)', e blocks() richiama shade() sul colore che riceve.
+     Finché leggeva solo l'esadecimale, un blocks(..., shade('#3a3a42', f), ...)
+     faceva parseInt('gb(58,58,66)', 16) = NaN, NaN>>16&255 = 0, e usciva
+     rgb(0,0,0): un nero PERFETTAMENTE VALIDO, che nessun controllo intercetta
+     (lezione 63) e che sullo sfondo nero del riquadro sembra un buco (lezione 55).
+     La pedana del trono e le file di divani della cattedrale erano nere così.
+     Un ramo qui sana tutti i punti di chiamata insieme, presenti e futuri. */
+  function shade(col, f) {
+    let r, g, b;
+    if (col[0] === '#') {
+      const n = parseInt(col.slice(1), 16);
+      r = (n >> 16) & 255; g = (n >> 8) & 255; b = n & 255;
+    } else {
+      const m = col.match(/-?\d+/g) || [0, 0, 0];
+      r = +m[0] || 0; g = +m[1] || 0; b = +m[2] || 0;
+    }
     r = Math.max(0, Math.min(255, Math.round(r * f)));
     g = Math.max(0, Math.min(255, Math.round(g * f)));
     b = Math.max(0, Math.min(255, Math.round(b * f)));
@@ -218,15 +233,46 @@ const Scenes = (() => {
     }
   }
 
-  // Porta chiusa con stipite e maniglia; targhetta opzionale
+  /* Porta chiusa con stipite, maniglia e targhetta opzionale.
+     LE PROPORZIONI VENGONO DALLA PORTA VERA, non dallo spazio disponibile: una
+     porta interna è 0,85 x 2,05 m, cioè LARGA 0,41 VOLTE LA PROPRIA ALTEZZA.
+     Tutti e sei i punti di chiamata passavano w = W*0.11-0.16 con h = 116-128,
+     cioè un rapporto 1,08: due volte e mezzo troppo larghe, e il risultato non
+     leggeva come porta ma come pensile da cucina — in tre fondali insieme.
+     Quindi `w` qui NON è più la larghezza del battente: è il POSTO in cui la
+     porta va messa, e la porta si centra dentro. I due pannelli sono verticali
+     (in una porta vera sono più alti che larghi) e la maniglia sta a 105 cm da
+     terra, che su 205 cm di battente è h * 0.51. */
   function door(ctx, x, floorY, w, h, leaf, frame, tag = null) {
-    ctx.fillStyle = frame; ctx.fillRect(x - 4, floorY - h - 4, w + 8, h + 4);
-    ctx.fillStyle = leaf; ctx.fillRect(x, floorY - h, w, h);
+    const lw = Math.max(9, Math.round(h * 0.42));
+    const lx = Math.round(x + w / 2 - lw / 2);
+    const bordo = Math.max(1, Math.round(lw * 0.12));
+    ctx.fillStyle = frame; ctx.fillRect(lx - bordo - 2, floorY - h - bordo - 2, lw + bordo * 2 + 4, h + bordo + 2);
+    ctx.fillStyle = leaf; ctx.fillRect(lx, floorY - h, lw, h);
+    // due pannelli verticali incassati, col filo chiaro dove prendono luce
+    const pw = lw - bordo * 2, ph1 = h * 0.40, ph2 = h * 0.36;
     ctx.fillStyle = shade(leaf, 0.72);
-    ctx.fillRect(x + 6, floorY - h + 8, w - 12, h * 0.36);
-    ctx.fillRect(x + 6, floorY - h * 0.5, w - 12, h * 0.36);
-    ctx.fillStyle = '#8a8a90'; ctx.fillRect(x + w - 9, floorY - h * 0.52, 5, 5);
-    if (tag) { ctx.fillStyle = tag; ctx.fillRect(x + w / 2 - 9, floorY - h - 12, 18, 7); }
+    ctx.fillRect(lx + bordo, floorY - h + bordo * 2, pw, ph1);
+    ctx.fillRect(lx + bordo, floorY - h * 0.46, pw, ph2);
+    ctx.fillStyle = shade(leaf, 1.22);
+    ctx.fillRect(lx + bordo, floorY - h + bordo * 2, pw, 1);
+    ctx.fillRect(lx + bordo, floorY - h * 0.46, pw, 1);
+    // maniglia: 105 cm da terra su un battente di 205 → h * 0.51. Misura e
+    // targhetta scalano col battente: su una porta da 95 px una maniglia da 5
+    // non si vede, e una targhetta fissa da 18 sembra un'etichetta appiccicata.
+    const mw = Math.max(4, Math.round(lw * 0.12)), my = Math.round(floorY - h * 0.51);
+    ctx.fillStyle = '#8a8a90'; ctx.fillRect(lx + lw - bordo - mw, my, mw, Math.max(2, Math.round(mw * 0.45)));
+    ctx.fillStyle = '#a8a8ae'; ctx.fillRect(lx + lw - bordo - mw, my, mw, 1);
+    // targhetta d'ottone all'altezza degli occhi, SUL battente (prima stava sopra
+    // l'architrave, dove nessuno guarda il nome di una porta)
+    if (tag) {
+      const tw = Math.max(12, Math.round(lw * 0.34)), th = Math.max(5, Math.round(tw * 0.42));
+      const tx = lx + Math.round((lw - tw) / 2), ty = Math.round(floorY - h * 0.78);
+      ctx.fillStyle = tag; ctx.fillRect(tx, ty, tw, th);
+      ctx.fillStyle = shade(tag, 0.55);
+      ctx.fillRect(tx + 3, ty + Math.floor(th / 2) - 1, tw - 6, 2);
+      ctx.fillStyle = shade(tag, 1.2); ctx.fillRect(tx, ty, tw, 1);
+    }
   }
 
   // Sagoma umana grigia, seduta o in piedi, appoggiata al pavimento dato
@@ -524,9 +570,53 @@ const Scenes = (() => {
       ctx.fillStyle = '#332f2b'; ctx.fillRect(W * 0.415, floorY + 4, 5, 12); ctx.fillRect(W * 0.475, floorY + 4, 5, 12);
       lattina(ctx, W * 0.445, floorY - 13);
       glow(ctx, W * 0.448, floorY - 8, 14, 12, '192,36,46');
-      // il corridoio buio sulla sinistra: qualcosa non torna
-      ctx.fillStyle = '#1d1d22'; ctx.fillRect(W * 0.22, H * 0.14, W * 0.05, floorY - H * 0.14);
-      ctx.fillStyle = '#4a4a50'; ctx.fillRect(W * 0.215, H * 0.13, W * 0.06, 5);
+      /* IL CORRIDOIO BUIO sulla sinistra. Era un rettangolo di nero pieno di
+         48x238 con un architrave grigio sopra: su un riquadro che ha il fondo
+         nero una zona nera non legge come vuoto, legge come una COSA (lezione
+         55) — e con un rapporto 1:5 quella cosa era un monolite appoggiato al
+         muro. Un vano porta è 1:2,4, quindi il vano si allarga a 100 px; e il
+         nero resta SOLO in fondo, perché la profondità la fanno i piani, non il
+         buio: il pavimento continua dentro con la doga del parquet, la parete
+         di sinistra prende la luce della lampada (che sta a destra) e quella di
+         destra resta in ombra. */
+      const oy = Math.round(H * 0.14), oh = floorY - oy;
+      const ow = Math.round(oh / 2.4), ox = Math.round(W * 0.20);
+      const fx = ox + 28, fw = ow - 56, fy = oy + 36, fbot = floorY - 24;
+      // il buio in fondo, che adesso è lontananza e non una lastra
+      ctx.fillStyle = '#0c0c10'; ctx.fillRect(ox, oy, ow, oh);
+      // parete sinistra: quella che prende la luce della stanza
+      for (let x = ox; x < fx; x++) {
+        const v = (x - ox) / (fx - ox);
+        ctx.fillStyle = shade('#3e3e46', 1 - v * 0.62);
+        ctx.fillRect(x, Math.round(oy + (fy - oy) * v), 1, Math.round(floorY - (floorY - fbot) * v) - Math.round(oy + (fy - oy) * v));
+      }
+      // parete destra: in ombra
+      for (let x = fx + fw; x < ox + ow; x++) {
+        const v = (ox + ow - x) / (ow - fw - 28);
+        ctx.fillStyle = shade('#26262c', 1 - v * 0.55);
+        ctx.fillRect(x, Math.round(oy + (fy - oy) * v), 1, Math.round(floorY - (floorY - fbot) * v) - Math.round(oy + (fy - oy) * v));
+      }
+      // il pavimento che continua DENTRO, con la stessa doga del parquet
+      for (let y = fbot; y <= floorY; y++) {
+        const u = (floorY - y) / (floorY - fbot);
+        const xl = Math.round(ox + (fx - ox) * u), xr = Math.round(ox + ow + (fx + fw - ox - ow) * u);
+        ctx.fillStyle = shade('#55504a', 1 - u * 0.62);
+        ctx.fillRect(xl, y, xr - xl, 1);
+        if ((floorY - y) % 8 === 3) { ctx.fillStyle = 'rgba(0,0,0,.22)'; ctx.fillRect(xl, y, xr - xl, 1); }
+      }
+      // il soffitto del corridoio, il piano più scuro dei tre
+      for (let y = oy; y <= fy; y++) {
+        const u = (y - oy) / (fy - oy);
+        const xl = Math.round(ox + (fx - ox) * u), xr = Math.round(ox + ow + (fx + fw - ox - ow) * u);
+        ctx.fillStyle = shade('#1c1c22', 1 - u * 0.5);
+        ctx.fillRect(xl, y, xr - xl, 1);
+      }
+      // lo stipite: architrave, e sullo spigolo verso la stanza il filo chiaro
+      ctx.fillStyle = '#4a4a50'; ctx.fillRect(ox - 7, oy - 8, ow + 14, 8);
+      ctx.fillStyle = '#5c5c64'; ctx.fillRect(ox - 7, oy - 8, ow + 14, 2);
+      ctx.fillStyle = '#3c3c42'; ctx.fillRect(ox - 7, oy, 7, floorY - oy);
+      ctx.fillStyle = '#44444a'; ctx.fillRect(ox + ow, oy, 7, floorY - oy);
+      ctx.fillStyle = '#6a6a72'; ctx.fillRect(ox + ow + 5, oy, 2, floorY - oy);
       // lampada a stelo ACCANTO al divano, appoggiata a terra
       ctx.fillStyle = '#3a3a40'; ctx.fillRect(W * 0.585, floorY - 70, 4, 70);
       ctx.fillRect(W * 0.575, floorY - 2, 24, 4);
@@ -711,26 +801,28 @@ const Scenes = (() => {
       // carta da parati a righe stanche
       ctx.fillStyle = 'rgba(170,170,175,.05)';
       for (let x = 0; x < W; x += 24) ctx.fillRect(x, 0, 8, floorY);
-      // LE PORTE: colori che una volta erano vivi, ora anemici
+      /* LE PORTE. Erano cinque ante da 125x116 tutte dentro l'inquadratura: un
+         rapporto 1,08 (cinque pensili appesi al muro) in una scena che si chiama
+         «Il Corridoio delle Porte Sbagliate». Ora la proporzione la fa door()
+         dall'altezza, e l'altezza viene dalla parete: una porta da 2,05 m su un
+         muro da 2,70 occupa il 76% della sua altezza. Il passo è W/4, quindi la
+         PRIMA E L'ULTIMA sono tagliate dal bordo — perché u1 dice «le porte non
+         finiscono, le contate fino a quaranta», e un corridoio che finisce dentro
+         il quadro dà una bugia al giocatore che ha appena letto quella riga. */
       const cols = ['#6a5a68', '#5a6a5e', '#6e6250', '#50606a', '#6a5250'];
       const tags = ['#b8b4a8', '#a8a89e', '#b0aca0', '#a0a4a8', '#b4aa9c'];
+      const dh = Math.round(floorY * 0.76), dlw = Math.round(dh * 0.42), pitch = W / 4;
       for (let i = 0; i < 5; i++) {
-        const dx = W * 0.045 + i * W * 0.19;
-        door(ctx, dx, floorY, W * 0.13, 116, cols[i], '#2e2c2a', tags[i]);
-        // ogni targhetta con la sua "scritta"
-        ctx.fillStyle = '#4a463e';
-        ctx.fillRect(dx + W * 0.065 - 6, floorY - 126, 12, 2);
+        door(ctx, i * pitch - dlw / 2, floorY, dlw, dh, cols[i], '#2e2c2a', tags[i]);
       }
-      // da SOTTO una porta (la terza): un filo di luce calda — l'unico colore vero
-      const dx3 = W * 0.045 + 2 * W * 0.19;
-      glow(ctx, dx3 + W * 0.065, floorY + 2, W * 0.11, 8, '224,178,96');
-      ctx.fillStyle = '#e0b260'; ctx.fillRect(dx3 + 3, floorY - 2, W * 0.13 - 6, 3);
-      // e da sotto un'altra (la quinta): un'ombra che passa, buio più buio
-      const dx5 = W * 0.045 + 4 * W * 0.19;
-      ctx.fillStyle = '#0e0e12'; ctx.fillRect(dx5 + 3, floorY - 2, W * 0.13 - 6, 3);
-      // appliques tra le porte, metà spente
+      // da SOTTO la porta di mezzo: un filo di luce calda — l'unico colore vero
+      glow(ctx, 2 * pitch, floorY + 2, dlw * 0.9, 8, '224,178,96');
+      ctx.fillStyle = '#e0b260'; ctx.fillRect(2 * pitch - dlw / 2 + 3, floorY - 3, dlw - 6, 3);
+      // e da sotto un'altra: un'ombra che passa, buio più buio
+      ctx.fillStyle = '#0e0e12'; ctx.fillRect(3 * pitch - dlw / 2 + 3, floorY - 3, dlw - 6, 3);
+      // appliques nel muro TRA le porte, metà spente
       for (let i = 0; i < 4; i++) {
-        const ax = W * 0.045 + (i + 1) * W * 0.19 - W * 0.03 + W * 0.065;
+        const ax = (i + 0.5) * pitch;
         ctx.fillStyle = '#3a3a40'; ctx.fillRect(ax - 4, H * 0.30, 9, 12);
         if (i % 2 === 0) {
           glow(ctx, ax, H * 0.28, 18, 14, '198,198,188');
@@ -864,35 +956,64 @@ const Scenes = (() => {
       }
       ctx.fillStyle = '#9a968e';
       for (let i = 0; i < 5; i++) ctx.fillRect(r() * W, shoreY + 24 + r() * (H - shoreY - 36), 4, 3);
-      // I DUE RACCHETTONI piantati nella cenere, uno di fronte all'altro:
-      // il legno è l'unico colore CALDO rimasto (la firma affettuosa)
+      /* LA SCALA DI QUESTA SPIAGGIA È UNA SOLA: 120 px per metro. Da lì vengono
+         tutte le misure, e le misure vengono dalle cose vere — un racchettone è
+         lungo 50 cm col piatto di 26x30, un ombrellone da spiaggia è alto 2,20
+         con la calotta di 2 m. Prima erano alti 60 px e 66: uguali. Un oggetto
+         fuori scala non legge come «importante», legge come «sbagliato», e
+         questa scena si ritrovava due caramelle grandi come un ombrellone. */
+      /* I DUE RACCHETTONI piantati nella cenere, uno di fronte all'altro: il
+         legno è l'unico colore CALDO rimasto (la firma affettuosa). Erano un
+         cerchio su un bastoncino, cioè un lecca-lecca: il pixelDisc ridisegnato
+         SOPRA l'ovale riportava il piatto a un tondo pieno. Ora il piatto è un
+         ovale 3:4 e non ha niente sopra, fra manico e piatto c'è il COLLO
+         strozzato — che è l'unica cosa che dice «racchettone» — e la venatura
+         del compensato corre verticale come nel compensato vero. */
       for (const [fx, tilt] of [[0.30, -0.12], [0.44, 0.12]]) {
-        ctx.save(); ctx.translate(W * fx, H * 0.80); ctx.rotate(tilt);
-        ctx.fillStyle = '#a86a3a'; ctx.fillRect(-4, -26, 8, 26);            // manico piantato
-        ctx.fillStyle = '#8a5228'; ctx.fillRect(-5, -24, 10, 9);            // la fasciatura del manico
-        ctx.fillStyle = '#c08448'; pixelEllipse(ctx, 0, -44, 22, 17, 3);    // il piatto, OVALE
-        ctx.fillStyle = '#a86a3a'; ctx.fillRect(-14, -46, 28, 2);           // la venatura del compensato
-        ctx.fillStyle = '#a86a3a'; pixelDisc(ctx, 0, -44, 14);
+        ctx.save(); ctx.translate(W * fx, H * 0.86); ctx.rotate(tilt);
+        ctx.fillStyle = '#8a5228'; ctx.fillRect(-3, -22, 6, 22);            // manico piantato
+        ctx.fillStyle = '#a86a3a'; ctx.fillRect(-3, -22, 2, 22);            // il filo di luce sul manico
+        ctx.fillStyle = '#6e4220'; ctx.fillRect(-4, -18, 8, 7);             // la fasciatura
+        ctx.fillStyle = '#8a5228'; ctx.fillRect(-4, -27, 8, 6);             // IL COLLO, strozzato
+        ctx.fillStyle = '#c08448'; pixelEllipse(ctx, 0, -46, 15, 19, 3);    // il piatto: ovale 3:4
+        ctx.fillStyle = '#a86a3a';                                          // le venature, VERTICALI
+        ctx.fillRect(-8, -58, 3, 24); ctx.fillRect(5, -58, 3, 24);
+        ctx.fillStyle = '#d09c60'; pixelEllipse(ctx, -2, -50, 7, 9, 3);     // il colpo di luce
         ctx.restore();
       }
-      glow(ctx, W * 0.37, H * 0.72, 60, 34, '192,132,72');
+      glow(ctx, W * 0.37, H * 0.78, 60, 34, '192,132,72');
       // la pallina, a metà strada, ferma da chissà quanto
-      ctx.fillStyle = '#d8d4c8'; ctx.fillRect(W * 0.368, H * 0.83, 5, 5);
-      // L'OMBRELLONE ROTTO: palo storto, metà tela crollata
-      const ux = W * 0.72, uy = H * 0.86;
-      ctx.save(); ctx.translate(ux, uy); ctx.rotate(-0.22);
-      ctx.fillStyle = '#6a645c'; ctx.fillRect(-2, -64, 5, 64);
+      ctx.fillStyle = '#d8d4c8'; ctx.fillRect(W * 0.368, H * 0.89, 5, 5);
+      /* L'OMBRELLONE ROTTO. Palo 2,20 m = 264 px, calotta 2 m: è LUI il soggetto
+         che questa scena non aveva, e adesso sta quattro volte il racchettone
+         come nel mondo vero. Mezza calotta è ancora su, dall'altra parte le
+         stecche sono nude e la tela pende fino a toccare la cenere. */
+      const ux = W * 0.62, uy = H * 0.93;
+      ctx.save(); ctx.translate(ux, uy); ctx.rotate(-0.09);
+      ctx.fillStyle = '#2e2c28'; ctx.fillRect(-14, -5, 30, 5);              // l'ombra alla base
+      ctx.fillStyle = '#6a645c'; ctx.fillRect(-4, -252, 8, 252);           // il palo
+      ctx.fillStyle = '#847e76'; ctx.fillRect(-4, -252, 3, 252);           // il filo di luce sul palo
+      ctx.fillStyle = '#55524c'; ctx.fillRect(-8, -166, 16, 6);            // lo snodo, rotto
+      // la mezza calotta ANCORA SU: un cono che scende verso sinistra
+      for (let i = 0; i <= 34; i++) {
+        const xx = -i * 3, yTop = -252 + i * 0.4, yBot = -252 + i * 1.9;
+        ctx.fillStyle = i % 6 < 3 ? '#8e8a84' : '#7c7872';
+        ctx.fillRect(xx - 3, yTop, 4, yBot - yTop);
+        if (i % 6 === 0) { ctx.fillStyle = '#5c5952'; ctx.fillRect(xx - 3, yTop, 4, 2); }  // le stecche sotto
+      }
+      // le STECCHE NUDE dalla parte rotta, che scendono sempre più giù
+      for (let sb = 0; sb < 3; sb++) {
+        const len = 66 + sb * 14, pend = 0.85 + sb * 0.28;
+        ctx.fillStyle = '#55524c';
+        for (let i = 0; i < len; i += 3) ctx.fillRect(i, -252 + i * pend, 4, 3);
+      }
+      // e la TELA CROLLATA che pende dalle stecche e TOCCA la cenere
+      for (let i = 0; i < 66; i += 3) {
+        const xx = 24 + i, yTop = -252 + xx * 1.02;
+        ctx.fillStyle = (i % 12 < 6) ? '#7c7872' : '#6a665f';
+        ctx.fillRect(xx, yTop, 4, -yTop - 4);
+      }
       ctx.restore();
-      // la mezza calotta ancora su
-      ctx.fillStyle = '#84807a';
-      for (let k = 0; k < 4; k++) ctx.fillRect(ux - 40 + k * 3, uy - 66 + k * 4, 40 - k * 5, 5);
-      // la mezza tela crollata che TOCCA la sabbia
-      ctx.fillStyle = '#74706a';
-      for (let k = 0; k < 5; k++) ctx.fillRect(ux + 6 + k * 5, uy - 46 + k * 9, 18 - k * 2, 8);
-      ctx.fillRect(ux + 28, uy - 6, 14, 6);
-      // stecche nude dove la tela non c'è più
-      ctx.fillStyle = '#55524c';
-      ctx.fillRect(ux + 4, uy - 60, 26, 3); ctx.fillRect(ux + 8, uy - 52, 30, 3);
       // orme che vanno verso il mare e SI FERMANO
       ctx.fillStyle = 'rgba(0,0,0,.20)';
       for (let i = 0; i < 6; i++) ctx.fillRect(W * 0.54 + i * 12, H * 0.92 - i * ((H * 0.92 - shoreY - 12) / 6), 7, 4);
@@ -909,15 +1030,21 @@ const Scenes = (() => {
         ctx.fillStyle = shade('#4e5056', 1 - i * 0.08);
         ctx.fillRect(W * 0.02 * i, 0, W - W * 0.04 * i, 12 - i * 2);
       }
+      /* Un unico punto di fuga per tutta la cabina — cappelliere, finestrini,
+         file di sedili e moquette: siamo IN PIEDI nel corridoio, quindi
+         l'orizzonte è all'altezza dei nostri occhi (1,60 m) e tutto converge là.
+         Alla fila più vicina un metro vale 238 px: da questa sola cifra vengono
+         tutte le altre quote, e le quote vengono dall'aereo vero (cappelliera
+         fra 1,90 e 2,10 m, finestrino a 1,25, sedile largo 45 cm). */
+      const vpx = W * 0.5, vpy = Math.round(H * 0.39), MT = 238;
       // CAPPELLIERE lungo i lati, che convergono verso il fondo
-      for (const side of [0, 1]) {
-        for (let i = 0; i < 5; i++) {
-          const t = i / 5;
-          const bw = W * 0.15 * (1 - t * 0.55), bh = 22 * (1 - t * 0.5);
-          const bx = side ? W * (0.98 - t * 0.36) - bw : W * (0.02 + t * 0.36);
-          ctx.fillStyle = shade('#5a5c64', 1 - t * 0.4); ctx.fillRect(bx, 22 + t * 30, bw, bh);
-          ctx.fillStyle = shade('#3e4046', 1 - t * 0.4); ctx.fillRect(bx, 22 + t * 30 + bh - 4, bw, 4);
-        }
+      for (const dir of [-1, 1]) for (const sq of [1, 0.63, 0.44, 0.31, 0.22]) {
+        const x1 = vpx + dir * 1.05 * MT * sq, x2 = vpx + dir * 1.78 * MT * sq;
+        const y1 = vpy - 0.50 * MT * sq, y2 = vpy - 0.30 * MT * sq;
+        const bx = Math.min(x1, x2), bw = Math.abs(x2 - x1);
+        ctx.fillStyle = shade('#5a5c64', 1 - (1 - sq) * 0.45); ctx.fillRect(bx, y1, bw, y2 - y1);
+        ctx.fillStyle = shade('#6a6c74', 1 - (1 - sq) * 0.45); ctx.fillRect(bx, y1, bw, Math.max(1, 3 * sq));
+        ctx.fillStyle = shade('#33353b', 1 - (1 - sq) * 0.45); ctx.fillRect(bx, y2 - Math.max(2, 5 * sq), bw, Math.max(2, 5 * sq));
       }
       // la LUCE FREDDA: strisce al neon lungo il corridoio, convergenti
       for (let i = 0; i < 5; i++) {
@@ -926,46 +1053,118 @@ const Scenes = (() => {
         glow(ctx, W * 0.5, 16 + t * H * 0.30, lw, 10, '186,198,210');
         ctx.fillStyle = '#bac6d2'; ctx.fillRect(W * 0.5 - lw / 2, 14 + t * H * 0.30, lw, 3);
       }
-      // FILE DI SEDILI in prospettiva, dal fondo verso di noi, con sagome
-      for (let row = 5; row >= 0; row--) {
-        const t = row / 6;                       // row 5 = lontano
-        const sy2 = floorY - (floorY - H * 0.40) * t;
-        const sh2 = 44 * (1 - t * 0.55), sw2 = W * 0.115 * (1 - t * 0.5);
-        for (const side of [0, 1]) {
-          for (let k = 0; k < 2; k++) {
-            const sx2 = side ? W * (0.60 + t * 0.10) + k * (sw2 + 4) : W * (0.40 - t * 0.10) - (k + 1) * (sw2 + 4);
-            // sedile: schienale + seduta appoggiata al pavimento della sua fila
-            ctx.fillStyle = shade('#54565e', 1 - t * 0.35);
-            ctx.fillRect(sx2, sy2 - sh2, sw2, sh2);
-            ctx.fillStyle = shade('#484a52', 1 - t * 0.35);
-            ctx.fillRect(sx2, sy2 - sh2, sw2, 6);
-            ctx.fillStyle = shade('#3c3e46', 1 - t * 0.35);
-            ctx.fillRect(sx2 - 2, sy2 - 4, sw2 + 4, 4);
-            // sagome nei sedili: teste immobili, non tutte
-            if ((row + k + side) % 2 === 0) {
-              ctx.fillStyle = shade('#2c2c32', 1 - t * 0.2);
-              ctx.fillRect(sx2 + sw2 * 0.25, sy2 - sh2 - 10 * (1 - t * 0.5), sw2 * 0.5, 12 * (1 - t * 0.5));
-            }
+      /* IL FONDO del corridoio, PRIMA dei sedili: quello che sta dietro si
+         disegna prima (lezione 36). Non finisce: si spegne in un chiarore. */
+      ctx.fillStyle = 'rgba(186,198,210,.10)'; ctx.fillRect(W * 0.44, H * 0.32, W * 0.12, H * 0.12);
+      // moquette: si stringe verso il fondo una riga per volta, non a rettangoli
+      for (let y = vpy; y < H; y++) {
+        const sq = (y - vpy) / 230;
+        const cw = Math.max(2, Math.round(150 * sq * 0.92));
+        ctx.fillStyle = shade('#3e3a44', 0.7 + sq * 0.4);
+        ctx.fillRect(Math.round(vpx - cw / 2), y, cw, 1);
+      }
+      /* I FINESTRINI, prima dei sedili perché i sedili li devono coprire in parte.
+         Erano quattro fillRect quadrati di 12x16 con scritto in commento «ovali
+         neri»: a quella misura non dicevano cosa fossero e sul muro leggevano
+         come macchie (lezione 59) — e i finestrini sono l'UNICA cosa che dice
+         «aereo». Ora sono ovali veri di 32 px sulla parete vicina, e dietro il
+         vetro non c'è cielo: c'è la pista ferma, come dice u5. */
+      for (const dir of [-1, 1]) for (const sw4 of [1, 0.62, 0.42, 0.29]) {
+        const wx = vpx + dir * (vpx - 30) * sw4, wy = vpy + 22 * sw4;
+        const rx = Math.max(4, 16 * sw4), ry = Math.max(3, 12 * sw4);
+        ctx.fillStyle = shade('#585a62', 1 - (1 - sw4) * 0.45);
+        pixelEllipse(ctx, wx, wy, rx + 3, ry + 3, 2);                  // la cornice
+        ctx.fillStyle = shade('#1c1e24', 1 - (1 - sw4) * 0.30);
+        pixelEllipse(ctx, wx, wy, rx, ry, 2);                          // il vetro
+        ctx.fillStyle = shade('#4c4e56', 1 - (1 - sw4) * 0.45);        // la pista. Ferma.
+        ctx.fillRect(Math.round(wx - rx * 0.8), Math.round(wy + ry * 0.3), Math.round(rx * 1.6), Math.max(1, Math.round(ry * 0.3)));
+      }
+      /* LE FILE DI SEDILI, tre-più-tre come dice u5. Rifatte da zero: prima erano
+         fillRect pieni con una riga scura in cima, le file si sovrapponevano
+         coprendo la base di quella dietro, e il risultato erano due piramidi di
+         casse — «delle scale senza senso». Un sedile d'aereo si riconosce da
+         quattro cose, e ora ci sono tutte: il POGGIATESTA staccato dallo
+         schienale da una fessura scura, il BRACCIOLO che sporge nel corridoio,
+         la TASCA del sedile (quella dove u5e fa trovare i fogli di volo del 19A)
+         e il BUIO SOTTO la seduta coi piedini. La fila più vicina è alta 155 px
+         e tagliata dal bordo basso: è il soggetto, e dice che siamo lì dentro.
+         Le sagome sono su OGNI sedile, perché u5 dice «TUTTI i sedili sono
+         occupati» e prima ce n'era una su due. */
+      const filaS = [1, 0.63, 0.44, 0.31, 0.22, 0.16];
+      for (let ri = filaS.length - 1; ri >= 0; ri--) {
+        const sq = filaS[ri], dim = 1 - (1 - sq) * 0.45;
+        const topY = Math.round(vpy + 75 * sq);      // capo dello schienale
+        const hrB = Math.round(vpy + 103 * sq);      // la fessura sotto il poggiatesta
+        const cuY = Math.round(vpy + 170 * sq);      // il cuscino della seduta
+        const baY = Math.round(vpy + 230 * sq);      // il pavimento di questa fila
+        const sw2 = 110 * sq, aw2 = 150 * sq;
+        for (const dir of [-1, 1]) {
+          const inner = vpx + dir * aw2 / 2;
+          const bx0 = dir < 0 ? inner - 3 * sw2 : inner;
+          // il buio sotto la seduta e i piedini: solo dove la fila è grande
+          if (sq > 0.42) {
+            ctx.fillStyle = shade('#1e2026', dim);
+            ctx.fillRect(bx0, cuY, 3 * sw2, baY - cuY);
+            ctx.fillStyle = shade('#3a3c42', dim);
+            for (let g = 0; g <= 3; g++) ctx.fillRect(bx0 + g * sw2 - 2, cuY + 10 * sq, 5, baY - cuY - 10 * sq);
+            ctx.fillStyle = shade('#4a4c54', dim);
+            ctx.fillRect(bx0, cuY, 3 * sw2, Math.max(3, 13 * sq));     // il bordo del cuscino
+            ctx.fillStyle = shade('#5c5e68', dim);
+            ctx.fillRect(bx0, cuY, 3 * sw2, Math.max(1, 3 * sq));
           }
+          for (let k = 0; k < 3; k++) {
+            const sx2 = bx0 + k * sw2;
+            /* Il manichino va disegnato PRIMA del sedile: da qui vediamo la nuca,
+               e lo schienale gliene copre la metà bassa. Il conto è quello della
+               lezione 51 — un sedile è 45 cm, una testa 22, quindi la testa è
+               mezzo sedile; e sopra il capo dello schienale (1,15 m) di una testa
+               ferma a 1,30 sporgono 15 cm, cioè un terzo. */
+            ctx.fillStyle = shade('#2c2e35', dim);
+            pixelDisc(ctx, sx2 + sw2 / 2, topY - 12 * sq, Math.max(4, 27 * sq), Math.max(2, Math.round(3 * sq)));
+            // schienale a tre fasce di tono, dal poggiatesta in giù
+            ctx.fillStyle = shade('#474951', dim); ctx.fillRect(sx2, hrB, sw2, cuY - hrB);
+            ctx.fillStyle = shade('#41434b', dim); ctx.fillRect(sx2, hrB + (cuY - hrB) * 0.46, sw2, (cuY - hrB) * 0.54);
+            ctx.fillStyle = shade('#37393f', dim); ctx.fillRect(sx2, cuY - Math.max(2, 9 * sq), sw2, Math.max(2, 9 * sq));
+            ctx.fillStyle = shade('#2c2e34', dim); ctx.fillRect(sx2, hrB, Math.max(1, 3 * sq), cuY - hrB); // cucitura
+            /* Il TAVOLINO chiuso con la sua chiusura, e sotto la TASCA con la
+               rivista che sporge. Sono i due segni che, visti da dietro, dicono
+               «sedile d'aereo» e non «anta d'armadio»: senza di loro il blocco
+               di tre restava una fila di cassettiere, ed è così che la scena
+               veniva letta. La rivista è anche l'unico taglio chiaro su un
+               pannello grande, quindi rompe la piattezza (regola delle 3 fasce). */
+            if (sq > 0.40) {
+              const tw3 = sw2 * 0.80, tx3 = sx2 + (sw2 - tw3) / 2;
+              const ty3 = Math.round(hrB + (cuY - hrB) * 0.22);
+              ctx.fillStyle = shade('#3c3e45', dim); ctx.fillRect(tx3, ty3, tw3, Math.max(2, (cuY - hrB) * 0.16));
+              ctx.fillStyle = shade('#5c5e67', dim); ctx.fillRect(tx3, ty3, tw3, 2);
+              ctx.fillStyle = shade('#6a6c74', dim); ctx.fillRect(sx2 + sw2 / 2 - 3, ty3 + (cuY - hrB) * 0.16 - 1, 7, 3);
+              const pw3 = sw2 * 0.68, px3 = sx2 + (sw2 - pw3) / 2;
+              const py3 = Math.round(hrB + (cuY - hrB) * 0.52);
+              ctx.fillStyle = shade('#8c8e96', dim);                     // la rivista che sporge
+              ctx.fillRect(px3 + pw3 * 0.14, py3 - Math.max(2, 7 * sq), pw3 * 0.44, Math.max(3, 9 * sq));
+              ctx.fillStyle = shade('#31333a', dim);
+              ctx.fillRect(px3, py3, pw3, Math.round((cuY - hrB) * 0.34));
+              ctx.fillStyle = shade('#585a63', dim); ctx.fillRect(px3, py3, pw3, 2);
+            }
+            // poggiatesta STACCATO dallo schienale da una fessura scura
+            const hw2 = sw2 * 0.84, hx2 = sx2 + (sw2 - hw2) / 2;
+            ctx.fillStyle = shade('#22242a', dim); ctx.fillRect(sx2, hrB - Math.max(1, 3 * sq), sw2, Math.max(1, 4 * sq));
+            ctx.fillStyle = shade('#4e5058', dim); ctx.fillRect(hx2, topY, hw2, hrB - topY - Math.max(1, 3 * sq));
+            ctx.fillStyle = shade('#5e6068', dim); ctx.fillRect(hx2, topY, hw2, Math.max(2, 4 * sq));
+          }
+          // bracciolo del posto sul corridoio: sporge NEL corridoio
+          const arw = Math.max(3, 13 * sq);
+          ctx.fillStyle = shade('#4e5058', dim);
+          ctx.fillRect(dir < 0 ? inner : inner - arw, cuY - Math.max(4, 26 * sq), arw, Math.max(6, 34 * sq));
+          ctx.fillStyle = shade('#64666f', dim);
+          ctx.fillRect(dir < 0 ? inner : inner - arw, cuY - Math.max(4, 26 * sq), arw, Math.max(2, 5 * sq));
         }
       }
-      // il fondo del corridoio: NON finisce — solo file sempre più piccole nel chiaro freddo
-      ctx.fillStyle = 'rgba(186,198,210,.10)'; ctx.fillRect(W * 0.44, H * 0.30, W * 0.12, H * 0.14);
-      ctx.fillStyle = '#6a737e';
-      for (let i = 0; i < 3; i++) ctx.fillRect(W * 0.47 + i * 6, H * 0.36 + i * 3, 4, 6);
-      // moquette del corridoio
-      blocks(ctx, W * 0.42, floorY, W * 0.16, H - floorY, '#3e3a44', 8, r, 0.10);
       // il segnale ALLACCIARE LE CINTURE: acceso, ambra — l'unico punto caldo
       ctx.fillStyle = '#2e3036'; ctx.fillRect(W * 0.47, 26, W * 0.06, 12);
       glow(ctx, W * 0.5, 32, 20, 12, '224,168,72');
       ctx.fillStyle = '#e0a848'; ctx.fillRect(W * 0.482, 29, 8, 6);
       ctx.fillStyle = '#8a8a92'; ctx.fillRect(W * 0.508, 29, 8, 6);
-      // finestrini: ovali neri sulla notte, nessuna nuvola
-      for (const side of [0, 1]) for (let i = 0; i < 4; i++) {
-        const t = i / 4;
-        const wx = side ? W * (0.93 - t * 0.30) : W * (0.04 + t * 0.30);
-        ctx.fillStyle = '#26262c'; ctx.fillRect(wx, H * 0.34 + t * 16, 12 * (1 - t * 0.4), 16 * (1 - t * 0.4));
-      }
     },
 
     stanza_sommersa(ctx, W, H) {
@@ -1195,42 +1394,121 @@ const Scenes = (() => {
     },
 
     galleria(ctx, W, H) {
-      // fila di teche di vetro illuminate da TV, sagome in pigiama dentro
+      /* LA GALLERIA DEI SONNAMBULI. Rifatta: erano QUATTRO teche identiche di
+         163x190 px riempite di un solo grigio (#22262c), che leggevano come
+         quattro porte d'ascensore, e dentro ognuna una sagoma alta 38 px — tre
+         volte troppo piccola per dire cosa fosse. Il metro qui è la teca: deve
+         contenere una persona, quindi la persona è il metro di tutto il resto
+         (lezione 51). Ora sono DUE teche di scorcio tagliate dai bordi (le
+         «file e file» del testo) più UNA in primo piano larga un terzo
+         dell'inquadratura, e dentro la grande il sonnambulo è alto 126 px, con
+         la poltrona sotto, il riverbero della TV sulla faccia e le righe del
+         pigiama larghe di conseguenza. Dentro ogni teca ci sono TRE PIANI —
+         fondo illuminato dalla TV, fianchi in ombra, ripiano orizzontale —
+         perché un unico colore piatto su 163x190 px è la definizione di
+         cartone. */
       const r = rng(2099);
       blocks(ctx, 0, 0, W, H, '#1a1a1f', 16, r, 0.14);
       const floorY = H - 60;
       blocks(ctx, 0, floorY, W, H - floorY, '#26262c', 12, r, 0.10);
       // corsia lucida al centro, coi riflessi delle teche
-      blocks(ctx, W * 0.06, floorY + 6, W * 0.88, H - floorY - 10, '#2e2e36', 10, r, 0.08);
-      // LE TECHE: quattro vetrine, ognuna col suo piedistallo e la sua TV
-      for (let i = 0; i < 4; i++) {
-        const tx = W * (0.06 + i * 0.24), tw = W * 0.17, th = H * 0.56, ty = floorY - th;
-        // basamento a terra
-        blocks(ctx, tx - 6, floorY - 12, tw + 12, 12, '#3a3a42', 8, r, 0.10);
-        // la luce della TV dentro: ogni teca di una gradazione diversa di freddo
-        const tones = [['138,168,190', '#8aa8be'], ['150,160,178', '#96a0b2'], ['128,150,164', '#8096a4'], ['160,170,180', '#a0aab4']];
-        glow(ctx, tx + tw / 2, ty + th * 0.45, tw * 1.1, th * 0.7, tones[i][0]);
-        // l'interno della teca
-        ctx.fillStyle = '#22262c'; ctx.fillRect(tx, ty, tw, th - 12);
-        // la TV piccola in alto nella teca, fissata a una staffa
-        ctx.fillStyle = '#3a3a42'; ctx.fillRect(tx + tw / 2 - 2, ty + 4, 4, 8);
-        tvScreen(ctx, tx + tw / 2 - 15, ty + 12, 30, 20, tones[i][0], tones[i][1]);
-        // LA SAGOMA IN PIGIAMA: seduta sul suo pouf, faccia allo schermo
-        blocks(ctx, tx + tw / 2 - 12, floorY - 26, 24, 14, '#3e3a44', 6, r, 0.10); // il pouf
-        sagoma(ctx, tx + tw / 2, floorY - 24, 44, '#55525c', true);
-        // le righe del pigiama
-        ctx.fillStyle = '#66626e';
-        ctx.fillRect(tx + tw / 2 - 7, floorY - 48, 14, 2); ctx.fillRect(tx + tw / 2 - 7, floorY - 42, 14, 2);
-        // il vetro: montanti + riflesso diagonale
+      blocks(ctx, W * 0.02, floorY + 6, W * 0.96, H - floorY - 10, '#2e2e36', 10, r, 0.08);
+
+      /* Una teca. `k` è la scala: 1 = la teca in primo piano, e ogni misura
+         dentro è un multiplo di k, così le due laterali sono la STESSA cosa
+         vista da più lontano e non un disegno diverso. */
+      const teca = (tx, tw, ty, th, rgb, scr, primo) => {
+        const k = th / 240, bot = ty + th;
+        glow(ctx, tx + tw / 2, ty + th * 0.55, tw * 0.5, th * 0.38, rgb);
+        // il fondo della teca, con l'alone chiaro dove batte la TV
+        ctx.fillStyle = '#20242a'; ctx.fillRect(tx, ty, tw, th);
+        ctx.fillStyle = '#2b313a';
+        pixelEllipse(ctx, tx + tw * 0.52, ty + th * 0.58, tw * 0.40, th * 0.32, 4);
+        // i fianchi in ombra: sono loro a dire che la teca ha una profondità
+        const fw = Math.max(4, Math.round(tw * 0.07));
+        ctx.fillStyle = '#15171c'; ctx.fillRect(tx, ty, fw, th); ctx.fillRect(tx + tw - fw, ty, fw, th);
+        ctx.fillStyle = '#2e333b'; ctx.fillRect(tx + fw - 2, ty, 2, th); ctx.fillRect(tx + tw - fw, ty, 2, th);
+        // il ripiano su cui poggia la poltrona: il terzo piano
+        const rip = Math.max(6, Math.round(th * 0.12));
+        ctx.fillStyle = '#2d3138'; ctx.fillRect(tx + fw, bot - rip, tw - fw * 2, rip);
+        ctx.fillStyle = '#3d424a'; ctx.fillRect(tx + fw, bot - rip, tw - fw * 2, Math.max(2, Math.round(3 * k)));
+        const sy = bot - rip, cx = tx + tw * 0.44;
+        // LA POLTRONA: spalliera, cuscino che sporge, braccioli grossi
+        const chW = Math.round(112 * k), chB = Math.round(112 * k);
+        ctx.fillStyle = '#37333f'; ctx.fillRect(cx - chW / 2, sy - chB, chW, chB);
+        ctx.fillStyle = '#443f4d'; ctx.fillRect(cx - chW / 2, sy - chB, chW, Math.max(2, Math.round(4 * k)));
+        ctx.fillStyle = '#3f3a49'; ctx.fillRect(cx - chW / 2 - 4 * k, sy - 26 * k, chW + 8 * k, 26 * k);
+        ctx.fillStyle = '#4d4759'; ctx.fillRect(cx - chW / 2 - 4 * k, sy - 26 * k, chW + 8 * k, Math.max(2, Math.round(3 * k)));
+        for (const bxa of [cx - chW / 2 - 10 * k, cx + chW / 2 - 3 * k]) {
+          ctx.fillStyle = '#494354'; ctx.fillRect(bxa, sy - 52 * k, 13 * k, 30 * k);
+          ctx.fillStyle = '#5a536a'; ctx.fillRect(bxa, sy - 52 * k, 13 * k, Math.max(2, Math.round(3 * k)));
+        }
+        /* IL SONNAMBULO: 126 px nella teca grande. Le quote sono quelle di una
+           persona seduta — busto 0,55 m per 0,44 di spalle, testa 0,24 — e alla
+           scala della teca (109 px per metro) fanno 60x48 e 26. Quello che lo fa
+           leggere come persona e non come scatola a righe è il resto: la testa
+           TONDA, il collo, le spalle più strette in cima, le braccia staccate
+           di tono appoggiate sui braccioli e le mani in fondo. */
+        const cu = sy - 26 * k;                       // il capo del cuscino: ci si siede qui
+        ctx.fillStyle = '#4a4650';                                            // gambe che vengono avanti
+        ctx.fillRect(cx - 18 * k, cu - 2 * k, 54 * k, 16 * k);
+        ctx.fillStyle = '#514c58'; ctx.fillRect(cx - 18 * k, cu - 2 * k, 54 * k, Math.max(1, Math.round(3 * k)));
+        ctx.fillStyle = '#464250'; ctx.fillRect(cx + 22 * k, cu + 14 * k, 17 * k, sy - cu - 14 * k);
+        ctx.fillStyle = '#33303a'; ctx.fillRect(cx + 20 * k, sy - 5 * k, 23 * k, 5 * k);   // le ciabatte
+        // busto: spalle più strette in cima, poi il torace
+        ctx.fillStyle = '#565260';
+        ctx.fillRect(cx - 17 * k, cu - 60 * k, 34 * k, 8 * k);
+        ctx.fillRect(cx - 24 * k, cu - 52 * k, 48 * k, 52 * k);
+        // le braccia, di un tono staccato, appoggiate sui braccioli, con le mani
+        for (const dirb of [-1, 1]) {
+          const abx = dirb < 0 ? cx - 24 * k - 11 * k : cx + 24 * k;
+          ctx.fillStyle = '#4b4756'; ctx.fillRect(abx, cu - 48 * k, 11 * k, 44 * k);
+          ctx.fillStyle = '#6a6474'; ctx.fillRect(abx, cu - 10 * k, 11 * k, 8 * k);   // la mano
+        }
+        // le righe del pigiama, larghe in proporzione al busto
+        ctx.fillStyle = '#6b6678';
+        for (let sr = 0; sr < 4; sr++) ctx.fillRect(cx - 24 * k, cu - 44 * k + sr * 12 * k, 48 * k, Math.max(1, Math.round(4 * k)));
+        // il collo, poi la testa TONDA; e sulla faccia il riverbero della TV
+        ctx.fillStyle = '#4e4a58'; ctx.fillRect(cx - 6 * k, cu - 68 * k, 12 * k, 10 * k);
+        ctx.fillStyle = '#6a6574'; pixelDisc(ctx, cx, cu - 76 * k, 15 * k, Math.max(2, Math.round(3 * k)));
+        ctx.fillStyle = scr; ctx.fillRect(cx + 4 * k, cu - 82 * k, 9 * k, 16 * k);
+        ctx.fillStyle = '#3c3946'; pixelDisc(ctx, cx, cu - 84 * k, 13 * k, Math.max(2, Math.round(3 * k))); // i capelli
+        // LA TV: piccola, di tre quarti, lo schermo girato verso di lui
+        const tvW = Math.round(46 * k), tvH = Math.round(34 * k);
+        const tvX = tx + tw - fw - tvW - Math.round(14 * k), tvY = sy - tvH - Math.round(22 * k);
+        ctx.fillStyle = '#2a2c32'; ctx.fillRect(tvX + tvW / 2 - 5 * k, tvY + tvH, 10 * k, 22 * k);
+        ctx.fillStyle = '#34363d'; ctx.fillRect(tvX + tvW / 2 - 15 * k, sy - 5 * k, 30 * k, 5 * k);
+        ctx.fillStyle = '#1c1e23'; ctx.fillRect(tvX, tvY, tvW, tvH);
+        ctx.fillStyle = '#33353c'; ctx.fillRect(tvX, tvY, tvW, Math.max(2, Math.round(3 * k)));
+        glow(ctx, tvX - 3 * k, tvY + tvH / 2, 22 * k, 16 * k, rgb);
+        ctx.fillStyle = scr; ctx.fillRect(tvX - Math.max(3, 5 * k), tvY + 4 * k, Math.max(3, 5 * k), tvH - 8 * k);
+        // il vetro davanti: montanti, cimasa e il riflesso in diagonale
         ctx.fillStyle = '#4a4e56';
-        ctx.fillRect(tx - 2, ty - 4, tw + 4, 5); ctx.fillRect(tx - 2, ty, 3, th - 12); ctx.fillRect(tx + tw - 1, ty, 3, th - 12);
+        ctx.fillRect(tx - 3, ty - Math.max(4, 6 * k), tw + 6, Math.max(4, 6 * k));
+        ctx.fillRect(tx - 3, ty, 4, th); ctx.fillRect(tx + tw - 1, ty, 4, th);
         ctx.fillStyle = 'rgba(210,220,230,.07)';
-        for (let k = 0; k < 3; k++) ctx.fillRect(tx + 6 + k * 4, ty + 8 + k * 18, 3, 26);
-        // la targhetta d'ottone sul basamento (senza nome leggibile)
-        ctx.fillStyle = '#8a8578'; ctx.fillRect(tx + tw / 2 - 10, floorY - 9, 20, 6);
-        // il riflesso della teca sulla corsia
-        ctx.fillStyle = `rgba(${tones[i][0]},.06)`; ctx.fillRect(tx + 4, floorY + 6, tw - 8, H - floorY - 12);
-      }
+        for (let kk = 0; kk < 4; kk++) ctx.fillRect(tx + 10 * k + kk * 6 * k, ty + 10 * k + kk * 26 * k, Math.max(2, 4 * k), 34 * k);
+        // il basamento e la targhetta d'ottone (senza nome: le parole stanno nel DOM)
+        blocks(ctx, tx - 8, bot, tw + 16, floorY - bot + 12, '#3a3a42', 8, r, 0.10);
+        ctx.fillStyle = '#8a8578'; ctx.fillRect(tx + tw / 2 - 14 * k, bot + 5, 28 * k, Math.max(4, 7 * k));
+        ctx.fillStyle = '#6a655c'; ctx.fillRect(tx + tw / 2 - 10 * k, bot + 7, 20 * k, 2);
+        // IL CUORE DI COLORE incastonato nel montante: l'unico caldo della sala,
+        // ed è quello che k8_prendi fa staccare «con uno scatto morbido»
+        if (primo) {
+          glow(ctx, tx + tw / 2, ty - 4, 26, 18, '214,86,64');
+          ctx.fillStyle = '#8a3a34'; ctx.fillRect(tx + tw / 2 - 8, ty - 12, 16, 12);
+          ctx.fillStyle = '#d65640'; ctx.fillRect(tx + tw / 2 - 5, ty - 10, 10, 8);
+          ctx.fillStyle = '#f0a080'; ctx.fillRect(tx + tw / 2 - 3, ty - 9, 4, 3);
+        }
+        // il riflesso della teca sulla corsia lucida
+        ctx.fillStyle = `rgba(${rgb},.07)`; ctx.fillRect(tx + 6, floorY + 6, tw - 12, H - floorY - 12);
+      };
+
+      // due teche di scorcio, tagliate dai bordi: le «file e file» del testo
+      teca(-46, 250, 108, 192, '150,160,178', '#96a0b2', false);
+      teca(756, 250, 108, 192, '128,150,164', '#8096a4', false);
+      // LA TECA IN PRIMO PIANO: 340 px su 960, un terzo dell'inquadratura
+      teca(310, 340, 48, 240, '138,168,190', '#8aa8be', true);
       // il soffitto se lo mangia il buio
       for (let i = 0; i < 4; i++) {
         ctx.fillStyle = `rgba(8,8,12,${0.16 + i * 0.12})`;
@@ -1308,19 +1586,70 @@ const Scenes = (() => {
         blocks(ctx, W * 0.5 - pw2 / 2, floorY - 10 - i * 10, pw2, 12, shade('#3a3a42', 1 + i * 0.06), 8, r, 0.10);
       }
       const topY = floorY - 30; // piano della pedana
-      // IL DIVANO-TRONO: schienale altissimo, braccioli come colonne
-      const dx = W * 0.32, dw = W * 0.36;
-      blocks(ctx, dx, topY - 110, dw, 40, '#4a4a54', 8, r, 0.10);           // cimasa dello schienale
-      blocks(ctx, dx + 6, topY - 80, dw - 12, 56, '#42424c', 8, r, 0.10);   // schienale
-      blocks(ctx, dx + 8, topY - 30, dw - 16, 30, '#4e4e58', 8, r, 0.10);   // seduta
-      blocks(ctx, dx - 16, topY - 64, 22, 64, '#3a3a44', 8, r, 0.10);       // bracciolo-colonna sx
-      blocks(ctx, dx + dw - 6, topY - 64, 22, 64, '#3a3a44', 8, r, 0.10);   // bracciolo-colonna dx
-      // IL BOZZOLO sul trono: filamenti grigi avvolti, con Daniele dentro
-      const bx = W * 0.5, by = topY - 44;
-      glow(ctx, bx, by, 60, 60, '150,150,158');
+      /* IL DIVANO-TRONO. Prima era tre blocks() sovrapposti a mattoni 8px: un muro
+         grigio con una cornice, e nessuno ci leggeva un divano. Un divano si
+         riconosce da quattro cose e non da altro — i CUSCINI separati da cuciture,
+         il FILO DI LUCE sul capo di ogni cuscino, i BRACCIOLI grossi che sporgono
+         IN AVANTI (quindi disegnati per ultimi, sopra la seduta), e la FASCIA
+         FRONTALE sotto la seduta con l'ombra a terra. Qui sono flat fill a tre
+         fasce di tono e non blocchi: la texture a mattoni era metà del problema. */
+      const dx = W * 0.31, dw = W * 0.38;
+      /* Le misure vengono dal divano vero, non a occhio: seduta a 45 cm, capo del
+         bracciolo a 62, e uno schienale da trono che arriva a 1,60. Alla scala di
+         questa pedana (1 m ≈ 68 px) fanno 30, 42 e 108 px — cioè il bracciolo è
+         DUE TERZI dello schienale, non quasi uguale: quando erano uguali le due
+         colonne laterali leggevano come pilastri e il tutto come una facciata. */
+      const armW = 48, armH = 62, backTop = topY - 122, seatTop = topY - 44, seatBot = topY - 14;
+      ctx.fillStyle = '#232329';                                             // ombra portata a terra
+      ctx.fillRect(dx - 8, topY - 5, dw + 16, 7);
+      // lo schienale, e sul suo capo il RULLO chiaro: è lui che dice imbottitura
+      ctx.fillStyle = '#3a3a44'; ctx.fillRect(dx + 14, backTop + 10, dw - 28, seatTop - backTop);
+      ctx.fillStyle = '#4e4e5a'; ctx.fillRect(dx + 18, backTop, dw - 36, 14);
+      ctx.fillStyle = '#65656f'; ctx.fillRect(dx + 18, backTop, dw - 36, 3);
+      // TRE cuscini di spalliera, più larghi che alti, separati da cuciture scure
+      const bw = (dw - 40) / 3;
+      for (let k = 0; k < 3; k++) {
+        const cx3 = dx + 20 + k * bw;
+        ctx.fillStyle = '#43434e'; ctx.fillRect(cx3 + 3, backTop + 16, bw - 9, seatTop - backTop - 12);
+        ctx.fillStyle = '#4d4d59'; ctx.fillRect(cx3 + 6, backTop + 20, bw - 15, 20);
+        ctx.fillStyle = '#5a5a66'; ctx.fillRect(cx3 + 4, backTop + 17, bw - 11, 2);
+        ctx.fillStyle = '#2a2a32'; ctx.fillRect(cx3 + bw - 6, backTop + 16, 4, seatTop - backTop - 12);
+      }
+      ctx.fillStyle = '#26262d'; ctx.fillRect(dx + 18, seatTop + 1, dw - 36, 5); // l'incavo seduta/schienale
+      // seduta: DUE cuscini col capo chiaro, e la fascia frontale sotto
+      for (let k = 0; k < 2; k++) {
+        const sx3 = dx + 20 + k * (dw - 40) / 2;
+        ctx.fillStyle = '#50505c'; ctx.fillRect(sx3, seatTop + 6, (dw - 40) / 2 - 5, seatBot - seatTop - 6);
+        ctx.fillStyle = '#65656f'; ctx.fillRect(sx3, seatTop + 6, (dw - 40) / 2 - 5, 3);
+      }
+      ctx.fillStyle = '#3a3a41'; ctx.fillRect(dx + 16, seatBot, dw - 32, topY - seatBot - 3); // fascia
+      ctx.fillStyle = '#2c2c33'; ctx.fillRect(dx + 16, seatBot, dw - 32, 2);
+      // braccioli: bassi e grossi, col rullo arrotondato in cima, disegnati per
+      // ULTIMI perché in un divano sporgono in avanti e coprono il capo della seduta
+      for (const ax3 of [dx, dx + dw - armW]) {
+        ctx.fillStyle = '#46464f'; ctx.fillRect(ax3, topY - armH, armW, armH);
+        ctx.fillStyle = '#52525e'; ctx.fillRect(ax3 + 3, topY - armH - 9, armW - 6, 12);
+        ctx.fillStyle = '#666672'; ctx.fillRect(ax3 + 6, topY - armH - 9, armW - 12, 3);
+        ctx.fillStyle = '#33333a'; ctx.fillRect(ax3 + armW - 4, topY - armH, 4, armH); // spigolo in ombra
+      }
+      /* IL BOZZOLO sul trono. Era un disco di 30 px con dentro un quadrato scuro
+         di 20: sotto i sessanta pixel non diceva cosa fosse (lezione 59), e il
+         quadrato scuro al centro leggeva come un buco. Ora è un ovale verticale
+         alto 96 con TESTA E SPALLE FUORI, perché il testo di m3 è preciso: i
+         filamenti «lo avvolgono dal petto in giù», e il cavo entra «nella base
+         del collo» — quindi il collo si deve vedere, o lo spinotto non ha dove
+         innestarsi. Col fuori-tutto il soggetto della scena arriva a 130 px. */
+      const bx = W * 0.5, by = topY - 46;
+      glow(ctx, bx, by - 6, 56, 62, '150,150,158');
       ctx.fillStyle = '#6a6a72';
-      pixelDisc(ctx, bx, by, 30);
-      ctx.fillStyle = '#7a7a82'; pixelDisc(ctx, bx - 4, by - 6, 20);
+      pixelEllipse(ctx, bx, by, 36, 48);                       // il bozzolo, ovale come un corpo
+      ctx.fillStyle = '#7a7a82'; pixelEllipse(ctx, bx - 4, by - 8, 24, 30);
+      ctx.fillStyle = '#8a8a92'; ctx.fillRect(bx - 21, by - 54, 42, 18);   // spalle di Daniele, fuori
+      ctx.fillStyle = '#3c3c44'; ctx.fillRect(bx - 8, by - 52, 16, 10);    // il collo, in ombra
+      ctx.fillStyle = '#9a9aa2'; ctx.fillRect(bx - 11, by - 74, 22, 24);   // la testa
+      ctx.fillStyle = '#5c5c64'; ctx.fillRect(bx - 11, by - 74, 22, 6);    // i capelli
+      ctx.fillStyle = '#2e2e34'; ctx.fillRect(bx - 7, by - 64, 4, 3);      // gli occhi aperti,
+      ctx.fillRect(bx + 3, by - 64, 4, 3);                                 // che seguono lo schermo
       // i filamenti: fasce che avvolgono il bozzolo e SCENDONO ancorandosi a trono e pedana
       ctx.fillStyle = '#55555e';
       for (let i = 0; i < 5; i++) {
@@ -1330,21 +1659,20 @@ const Scenes = (() => {
       ctx.fillStyle = '#4a4a52';
       ctx.fillRect(bx - 34, by + 10, 5, topY - by - 10); ctx.fillRect(bx + 28, by + 4, 5, topY - by - 4);
       ctx.fillRect(bx - 6, by + 24, 4, topY - by - 24);
-      // dentro il bozzolo: la sagoma rannicchiata, appena leggibile
-      ctx.fillStyle = '#3a3a42'; ctx.fillRect(bx - 10, by - 10, 20, 22);
-      // IL CAVO HDMI innestato nel bozzolo, che serpeggia giù dalla pedana fino a fuori scena
+      // IL CAVO HDMI: parte dalla BASE DEL COLLO, come dice m3, e serpeggia giù
+      // fino a fuori scena passando davanti alla pedana
       ctx.fillStyle = '#111116';
-      ctx.fillRect(bx + 24, by + 2, 26, 5);
-      let px2 = bx + 50, py2 = by + 2;
-      for (let seg = 0; seg < 6; seg++) {
+      ctx.fillRect(bx + 10, by - 46, 22, 5);
+      let px2 = bx + 32, py2 = by - 46;
+      for (let seg = 0; seg < 8; seg++) {
         ctx.fillRect(px2, py2, 5, 24); py2 += 24;
         ctx.fillRect(px2, py2, 26, 5); px2 += 26;
         if (py2 > H - 14) break;
       }
-      // lo spinotto sul bozzolo, con la spia rossa: IL colore della scena
-      ctx.fillStyle = '#26262c'; ctx.fillRect(bx + 18, by - 2, 10, 9);
-      ctx.fillStyle = '#c0242e'; ctx.fillRect(bx + 20, by, 3, 3);
-      glow(ctx, bx + 21, by + 1, 14, 12, '192,36,46');
+      // lo spinotto nel collo, con la spia rossa: IL colore della scena
+      ctx.fillStyle = '#26262c'; ctx.fillRect(bx + 6, by - 50, 10, 12);
+      ctx.fillStyle = '#c0242e'; ctx.fillRect(bx + 8, by - 47, 3, 3);
+      glow(ctx, bx + 9, by - 46, 14, 12, '192,36,46');
       // due bracieri ai lati della pedana... spenti; resta un fumo dritto
       for (const fx of [0.16, 0.84]) {
         blocks(ctx, W * fx - 8, floorY - 26, 18, 26, '#33333a', 6, r, 0.12);
@@ -1382,24 +1710,57 @@ const Scenes = (() => {
         blocks(ctx, vx2 + vw2 / 2 - lw3 / 2, vy2 + vh2 + 4, lw3, floorY - vy2 - vh2 - 4, '#2a2a31', 8, r, 0.12);
         ctx.fillStyle = '#34343c'; ctx.fillRect(vx2 - 2, vy2 + vh2 + 4, vw2 + 4, 5); // il davanzale che li unisce
       }
-      // LA NAVATA: file di divani-panche fusi, in prospettiva verso il fondo
+      /* LA NAVATA: file di divani fusi come panche. Tre correzioni, tutte
+         necessarie perché si leggessero come FILE e non come una scalinata:
+         (1) la distanza fra le file cresce verso l'osservatore — t^0.65 invece
+             di t — così la prima fila ha 56 px di respiro e non 27, e nessuna
+             fila copre la base di quella dietro (era quello a fare i gradoni);
+         (2) ogni fila è SPEZZATA dalla corsia centrale, che è il segno per cui
+             una fila di sedute si legge come banco di chiesa;
+         (3) seduta, schienale e filo di luce sul capo dello schienale: tre toni
+             più un pixel chiaro, la convenzione dell'imbottitura. Con un solo
+             tono piatto una superficie legge come cartone — e nera come niente. */
+      const navaD = floorY - H * 0.46;
       for (let row = 4; row >= 0; row--) {
-        const t = row / 5;                          // row 4 = lontano
-        const py2 = floorY - (floorY - H * 0.46) * t;
-        const pw2 = W * (0.56 - t * 0.24), ph2 = 26 * (1 - t * 0.5);
-        const px2 = W * 0.5 - pw2 / 2;
-        blocks(ctx, px2, py2 - ph2, pw2, ph2, shade('#44444e', 1 - t * 0.3), 8, r, 0.10);
-        blocks(ctx, px2, py2 - ph2 - 12 * (1 - t * 0.5), pw2, 13 * (1 - t * 0.5), shade('#3c3c46', 1 - t * 0.3), 8, r, 0.08);
-        // braccioli fusi male: gobbe dove i divani si sono saldati
-        ctx.fillStyle = shade('#38383f', 1 - t * 0.3);
-        for (let k = 1; k < 4; k++) ctx.fillRect(px2 + k * pw2 / 4 - 4, py2 - ph2 - 16 * (1 - t * 0.5), 8, 16 * (1 - t * 0.5));
+        const t = row / 4;                          // row 4 = la fila più lontana
+        const sc = 1 - t * 0.55;                    // scala prospettica dei pezzi
+        const py2 = floorY - navaD * Math.pow(t, 0.65);
+        const pw2 = W * (0.58 - t * 0.26), px2 = W * 0.5 - pw2 / 2;
+        const aw2 = W * (0.15 - t * 0.08);          // la corsia che spezza la fila
+        const seatH = Math.max(5, Math.round(15 * sc)), backH = Math.max(6, Math.round(30 * sc));
+        for (const half of [[px2, W * 0.5 - aw2 / 2], [W * 0.5 + aw2 / 2, px2 + pw2]]) {
+          const hx = half[0], hw = half[1] - half[0];
+          if (hw < 6) continue;
+          // schienale, poi seduta davanti: la seduta copre il piede dello schienale
+          ctx.fillStyle = shade('#3c3c46', 1 - t * 0.30);
+          ctx.fillRect(hx, py2 - seatH - backH, hw, backH);
+          ctx.fillStyle = shade('#5e5e6a', 1 - t * 0.30);              // il filo di luce
+          ctx.fillRect(hx, py2 - seatH - backH, hw, Math.max(1, Math.round(2 * sc)));
+          ctx.fillStyle = shade('#4a4a54', 1 - t * 0.30);
+          ctx.fillRect(hx, py2 - seatH, hw, seatH);
+          ctx.fillStyle = shade('#585862', 1 - t * 0.30);
+          ctx.fillRect(hx, py2 - seatH, hw, Math.max(1, Math.round(2 * sc)));
+          ctx.fillStyle = shade('#2a2a31', 1 - t * 0.30);               // l'ombra sotto la seduta
+          ctx.fillRect(hx, py2 - 2, hw, 3);
+          // braccioli fusi male: gobbe dove i divani si sono saldati fra loro
+          const gobbe = Math.max(1, Math.round(hw / 90));
+          for (let k = 1; k <= gobbe; k++) {
+            const gw = Math.max(4, Math.round(11 * sc)), gh = Math.max(3, Math.round(9 * sc));
+            ctx.fillStyle = shade('#4e4e58', 1 - t * 0.30);
+            ctx.fillRect(hx + k * hw / (gobbe + 1) - gw / 2, py2 - seatH - backH - gh, gw, gh);
+            ctx.fillStyle = shade('#66666f', 1 - t * 0.30);
+            ctx.fillRect(hx + k * hw / (gobbe + 1) - gw / 2, py2 - seatH - backH - gh, gw, 2);
+          }
+        }
       }
-      // corsia centrale: passatoia grigia che corre verso il fondo
-      for (let i = 0; i < 6; i++) {
-        const t = i / 6;
-        const cw = W * (0.13 - t * 0.07);
-        ctx.fillStyle = shade('#3a3640', 1 - t * 0.3);
-        ctx.fillRect(W * 0.5 - cw / 2, floorY - (floorY - H * 0.46) * t - 6, cw, (floorY - H * 0.46) / 6 + 7);
+      // corsia centrale: la passatoia si stringe verso il fondo UNA RIGA PER VOLTA.
+      // A blocchi di sei era una scaletta di rettangoli — un'altra scalinata dove
+      // serviva una fuga prospettica.
+      for (let y = Math.round(floorY - navaD); y <= floorY; y++) {
+        const u = (floorY - y) / navaD;              // 0 = ai nostri piedi, 1 = in fondo
+        const cw = Math.round(W * (0.145 - u * 0.085));
+        ctx.fillStyle = shade('#3a3640', 1 - u * 0.30);
+        ctx.fillRect(Math.round(W * 0.5 - cw / 2), y, cw, 1);
       }
       // IL FONDO: una parete di chiarore freddo... con una SAGOMA-BUCO al centro,
       // la forma di una persona dove la luce semplicemente NON c'è
