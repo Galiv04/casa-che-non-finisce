@@ -134,7 +134,7 @@ La forma dentro il bozzolo si piega in avanti, verso di voi, fuori dalla luce de
     caption: 'Il cavo vero — e la casa se ne accorge',
     text: `Gaetano segue i cavi come si segue uno schema elettrico: scarta i finti — troppo puliti, troppo in vista, ESPOSITIVI — e trova, sotto la pedana del trono, mimetizzato tra dodici gemelli identici, l'unico che è CALDO.
 
-> Gaetano: "Eccolo. Alimentazione vera. Gli altri sono scenografia." *(lo afferra con due mani)* "Questo lo stacco di netto. Ingegneria irpina: se non sai cosa fa un cavo, è colpa di chi non l'ha etichettato."
+> Gaetano: "Eccolo. Alimentazione vera. Gli altri sono scenografia." *(lo afferra con due mani)* "Questo lo stacco di netto. Regola di casa mia: se non sai cosa fa un cavo, è colpa di chi non l'ha etichettato."
 
 > Claudia: "Aspetta, se lo stacchi la casa lo sente—"
 
@@ -209,7 +209,7 @@ Le dita si fermano. Poi, piano, battono un'ultima cosa — corta, secca, la più
     caption: 'Il circuito del tasto rosso',
     text: `Claudia scatta col telefono in modalità macro — il tasto rosso riempie lo schermo — e passa la foto a Gaetano mentre il Guardiano ancora si srotola.
 
-Gaetano ingrandisce. E ride. Una risata corta, cattiva, da ingegnere che ha appena trovato l'errore nel progetto di un rivale.
+Gaetano ingrandisce. E ride. Una risata corta, cattiva, di uno che ha appena trovato l'errore nel disegno di un altro.
 
 > Gaetano: "Non è collegato."
 

@@ -154,7 +154,7 @@ E poi Natalino, che si era chinato a guardare sotto il letto per puro istinto da
 
 Trent'anni di litigio vi passano attraverso in dieci secondi. È come farsi attraversare da una lastra di gennaio.
 
-> Gaetano: *(coi denti che battono)* "Registrato. La stanza si difende. Servono le parole ESATTE, non parole qualunque — o l'occasione giusta."`,
+> Gaetano: *(coi denti che battono)* "Ok. Ok. La stanza si difende, quindi servono le parole ESATTE — non parole qualunque, o il momento giusto." *(si tira su)* "E allora le troviamo."`,
     choices: [
       { text: '🚪 Fuori dalla cameretta, per ora', next: 'u3' },
     ],
@@ -648,7 +648,7 @@ Pesa perché all'altro capo c'è ATTACCATO QUALCOSA. Natalino molla la presa un 
     caption: 'Come funziona un Cuore di Colore',
     text: `Gaetano lo esamina alla sua maniera: torcia, controluce, il pollice che preme piano per sentire la consistenza. Il Cuore pulsa — caldo, rosso-arancio-oro — e a ogni battito il buio intorno arretra di un palmo, come una marea al contrario.
 
-> Gaetano: "Ok. Osservazioni. Uno: batte da SOLO, senza un corpo. Quindi non è un organo — è una RISERVA. Il colore compresso di qualcuno, impacchettato così stretto che è diventato materia." *(lo gira, delicatissimo)* "Due: scalda la mano ma non si consuma. E tre — la più importante — guardate cosa fa quando lo avvicino a Emanuela."
+> Gaetano: "Ok, guardate. Batte da SOLO, senza un corpo. Quindi non è un organo, è una RISERVA: il colore compresso di qualcuno, impacchettato così stretto che è diventato materia." *(lo gira, delicatissimo)* "Scalda la mano e non si consuma. E adesso la cosa bella — state a vedere cosa fa quando lo avvicino a Emanuela."
 
 Lo avvicina. Il Cuore accelera. Il battito si sincronizza, in tre secondi netti, con quello di lei.
 
@@ -745,7 +745,7 @@ Le porte aspettano, coi loro colori sbagliati. Da qualche parte là sotto, Danie
 
 Vi fermate al centro del corridoio, e per la prima volta lo guardate senza paura: porte coi colori sbagliati, targhette con la grafia rubata a Daniele, ricordi messi in barattolo da una cosa che li mangia. Sapete cosa c'è dietro. Ci siete ENTRATI. E ne siete usciti con le tasche più piene di come eravate entrati.
 
-> Gaetano: "Ricapitolo da ingegnere: la casa archivia i ricordi che le servono e li tiene in produzione. Cellette, loop, mungitura. Adesso lo sappiamo."
+> Gaetano: "Allora: la casa si tiene i ricordi che le servono e li fa girare senza fermarli mai. Cellette, giri a vuoto, mungitura." *(e si sta già alzando)* "Adesso lo sappiamo. Adesso ce ne serviamo."
 
 > Claudia: "E sappiamo che i suoi archivi si SVUOTANO. L'abbiamo fatto. Più di una volta."
 

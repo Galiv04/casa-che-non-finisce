@@ -280,7 +280,7 @@ Gaetano la apre. Sotto, una scala a pioli scende in un buio che non è vuoto. Si
 
 Gaetano tasta il primo piolo. Il legno è umido, e sotto l'umido è **molle**, come tastare una gengiva. La scala scende per almeno dieci metri, forse molti di più: il buio qui sotto mente sulle distanze.
 
-> Gaetano: "Ragazzi. Parlo da ingegnere: questa calata è OLTRE i margini di sicurezza. Se si scende, si scende legati, in cordata, e piano. E lo dico chiaro, guardandovi in faccia—"
+> Gaetano: "Ragazzi, questa calata è oltre qualunque margine." *(si sta già legando in vita, e lo dice mentre stringe il nodo)* "Quindi scendo io per primo, legato, e da sotto vi dico cosa c'è. Se tiene per me tiene per tutti. Ma si scende in cordata e piano, e questo lo dico guardandovi in faccia—"
 
 Vi guarda in faccia. Uno per uno.
 
@@ -620,7 +620,7 @@ Il Riscossore, riavvolto nell'angolo, apre un occhio solo e ve lo tiene addosso.
 
 E poi Claudia lo vede, e vi fermate tutti. Su una teca in fondo, incastonato nel meccanismo come una batteria, pulsa un **CUORE DI COLORE**. Vivo, caldo, una resurrezione in tasca. E il cavo del Cuore scende dritto dentro la teca: È LUI che tiene acceso il televisorino del sonnambulo là dentro — un signore sulla sessantina, pigiama a righe, che sorride piano al suo programma grigio.
 
-> Gaetano: *(piano, da ingegnere, odiandosi)* "Se lo stacchiamo, la teca si spegne. E lui... si spegne con la teca. Guardate il quadro: non c'è alimentazione di riserva."
+> Gaetano: *(piano, e odiandosi)* "Se lo stacchiamo, la teca si spegne. E lui... si spegne con la teca. Guardate il quadro: non c'è alimentazione di riserva."
 
 > Emanuela: "Quindi il prezzo di una resurrezione dei nostri è... lui."
 

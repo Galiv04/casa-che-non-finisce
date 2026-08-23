@@ -1,12 +1,12 @@
 # 🚪 La Casa che non Finisce
 
+### ▶ [GIOCA ORA](https://galiv04.github.io/casa-che-non-finisce/)
+
 [![Test](https://github.com/Galiv04/casa-che-non-finisce/actions/workflows/test.yml/badge.svg)](https://github.com/Galiv04/casa-che-non-finisce/actions/workflows/test.yml)
 
 > Daniele non risponde da tre giorni. Entrate in casa sua con le chiavi di scorta:
 > la porta sparisce dietro di voi, e dentro la casa non finisce più.
 > Il suo demone, **Eleinad**, colleziona la voglia di vivere — e stanotte vuole la vostra.
-
-**🎮 Gioca subito: https://galiv04.github.io/casa-che-non-finisce/**
 
 Horror interattivo in stile D&D, in italiano, per **1-5 giocatori sullo stesso schermo**
 (più un sesto da salvare — e poi da giocare). Narratore automatico, zero preparazione,

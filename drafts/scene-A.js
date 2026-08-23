@@ -562,7 +562,7 @@ Ma sotto il sarcasmo, il gruppo si è raddrizzato. Perché Gaetano ha fatto la c
 
 Il metro **dà uno strattone**.
 
-Non si incastra: TIRA. Come se all'altro capo qualcosa avesse abboccato. Gaetano, da ingegnere e da idiota — le due cose stasera coincidono — invece di mollare stringe, e il corridoio se lo carica in avanti di due metri buoni, con le suole che fischiano sul parquet.
+Non si incastra: TIRA. Come se all'altro capo qualcosa avesse abboccato. Gaetano, che davanti a una cosa che tira non ha mai saputo mollare — è il difetto che gli fa venire in mente le escursioni belle e fare le figure peggiori — invece di lasciare stringe, e il corridoio se lo carica in avanti di due metri buoni, con le suole che fischiano sul parquet.
 
 > Gaetano: "IL MIO METRO NO! È UNO STANLEY PROFESSIONALE—"
 

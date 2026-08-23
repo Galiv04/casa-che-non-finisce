@@ -10,41 +10,31 @@
 
 const ITEMS = {
   /* --- cure e consumabili --- */
-  kit_emanuela:   { name: 'Kit della borsa Kerastase', desc: 'Garze, cerotti, ago da sutura e una calma da salone pieno il sabato. Ripristina 10 PV.', usable: true, heal: 10,
-    lore: `Non è un kit: è la borsa Kerastase con dentro un altro mondo. Garze sterili, cerotti di tre misure, disinfettante, un ago da sutura curvo nella sua bustina, e una pinzetta che di solito serve alle sopracciglia e stasera no.\n\nEmanuela ha imparato a medicare in un salone: scottature da piastra, tagli da forbice, gente che sviene alla vista del proprio sangue. Ha le mani che non tremano perché il sabato pieno non lo permette.\n\nQuando ti mette le mani addosso non chiede se fa male. Dice quanto dura.` },
+  kit_emanuela:   { name: 'Kit della borsa Kerastase', desc: 'Garze, cerotti, ago da sutura e una calma da salone pieno il sabato. Ripristina 10 PV.', usable: true, heal: 10 },
   lattina_zero:   { name: 'Coca Zero di Daniele', desc: 'Della scorta industriale. Fredda al punto giusto anche quando non dovrebbe. +4 PV e lucidità immediata. Daniele approverebbe. Anzi: pretenderebbe.', usable: true, heal: 4 },
   birra_limone:   { name: 'Birra al limone di Federico', desc: 'Della scorta tattica ("ne servono DIECI al giorno, è scienza"). +3 PV e un rutto di conforto che sfida il Grigiore.', usable: true, heal: 3 },
   ipa_gaetano:    { name: 'IPA di Gaetano', desc: 'Luppolo serio per momenti seri. +4 PV e il coraggio amaro di chi legge le etichette.', usable: true, heal: 4 },
   taralli:        { name: 'Taralli della borsa di Emanuela', desc: 'Dalla borsa Kerastase: il pronto soccorso, il salone di bellezza, e i taralli. +2 PV e un morale insospettabilmente migliore.', usable: true, heal: 2 },
-  tronello:       { name: 'Tronello di riserva', desc: 'Rollato da Natalino con cura liturgica. Troppo prezioso per fumarselo in fretta: la Casa rispetta le cose fatte con amore. "Non è vizio, è MANUTENZIONE."', usable: false,
-    lore: `Sta in una scatolina di latta insieme a due bottoni e a una chiave che non apre niente.\n\nNatalino l'ha fatto sul tavolo di formica con la calma di chi apparecchia, e quando ha finito l'ha guardato un secondo di troppo — quel secondo in cui uno controlla se una cosa fatta a mano è venuta bene.\n\nLa Casa rispetta le cose fatte con amore: è una regola che non ha scritto nessuno e che vale in tutte le stanze. Quello che è stato costruito con attenzione, qui dentro, tiene. Sprecarlo di fretta sarebbe buttarlo via due volte.` },
-  caffe_moka:     { name: 'La moka di Daniele', desc: 'Il caffè di casa sua, nero e VIVO. Ricarica TUTTE le abilità di una persona.', usable: true, recharge: true,
-    lore: `Moka da tre, alluminio, guarnizione cambiata di recente e il manico un po' fuso da una volta che è rimasta sul fuoco.\n\nIl caffè di casa di Daniele si riconosce: lo fa forte e non lo zucchera, e se gli dici che è forte risponde «è caffè». Lo prepara ancora per due tazzine anche quando è solo, per abitudine, e la seconda la lava senza averla usata.\n\nRicarica tutte le abilità di una persona, e non è magia. È che qualcuno, in questa casa, si è alzato e ha messo su il caffè per voi.` },
+  tronello:       { name: 'Tronello di riserva', desc: 'Rollato da Natalino con cura liturgica. Troppo prezioso per fumarselo in fretta: la Casa rispetta le cose fatte con amore. "Non è vizio, è MANUTENZIONE."', usable: false },
+  caffe_moka:     { name: 'La moka di Daniele', desc: 'Il caffè di casa sua, nero e VIVO. Ricarica TUTTE le abilità di una persona.', usable: true, recharge: true },
   gocce_dottore:  { name: 'Le Gocce del Dottore', desc: 'La scorta di Daniele, con la ricetta e la sua grafia sui promemoria. Il dottore sa il fatto suo: +6 PV e scioglie il Grigiore dalle vene.', usable: true, heal: 6, cureVeleno: true },
   boccata_colore: { name: 'Boccata di Colore', desc: 'Una fiala del Mercante: dentro c\'è un tramonto di qualcun altro. Cura il GRIGIORE e scalda il resto (+3 PV).', usable: true, heal: 3, cureVeleno: true },
   cuore_colore:   { name: 'Cuore di Colore', desc: 'Batte. Nella borsa, batte. L\'oggetto più raro della Casa: riporta indietro uno SPIRITO. Uno solo. Sceglietelo bene.', revive: true },
 
   /* --- oggetti da combattimento --- */
   spray_kerastase: { name: 'Spray professionale Kerastase', desc: 'Prodotto di punta, uso improprio: dritto negli occhi (quando ci sono). 1d2 danni e il bersaglio, accecato, attacca con svantaggio.', combat: { distract: true, dice: [1, 2], distractText: ' Lo spray professionale ACCECA: svantaggio al prossimo attacco!' }, icon: '💇' },
-  accendino_bbq:   { name: 'Accendigas della grigliata', desc: 'Quello delle grigliate stile Pasquetta di Gaetano. Una fiamma VERA, calda e viva: 2d4 danni, DOPPI alle cose del Grigiore. Il gas basta per un colpo.', combat: { dice: [2, 4], holy: true }, icon: '🔥',
-    lore: `Un accendigas lungo da barbecue, plastica nera, il grilletto duro e la punta annerita.\n\nViene dalle grigliate di Pasquetta di Gaetano, quelle in cui accende la carbonella con un metodo che lui chiama scientifico e che consiste nel non arrendersi. Il serbatoio è pieno a metà: non l'ha mai ricaricato in vita sua, lo ricompra.\n\nLa fiamma è vera, ed è l'unica cosa nello zaino che fa luce e calore insieme. Le cose del Grigiore non sanno cosa farne: si sono organizzate contro il colore, non contro il fuoco.` },
+  accendino_bbq:   { name: 'Accendigas della grigliata', desc: 'Quello delle grigliate stile Pasquetta di Gaetano. Una fiamma VERA, calda e viva: 2d4 danni, DOPPI alle cose del Grigiore. Il gas basta per un colpo.', combat: { dice: [2, 4], holy: true }, icon: '🔥' },
   lattina_agitata: { name: 'Coca Zero agitata', desc: 'Agitata con odio per trenta secondi. Aperta in faccia: 2d6 danni di schiuma pressurizzata. Daniele NON approverebbe lo spreco. Capirebbe l\'urgenza.', combat: { dice: [2, 6] }, icon: '🥤' },
-  cassa_bluetooth: { name: 'Cassa bluetooth (playlist dell\'estate)', desc: 'La playlist delle vacanze, a tutto volume. La musica VIVA ferma le cose grigie: le piccole si bloccano un giro, le grandi esitano. Un uso: poi la batteria muore.', combat: { calm: true }, icon: '🔊',
-    lore: `Una cassa blu con la gomma spellata sull'angolo, che si accende con un suono da videogioco e prende la carica solo se il cavo sta in un certo modo.\n\nLa playlist è quella: quaranta canzoni scelte in cinque anni di macchine, spiagge e balconi, in ordine sbagliato, con dentro due pezzi che nessuno ammette di aver aggiunto.\n\nLe cose grigie la odiano, e non è per la musica: è che quaranta canzoni scelte in cinque anni sono l'archivio di tutte le sere in cui vi siete divertiti, e il Grigiore non ha niente da opporre a un archivio così. Vi sente cantare male e vi lascia passare.` },
-  pallina_racchettoni: { name: 'La pallina dei racchettoni', desc: 'Servita da Claudia o da Gaetano, è una fucilata che decapita i passanti. 2d8 danni, DOPPI alle cose del Grigiore: non c\'è niente di più VIVO di quel dritto.', combat: { dice: [2, 8], holy: true }, icon: '🎾',
-    lore: `Gomma dura, gialla sbiadita, con una crepa sottile che le fa fare un rumore diverso quando la prendi bene.\n\nClaudia serve piatta e tesa. Gaetano serve alto e con effetto, e ogni due estati litigano su quale sia il modo giusto, e ogni due estati non arrivano a una conclusione perché in mezzo c'è sempre qualcuno che dice di andare in acqua.\n\nContro le cose del Grigiore fa un danno spropositato, e la ragione è la stessa della cassa: questa pallina viene da un pomeriggio in cui nessuno stava pensando a niente. È l'oggetto più felice dello zaino, e la felicità qui dentro taglia.` },
+  cassa_bluetooth: { name: 'Cassa bluetooth (playlist dell\'estate)', desc: 'La playlist delle vacanze, a tutto volume. La musica VIVA ferma le cose grigie: le piccole si bloccano un giro, le grandi esitano. Un uso: poi la batteria muore.', combat: { calm: true }, icon: '🔊' },
+  pallina_racchettoni: { name: 'La pallina dei racchettoni', desc: 'Servita da Claudia o da Gaetano, è una fucilata che decapita i passanti. 2d8 danni, DOPPI alle cose del Grigiore: non c\'è niente di più VIVO di quel dritto.', combat: { dice: [2, 8], holy: true }, icon: '🎾' },
 
   /* --- oggetti chiave --- */
-  chiavi_scorta:   { name: 'Chiavi di scorta di Daniele', desc: 'Ve le diede "per le emergenze". Lanciate in faccia a una cosa grigia fanno 1d4 danni e un bel rumore metallico — il rumore di una porta che si APRE.', combat: { dice: [1, 4], distractText: ' — il tintinnio delle chiavi lo distrae!' }, icon: '🔑',
-    lore: `Due chiavi e un portachiavi di gomma a forma di ananas, di quelli che regalano al mare.\n\n«Per le emergenze», ha detto dandole a Gaetano tre anni fa. Poi ha aggiunto la frase che gli somiglia: «Tanto voi non venite mai.» E ha riso lui per primo, come sempre, per farla passare da battuta.\n\nSono state in un cassetto tre anni. Adesso sono in questa casa, in mano a chi è venuto. Tirate contro una cosa grigia fanno un rumore metallico stupido. Fanno anche un altro rumore, e quello lo sentite solo voi.` },
+  chiavi_scorta:   { name: 'Chiavi di scorta di Daniele', desc: 'Ve le diede "per le emergenze". Lanciate in faccia a una cosa grigia fanno 1d4 danni e un bel rumore metallico — il rumore di una porta che si APRE.', combat: { dice: [1, 4], distractText: ' — il tintinnio delle chiavi lo distrae!' }, icon: '🔑' },
   manuale_annotato: { name: 'Il Manuale Annotato', desc: 'Il Cialdini di Daniele, sottolineato in tre colori. A margine, le sue note: il libretto di istruzioni del nemico, scritto dalla vittima.', usable: false },
-  foto_meta_federico: { name: 'Mezza foto (Federico)', desc: 'Metà di una foto strappata: un bambino su un letto a castello, che ride. Il bordo strappato CERCA l\'altra metà.', usable: false,
-    lore: `Carta lucida, dieci per quindici, di quelle che si sviluppavano al negozio in un'ora.\n\nUn bambino sul letto a castello, piano di sopra, che ride con la bocca aperta e un dente in meno. Maglietta del Napoli di due taglie più grande. Dietro, a penna: agosto 1994.\n\nLo strappo non è un taglio, è uno strappo di mano fatto in fretta, e la carta ha ceduto in diagonale lasciando un bordo che combacia solo con la sua metà. Se avvicini questa metà a qualcosa che non è la sua metà, il bordo si arriccia. Provateci. Si arriccia.` },
-  foto_meta_daniele: { name: 'Mezza foto (Daniele)', desc: 'L\'altra metà: lo stesso letto, lo stesso identico riso. Strappata dal centro, dove le due spalle si toccavano.', usable: false,
-    lore: `L'altra metà. Lo stesso letto a castello, piano di sotto, lo stesso riso identico.\n\n«Identico» è la parola giusta e la parola sbagliata insieme: due bambini diversi che ridono nello stesso momento non ridono uguale — la bocca si apre a modo suo, gli occhi si chiudono a modo suo. Qui sì.\n\nLo strappo passa esattamente dove le due spalle si toccavano. Chi ha strappato questa foto ha mirato lì: non al centro del foglio, al punto in cui erano attaccati. È una cosa che si fa per separare, non per distruggere. E chi separa due bambini che ridono lo fa perché uno dei due, dopo, gli serve da solo.` },
+  foto_meta_federico: { name: 'Mezza foto (Federico)', desc: 'Metà di una foto strappata: un bambino su un letto a castello, che ride. Il bordo strappato CERCA l\'altra metà.', usable: false },
+  foto_meta_daniele: { name: 'Mezza foto (Daniele)', desc: 'L\'altra metà: lo stesso letto, lo stesso identico riso. Strappata dal centro, dove le due spalle si toccavano.', usable: false },
   foto_gemelli:    { name: 'La foto dei gemelli (intera)', desc: 'Ricomposta col nastro adesivo: due gemelli che ridono della STESSA cosa. Mostrata in combattimento, la Casa NON RIESCE a guardarla: 2d4 danni a TUTTI, più il doppio se è roba grigia. Un uso: poi il nastro cede.', combat: { all: true, dice: [2, 4], holy: true, distract: true, distractText: ' — la foto intera li ACCECA di colore!' }, icon: '📸' },
-  d20_daniele:     { name: 'Il d20 di Daniele', desc: 'Dal suo set da gioco di ruolo mai usato ("un giorno li porto a giocare a D&D"). UNA volta, permette di RITIRARE una prova fallita: il gioco ve lo proporrà al momento giusto.', usable: false,
-    lore: `Resina verde coi numeri argentati, da un set di sette dadi che è ancora nella sua scatola di plastica, con la pellicola sopra.\n\nNon l'ha mai tirato. Il set è del 2019: l'ha ordinato una sera, l'ha ritirato al punto di consegna, l'ha messo sulla libreria e ha scritto nel gruppo «un giorno li porto a giocare a D&D». Nessuno ha risposto no. Nessuno ha risposto sì. Il messaggio è ancora là, tre righe sopra un meme sui condizionatori.\n\nSei anni dopo state giocando. Il dado è in mano vostra e Daniele è di sopra. Tiratelo bene: è la prima volta che serve, e a lui la prima volta l'hanno fatta aspettare abbastanza.` },
+  d20_daniele:     { name: 'Il d20 di Daniele', desc: 'Dal suo set da gioco di ruolo mai usato ("un giorno li porto a giocare a D&D"). UNA volta, permette di RITIRARE una prova fallita: il gioco ve lo proporrà al momento giusto.', usable: false },
   conchiglia_gaeta: { name: 'Conchiglia di Gaeta', desc: 'Il rumore del mare VERO, dentro una conchiglia grigia. Portata all\'orecchio di una cosa del Grigiore: 1d6 danni e svantaggio, perché il mare è l\'ultimo colore che resiste. Un uso: poi il suono si spegne.', combat: { dice: [1, 6], holy: true, distract: true, distractText: ' — il mare dentro la conchiglia lo pietrifica!' }, icon: '🐚' },
   joycon_sinistro: { name: 'Il joy-con sinistro', desc: 'Il pezzo mancante della Switch di Daniele. La Casa l\'aveva nascosto nel 1994. I salvataggi non si cancellano: si SOSPENDONO.', usable: false },
   maschera_daniele: { name: 'La maschera di Eleinad', desc: 'Cartapesta grigia col volto di Daniele, caduta quando ha smesso di fingere. Da un lato è una faccia; dall\'altro, lucida, RIFLETTE. Chi la alza davanti al demone gli mostra cos\'è.', usable: false, lore: `Pesa niente. È questo che colpisce: tutto quel terrore, e in mano sono trenta grammi di cartapesta grigia.\n\nDal lato interno, dove ha aderito per settimane a un volto che non era il suo, la superficie si è fatta liscia e lucida come uno specchio da borsetta. Ci si vede benissimo. Ci si vede TROPPO bene: ci si vede come si è, non come si vorrebbe.\n\nEcco perché Eleinad non la indossa più: alla fine, a forza di rubare una faccia, lo specchio guarda anche DENTRO. E là dentro non c'era nessuno.` },
@@ -659,7 +649,7 @@ Ma sotto il sarcasmo, il gruppo si è raddrizzato. Perché Gaetano ha fatto la c
 
 Il metro **dà uno strattone**.
 
-Non si incastra: TIRA. Come se all'altro capo qualcosa avesse abboccato. Gaetano, da ingegnere e da idiota — le due cose stasera coincidono — invece di mollare stringe, e il corridoio se lo carica in avanti di due metri buoni, con le suole che fischiano sul parquet.
+Non si incastra: TIRA. Come se all'altro capo qualcosa avesse abboccato. Gaetano, che davanti a una cosa che tira non ha mai saputo mollare — è il difetto che gli fa venire in mente le escursioni belle e fare le figure peggiori — invece di lasciare stringe, e il corridoio se lo carica in avanti di due metri buoni, con le suole che fischiano sul parquet.
 
 > Gaetano: "IL MIO METRO NO! È UNO STANLEY PROFESSIONALE—"
 
@@ -2582,7 +2572,7 @@ E poi Natalino, che si era chinato a guardare sotto il letto per puro istinto da
 
 Trent'anni di litigio vi passano attraverso in dieci secondi. È come farsi attraversare da una lastra di gennaio.
 
-> Gaetano: *(coi denti che battono)* "Registrato. La stanza si difende. Servono le parole ESATTE, non parole qualunque — o l'occasione giusta."`,
+> Gaetano: *(coi denti che battono)* "Ok. Ok. La stanza si difende, quindi servono le parole ESATTE — non parole qualunque, o il momento giusto." *(si tira su)* "E allora le troviamo."`,
     choices: [
       { text: '🚪 Fuori dalla cameretta, per ora', next: 'u3' },
     ],
@@ -3076,7 +3066,7 @@ Pesa perché all'altro capo c'è ATTACCATO QUALCOSA. Natalino molla la presa un 
     caption: 'Come funziona un Cuore di Colore',
     text: `Gaetano lo esamina alla sua maniera: torcia, controluce, il pollice che preme piano per sentire la consistenza. Il Cuore pulsa — caldo, rosso-arancio-oro — e a ogni battito il buio intorno arretra di un palmo, come una marea al contrario.
 
-> Gaetano: "Ok. Osservazioni. Uno: batte da SOLO, senza un corpo. Quindi non è un organo — è una RISERVA. Il colore compresso di qualcuno, impacchettato così stretto che è diventato materia." *(lo gira, delicatissimo)* "Due: scalda la mano ma non si consuma. E tre — la più importante — guardate cosa fa quando lo avvicino a Emanuela."
+> Gaetano: "Ok, guardate. Batte da SOLO, senza un corpo. Quindi non è un organo, è una RISERVA: il colore compresso di qualcuno, impacchettato così stretto che è diventato materia." *(lo gira, delicatissimo)* "Scalda la mano e non si consuma. E adesso la cosa bella — state a vedere cosa fa quando lo avvicino a Emanuela."
 
 Lo avvicina. Il Cuore accelera. Il battito si sincronizza, in tre secondi netti, con quello di lei.
 
@@ -3173,7 +3163,7 @@ Le porte aspettano, coi loro colori sbagliati. Da qualche parte là sotto, Danie
 
 Vi fermate al centro del corridoio, e per la prima volta lo guardate senza paura: porte coi colori sbagliati, targhette con la grafia rubata a Daniele, ricordi messi in barattolo da una cosa che li mangia. Sapete cosa c'è dietro. Ci siete ENTRATI. E ne siete usciti con le tasche più piene di come eravate entrati.
 
-> Gaetano: "Ricapitolo da ingegnere: la casa archivia i ricordi che le servono e li tiene in produzione. Cellette, loop, mungitura. Adesso lo sappiamo."
+> Gaetano: "Allora: la casa si tiene i ricordi che le servono e li fa girare senza fermarli mai. Cellette, giri a vuoto, mungitura." *(e si sta già alzando)* "Adesso lo sappiamo. Adesso ce ne serviamo."
 
 > Claudia: "E sappiamo che i suoi archivi si SVUOTANO. L'abbiamo fatto. Più di una volta."
 
@@ -3940,7 +3930,7 @@ Gaetano la apre. Sotto, una scala a pioli scende in un buio che non è vuoto. Si
 
 Gaetano tasta il primo piolo. Il legno è umido, e sotto l'umido è **molle**, come tastare una gengiva. La scala scende per almeno dieci metri, forse molti di più: il buio qui sotto mente sulle distanze.
 
-> Gaetano: "Ragazzi. Parlo da ingegnere: questa calata è OLTRE i margini di sicurezza. Se si scende, si scende legati, in cordata, e piano. E lo dico chiaro, guardandovi in faccia—"
+> Gaetano: "Ragazzi, questa calata è oltre qualunque margine." *(si sta già legando in vita, e lo dice mentre stringe il nodo)* "Quindi scendo io per primo, legato, e da sotto vi dico cosa c'è. Se tiene per me tiene per tutti. Ma si scende in cordata e piano, e questo lo dico guardandovi in faccia—"
 
 Vi guarda in faccia. Uno per uno.
 
@@ -4280,7 +4270,7 @@ Il Riscossore, riavvolto nell'angolo, apre un occhio solo e ve lo tiene addosso.
 
 E poi Claudia lo vede, e vi fermate tutti. Su una teca in fondo, incastonato nel meccanismo come una batteria, pulsa un **CUORE DI COLORE**. Vivo, caldo, una resurrezione in tasca. E il cavo del Cuore scende dritto dentro la teca: È LUI che tiene acceso il televisorino del sonnambulo là dentro — un signore sulla sessantina, pigiama a righe, che sorride piano al suo programma grigio.
 
-> Gaetano: *(piano, da ingegnere, odiandosi)* "Se lo stacchiamo, la teca si spegne. E lui... si spegne con la teca. Guardate il quadro: non c'è alimentazione di riserva."
+> Gaetano: *(piano, e odiandosi)* "Se lo stacchiamo, la teca si spegne. E lui... si spegne con la teca. Guardate il quadro: non c'è alimentazione di riserva."
 
 > Emanuela: "Quindi il prezzo di una resurrezione dei nostri è... lui."
 
@@ -5119,7 +5109,7 @@ La forma dentro il bozzolo si piega in avanti, verso di voi, fuori dalla luce de
     caption: 'Il cavo vero — e la casa se ne accorge',
     text: `Gaetano segue i cavi come si segue uno schema elettrico: scarta i finti — troppo puliti, troppo in vista, ESPOSITIVI — e trova, sotto la pedana del trono, mimetizzato tra dodici gemelli identici, l'unico che è CALDO.
 
-> Gaetano: "Eccolo. Alimentazione vera. Gli altri sono scenografia." *(lo afferra con due mani)* "Questo lo stacco di netto. Ingegneria irpina: se non sai cosa fa un cavo, è colpa di chi non l'ha etichettato."
+> Gaetano: "Eccolo. Alimentazione vera. Gli altri sono scenografia." *(lo afferra con due mani)* "Questo lo stacco di netto. Regola di casa mia: se non sai cosa fa un cavo, è colpa di chi non l'ha etichettato."
 
 > Claudia: "Aspetta, se lo stacchi la casa lo sente—"
 
@@ -5194,7 +5184,7 @@ Le dita si fermano. Poi, piano, battono un'ultima cosa — corta, secca, la più
     caption: 'Il circuito del tasto rosso',
     text: `Claudia scatta col telefono in modalità macro — il tasto rosso riempie lo schermo — e passa la foto a Gaetano mentre il Guardiano ancora si srotola.
 
-Gaetano ingrandisce. E ride. Una risata corta, cattiva, da ingegnere che ha appena trovato l'errore nel progetto di un rivale.
+Gaetano ingrandisce. E ride. Una risata corta, cattiva, di uno che ha appena trovato l'errore nel disegno di un altro.
 
 > Gaetano: "Non è collegato."
 
