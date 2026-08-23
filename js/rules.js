@@ -40,8 +40,10 @@ const RULES_HOWTO = `
 <h3>🗣 I Duelli di Parole</h3>
 <p>Il demone di questa casa combatte anche <b>con la retorica</b>: trucchi di persuasione e fallacie logiche. Nei Duelli di Parole non si tira il dado: si <b>ragiona</b>. Leggete il suo discorso, riconoscete il trucco, nominatelo — e l'incantesimo si spezza. Sbagliate, e la manipolazione affonda. Suggerimento: nella Casa c'è un Manuale, annotato da chi il nemico lo conosce meglio di chiunque.</p>
 
-<h3>🎨 Il Colore</h3>
-<p>La valuta della notte: la vostra vitalità. Si <b>guadagna</b> con le scelte vive e coraggiose, si <b>spende</b> dal Mercante Grigio (cure, attrezzi... e la resurrezione). Il Grigiore ve lo vuole succhiare via tutto.</p>
+<h3>🎨 Il Colore — il secondo tentativo</h3>
+<p>La valuta della notte è la vostra vitalità, e serve a <b>una cosa sopra tutte: rifare un tiro andato male</b>. Quando un dado vi tradisce — una prova o un colpo in combattimento — il gioco vi chiede se volete rimetterci del vostro colore: la mano si riscalda, il dado torna in aria, la Casa deve ricontare.</p>
+<p>Il primo ritiro costa <b>2</b>, il secondo <b>3</b>, poi <b>5</b>, poi <b>8</b>: più insistete <i>nella stessa stanza</i> (o nello stesso scontro), più il Grigiore si difende. Cambiate stanza e il prezzo torna a 2. Nello <b>zaino</b> c'è scritto sempre quanto costa il prossimo e quanti ne comprate col saldo di adesso.</p>
+<p>Il Colore si <b>guadagna</b> con le scelte vive e coraggiose (poche, e contano), e si <b>spende</b> anche dal Mercante Grigio: cure, attrezzi, e il 💗 Cuore di Colore. Fate i conti: ogni ritiro è un pezzo di resurrezione in meno.</p>
 
 <h3>🩶 L'Ingrigito</h3>
 <p>Certe cose della Casa vi entrano nelle vene: chi è INGRIGITO ha -2 a prove e attacchi finché non si cura (Gocce del Dottore, Boccata di Colore, o certe scene).</p>
@@ -55,7 +57,7 @@ const RULES_QUICK = `
 <div class="ability-box"><span class="ability-name">⚔ Combattimento</span><div class="ability-desc">A turni: attacco / abilità / oggetto / difesa (+3 CA). A 0 PV si sviene (cura per rialzarsi). Armi VIVIDE = danni doppi alle cose grigie.</div></div>
 <div class="ability-box"><span class="ability-name">⚰️ Morte vera</span><div class="ability-desc">Solo negli snodi segnalati. Il morto resta come SPIRITO 👻: commenta, sblocca scelte segrete, non tira dadi. Torna in vita solo con un 💗 Cuore di Colore.</div></div>
 <div class="ability-box"><span class="ability-name">🗣 Duello di Parole</span><div class="ability-desc">Niente dadi: riconoscete la fallacia del nemico e nominatela. Il Manuale Annotato (e Daniele) aiutano.</div></div>
-<div class="ability-box"><span class="ability-name">🎨 Colore</span><div class="ability-desc">La valuta: si guadagna col coraggio, si spende dal Mercante. La resurrezione costa carissimo.</div></div>
+<div class="ability-box"><span class="ability-name">🎨 Colore</span><div class="ability-desc">Compra il <b>secondo tentativo</b>: un tiro fallito si può RITIRARE pagando 2🎨 (poi 3, 5, 8 se insistete nella stessa stanza; cambiando stanza si torna a 2). Si spende anche dal Mercante — e la resurrezione costa carissimo.</div></div>
 <div class="ability-box"><span class="ability-name">🩶 Ingrigito</span><div class="ability-desc">-2 a tutto finché non vi curate (Gocce del Dottore, Boccata di Colore).</div></div>
 <div class="ability-box"><span class="ability-name">🎮 Daniele</span><div class="ability-desc">Si sblocca giocando: liberatelo, e il sesto eroe è vostro. Il colpo finale spetta a lui.</div></div>
 `;

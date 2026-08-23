@@ -354,6 +354,239 @@ for (const sid of bersagliRitorno) {
 }
 if (!proveRipetibili) { ok(); console.log(`  ✔ ${bersagliRitorno.size} scene rivisitabili, nessuna prova ripetibile`); }
 
+
+/* ---------- se cadete tutti: ripartenza dal checkpoint (ago 2026) ----------
+   Il motore promette due cose: (1) ogni sconfitta finisce in una scena che
+   RIMETTE IN PIEDI il gruppo, (2) dalla seconda caduta nello stesso scontro
+   compare la scelta di tornare all'ultimo checkpoint. Se una delle due non è
+   implementata, la promessa è una bugia: qui si verifica staticamente. */
+section('Ripartenza dal checkpoint (se cadete tutti)');
+
+const engineTxt = readFileSync(join(root, 'js/engine.js'), 'utf8');
+const combatTxt = readFileSync(join(root, 'js/combat.js'), 'utf8');
+let cpProblemi = 0;
+
+// 1. ogni destinazione di sconfitta esiste ed è una scena di recupero (fullHeal)
+const destSconfitta = new Set(Object.values(CAMPAIGN).filter(s => s.combat && s.combat.defeat).map(s => s.combat.defeat));
+for (const d of destSconfitta) {
+  if (!CAMPAIGN[d]) { fail(`scena di sconfitta "${d}" inesistente`); cpProblemi++; continue; }
+  if (!CAMPAIGN[d].fullHeal) {
+    fail(`scena di sconfitta "${d}" non rimette in piedi il gruppo (manca fullHeal: true): il gruppo resterebbe a terra`);
+    cpProblemi++;
+  }
+}
+
+// 2. il motore implementa DAVVERO la ripartenza e la espone
+for (const [frammento, cosa] of [
+  ['function riprendiDaCheckpoint', 'la funzione riprendiDaCheckpoint()'],
+  ['lastCheckpoint', 'lo snapshot G.lastCheckpoint'],
+  ['function registraCaduta', 'il contatore delle cadute registraCaduta()'],
+  ['btn-checkpoint-return', 'la SCELTA visibile di ritorno al checkpoint nelle scene di sconfitta'],
+  ['riprendiDaCheckpoint, registraCaduta, haCheckpoint', 'l\'export di riprendiDaCheckpoint/registraCaduta/haCheckpoint'],
+]) {
+  if (!engineTxt.includes(frammento)) { fail(`js/engine.js: manca ${cosa}`); cpProblemi++; }
+}
+if (!combatTxt.includes('Engine.registraCaduta')) { fail('js/combat.js: defeat() non registra la caduta (Engine.registraCaduta)'); cpProblemi++; }
+
+// 3. lo snapshot deve riavvolgere anche le scene VISITATE, o i flag one-shot si perdono
+if (!/enteredScenes:\s*G\.enteredScenes/.test(engineTxt)) {
+  fail('js/engine.js: lo snapshot del checkpoint non salva enteredScenes → i flag one-shot delle scene già viste non si rimetterebbero mai (soft-lock)');
+  cpProblemi++;
+}
+
+// 4. i flag di CHECKPOINT_FLAGS devono essere impostabili da una scena RAGGIUNGIBILE
+const cpFlags = (readFileSync(join(root, 'js/campaign.js'), 'utf8').match(/const CHECKPOINT_FLAGS\s*=\s*\[([^\]]*)\]/) || [])[1];
+if (cpFlags) {
+  const lista = [...cpFlags.matchAll(/'([a-z_0-9]+)'/g)].map(m => m[1]);
+  for (const f of lista) {
+    const sorgenti = Object.entries(CAMPAIGN).filter(([, s]) => s.sets && s.sets[f]).map(([id]) => id);
+    // "<eroe>_in_squadra" NON passa da scene.sets: lo imposta il motore in unlockHero
+    // (ed è lì che chiama scattaCheckpoint). Vale come sorgente a tutti gli effetti.
+    const daUnlock = /_in_squadra$/.test(f)
+      ? Object.entries(CAMPAIGN).filter(([, s]) => s.unlockHero && s.unlockHero + '_in_squadra' === f).map(([id]) => id)
+      : [];
+    if (daUnlock.length && !engineTxt.includes("scattaCheckpoint(hero.id + '_in_squadra')")) {
+      fail(`CHECKPOINT_FLAGS: "${f}" arriva da unlockHero, ma js/engine.js non chiama scattaCheckpoint lì (checkpoint morto)`);
+      cpProblemi++;
+    }
+    const tutte = [...sorgenti, ...daUnlock];
+    if (!tutte.length) { fail(`CHECKPOINT_FLAGS: "${f}" non è impostato da NESSUNA scena (checkpoint morto)`); cpProblemi++; }
+    else if (!tutte.some(id => reachable.has(id))) { fail(`CHECKPOINT_FLAGS: "${f}" è impostato solo da scene irraggiungibili`); cpProblemi++; }
+  }
+  console.log(`  ✔ ${lista.length} checkpoint (CHECKPOINT_FLAGS), tutti impostabili da scene raggiungibili`);
+} else {
+  console.log('  ℹ nessun CHECKPOINT_FLAGS: il punto di ripartenza è l\'ultima scena di riposo (fullHeal/recharge) visitata');
+}
+
+if (!cpProblemi) { ok(); console.log(`  ✔ ${destSconfitta.size} scene di sconfitta valide (tutte rimettono in piedi il gruppo) e ripartenza dal checkpoint implementata ed esposta`); }
+
+/* ---------- il Colore compra il secondo tentativo (ago 2026) ----------
+   Il committente, giocando: «la valuta non fa nulla». Adesso fa UNA cosa, sempre
+   la stessa: ripaga un dado andato male. Qui si verifica che (1) il motore la
+   implementi ed esponga, (2) il combattimento la offra senza modali, (3) i testi
+   di gioco la spieghino, (4) i numeri annunciati nei testi della campagna siano
+   quelli VERI, e (5) l'economia non sia tornata a gonfiarsi. */
+section('Il Colore compra il secondo tentativo (economia della valuta)');
+
+let colProblemi = 0;
+const rulesTxt = readFileSync(join(root, 'js/rules.js'), 'utf8');
+const readmeTxt = readFileSync(join(root, 'README.md'), 'utf8');
+
+for (const [frammento, cosa, dove, txt] of [
+  ['const RITIRO_COSTI = [2, 3, 5, 8]', 'la scala dei costi del ritiro', 'js/engine.js', engineTxt],
+  ['function costoRitiro(', 'costoRitiro(n)', 'js/engine.js', engineTxt],
+  ['function costoRitiroOra(', 'costoRitiroOra(ctx)', 'js/engine.js', engineTxt],
+  ['function puoiRitirare(', 'puoiRitirare(ctx)', 'js/engine.js', engineTxt],
+  ['function spendiRitiro(', 'spendiRitiro(ctx)', 'js/engine.js', engineTxt],
+  ['function ritiriDisponibili(', 'ritiriDisponibili(ctx)', 'js/engine.js', engineTxt],
+  ['function guadagnaColore(', 'guadagnaColore(n) — l\'unico punto in cui il Colore cresce', 'js/engine.js', engineTxt],
+  ['goldEarned', 'la statistica del Colore RACCOLTO (G.stats.goldEarned)', 'js/engine.js', engineTxt],
+  ['btn-reroll-yes', 'il bottone del d20 di Daniele', 'js/engine.js', engineTxt],
+  ['btn-colore-yes', 'il bottone del ritiro pagato in Colore (prove di scena)', 'js/engine.js', engineTxt],
+  ['btn-reroll-no', 'il bottone per accettare il fato', 'js/engine.js', engineTxt],
+  ['costoRitiroOra, puoiRitirare, spendiRitiro, ritiriDisponibili', 'l\'export delle funzioni del ritiro', 'js/engine.js', engineTxt],
+  ['A che serve il Colore', 'la spiegazione della valuta nello ZAINO (HUD)', 'js/engine.js', engineTxt],
+  ['btn-colore-combat', 'il bottone del ritiro DENTRO il combattimento', 'js/combat.js', combatTxt],
+  ['Engine.spendiRitiro', 'lo scalo del costo nel combattimento', 'js/combat.js', combatTxt],
+  ['Lascia perdere', 'l\'uscita "Lascia perdere" del menu di ritiro', 'js/combat.js', combatTxt],
+  ['Engine.guadagnaColore', 'il loot di combattimento contato in goldEarned', 'js/combat.js', combatTxt],
+  ['secondo tentativo', 'la spiegazione del Colore nelle regole in gioco', 'js/rules.js', rulesTxt],
+  ['secondo tentativo', 'la riga della valuta nel README', 'README.md', readmeTxt],
+]) {
+  if (!txt.includes(frammento)) { fail(`${dove}: manca ${cosa}`); colProblemi++; }
+}
+// il combattimento NON deve aprire modali: il bot headless (e il giocatore) là dentro
+// guardano solo #combat-actions
+if (/modal-generic/.test(combatTxt)) { fail('js/combat.js usa modal-generic: dentro il combattimento i bottoni vanno in #combat-actions'); colProblemi++; }
+// la valuta della Casa è il Colore, non le monete
+if (/monete/.test(engineTxt)) { fail('js/engine.js parla di "monete": qui la valuta è il Colore 🎨'); colProblemi++; }
+
+/* 1. i NUMERI annunciati dai testi devono essere quelli veri (LESSON #10:
+      le promesse nel testo sono contratti). Un testo che dice "+2 Colore" mentre
+      i dati ne danno 1 è una bugia detta al tavolo. */
+const RE_CLAIM = /🎨\s*(?:Colore\s*)?([+\-−]?)\s*(\d+)|([+\-−]?)\s*(\d+)\s*(?:🎨|di Colore\b)|Colore\s*([+\-−])\s*(\d+)/g;
+function claimsDi(testo) {
+  const out = [];
+  RE_CLAIM.lastIndex = 0;
+  let m;
+  while ((m = RE_CLAIM.exec(testo || ''))) {
+    const segno = m[1] || m[3] || m[5] || '+';
+    const n = parseInt(m[2] || m[4] || m[6], 10);
+    out.push({ v: (segno === '-' || segno === '−') ? -n : n, raw: m[0] });
+  }
+  return out;
+}
+// per ogni scena: i valori che il suo testo PUÒ legittimamente annunciare
+const fontiColore = {};
+for (const id of Object.keys(CAMPAIGN)) fontiColore[id] = new Set();
+for (const [id, s] of Object.entries(CAMPAIGN)) {
+  if (s.gold) fontiColore[id].add(s.gold);
+  if (s.goldLoss) fontiColore[id].add(-s.goldLoss).add(s.goldLoss); // la perdita si scrive "-2" o "2 🎨 di Colore"
+  if (s.combat && s.combat.loot && s.combat.loot.gold) fontiColore[id].add(s.combat.loot.gold);
+  for (const c of (s.choices || [])) {
+    if (c.requiresGold) fontiColore[id].add(c.requiresGold);
+    if (c.gold) {
+      fontiColore[id].add(c.gold);
+      // una scelta annuncia il suo guadagno anche nella scena di DESTINAZIONE
+      for (const d of [c.next, c.check && c.check.success, c.check && c.check.fail]) {
+        if (d && fontiColore[d]) fontiColore[d].add(c.gold);
+      }
+    }
+  }
+}
+let bugieColore = 0;
+for (const [id, s] of Object.entries(CAMPAIGN)) {
+  for (const c of claimsDi(s.text)) {
+    if (!fontiColore[id].has(c.v)) {
+      fail(`scena "${id}": il testo annuncia ${c.v > 0 ? '+' : ''}${c.v} di Colore («${c.raw.trim()}») ma i dati non lo prevedono`);
+      bugieColore++;
+    }
+  }
+  for (const ch of (s.choices || [])) {
+    for (const c of claimsDi(ch.text)) {
+      const dest = [ch.next, ch.check && ch.check.success, ch.check && ch.check.fail].filter(Boolean);
+      const ok = (ch.requiresGold === c.v) || (ch.gold === c.v) || (ch.gold === -c.v) ||
+        dest.some(d => CAMPAIGN[d] && (CAMPAIGN[d].gold === c.v || (CAMPAIGN[d].minigame &&
+          [CAMPAIGN[d].minigame.success, CAMPAIGN[d].minigame.fail].some(x => CAMPAIGN[x] && CAMPAIGN[x].gold === c.v))));
+      if (!ok) { fail(`scena "${id}": la SCELTA «${ch.text.slice(0, 44)}…» annuncia ${c.v}🎨 che i dati non danno`); bugieColore++; }
+    }
+  }
+}
+if (!bugieColore) { ok(); console.log('  ✔ ogni numero di Colore annunciato nei testi corrisponde al dato (nessuna promessa a vuoto)'); }
+
+/* 2. l'economia: il Colore disponibile in TUTTA la campagna deve valere pochi
+      ritiri, o la valuta si satura e torna decorativa (LESSON: 15, seconda tornata). */
+let colTot = 0, colSiti = 0, spendite = 0;
+for (const s of Object.values(CAMPAIGN)) {
+  if (s.gold > 0) { colTot += s.gold; colSiti++; }
+  if (s.combat && s.combat.loot && s.combat.loot.gold > 0) { colTot += s.combat.loot.gold; colSiti++; }
+  for (const c of (s.choices || [])) {
+    if (c.gold > 0 && c.requiresGold == null) { colTot += c.gold; colSiti++; }
+    if (c.requiresGold != null) spendite++;
+  }
+}
+console.log(`  ℹ Colore in tutta la campagna: ${colTot} su ${colSiti} occasioni · ${spendite} acquisti dal Mercante · il ritiro costa 2/3/5/8`);
+if (colTot > 110) { fail(`INFLAZIONE: ${colTot} di Colore disponibili nella campagna (con ritiri da 2🎨 la valuta si satura: tenere ≤110)`); colProblemi++; }
+if (colTot < 30) { fail(`il Colore è troppo raro (${colTot} in tutta la campagna): il secondo tentativo diventa irraggiungibile`); colProblemi++; }
+// il Cuore di Colore deve restare comprabile: paga la morte del gruppo in combattimento
+{
+  const prezzi = Object.values(CAMPAIGN).flatMap(s => (s.choices || []).filter(c => c.item === 'cuore_colore' && c.requiresGold).map(c => c.requiresGold));
+  if (!prezzi.length) { fail('il Cuore di Colore non è più acquistabile da nessuna parte (paga la morte in combattimento: deve restare comprabile)'); colProblemi++; }
+  else console.log(`  ℹ il 💗 Cuore di Colore dal Mercante: ${prezzi.join('🎨 / ')}🎨 + il tronello (caro, ma raggiungibile)`);
+}
+if (!colProblemi) { ok(); console.log('  ✔ ritiro implementato nel motore e nel combattimento, spiegato nello zaino, nelle regole e nel README'); }
+
+
+/* ---------- densità: la metrica GIUSTA ---------- */
+section('Densità (nodi di decisione, non scene)');
+
+/* Storia di questa sezione: la soglia della serie era "corridoi ≤15%", dove corridoio
+   = scena con una sola scelta. Misurandola sui cinque giochi è venuto fuori che
+   Casa stava al 27% e Relais al 20% — ma leggendo le scene, quasi tutte erano BATTUTE:
+   sotto-scene che chiudono un momento, cioè buona scrittura. Inseguire quel numero
+   porta ad aggiungere seconde scelte finte, che è esattamente il difetto peggiore
+   della serie. Quindi la metrica è cambiata, e misura due cose che contano davvero:
+
+   1. SCELTE PER NODO DI DECISIONE: la media sulle sole scene con ≥2 scelte. È quanto
+      è ricca una decisione quando il gioco te ne offre una. Soglia: ≥2.2.
+   2. CORRIDOI STERILI: scene con una sola scelta E nessun effetto (niente item, sets,
+      check, cure, danni, valuta, combat, minigioco, finale). Quelle sì sono
+      riempitivo. Soglia: 0, o pochissime e giustificate.
+
+   Il numero grezzo di corridoi resta stampato, ma come informazione, non come voto. */
+{
+  const idsTot = Object.keys(CAMPAIGN);
+  const CAMBIA_SCENA = ['item', 'item2', 'sets', 'heal', 'damage', 'gold', 'goldLoss',
+    'fullHeal', 'recharge', 'attenzione', 'unlockHero', 'freeAll', 'reviveAll',
+    'killRoller', 'poisonRoller', 'captureRoller'];
+  const CAMBIA_SCELTA = ['item', 'item2', 'sets', 'check', 'heal', 'damage', 'gold',
+    'goldLoss', 'removeItem', 'removeItem2', 'sacrifice', 'requiresGold'];
+  let scelteTot = 0, nodi = 0, scelteNodi = 0, corridoi = 0;
+  const sterili = [];
+  for (const [id, s] of Object.entries(CAMPAIGN)) {
+    const ch = s.choices || [];
+    scelteTot += ch.length;
+    if (ch.length >= 2) { nodi++; scelteNodi += ch.length; continue; }
+    if (ch.length !== 1) continue;
+    corridoi++;
+    const cambiaScena = CAMBIA_SCENA.some(k => s[k] !== undefined && s[k] !== false && s[k] !== 0);
+    const c = ch[0] || {};
+    const cambiaScelta = CAMBIA_SCELTA.some(k => c[k] !== undefined && c[k] !== false && c[k] !== 0);
+    if (!cambiaScena && !cambiaScelta && !s.combat && !s.minigame && !s.ending) sterili.push(id);
+  }
+  const perNodo = nodi ? scelteNodi / nodi : 0;
+  console.log(`  ℹ ${idsTot.length} scene · ${nodi} nodi di decisione (${Math.round(nodi / idsTot.length * 100)}%) · ${corridoi} scene-battuta con una sola uscita`);
+  console.log(`  ℹ scelte per scena: ${(scelteTot / idsTot.length).toFixed(2)} (numero diluito dalle battute) · scelte per NODO: ${perNodo.toFixed(2)}`);
+  if (perNodo < 2.2) fail(`solo ${perNodo.toFixed(2)} scelte per nodo di decisione: quando il gioco offre una scelta, deve offrirne almeno 2,2 in media`);
+  else ok();
+  if (sterili.length) {
+    for (const id of sterili) warn(`corridoio STERILE "${id}": una sola uscita e nessun effetto — o gli si dà un effetto, o gli si dà una seconda azione vera, o si fonde con la scena accanto`);
+    if (sterili.length > Math.max(3, Math.round(idsTot.length * 0.02))) {
+      fail(`${sterili.length} corridoi sterili su ${idsTot.length} scene: è riempitivo, non ritmo`);
+    }
+  } else { ok(); console.log('  ✔ nessun corridoio sterile: ogni scena con una sola uscita cambia comunque qualcosa'); }
+}
+
 /* ---------- esito ---------- */
 console.log('\n' + '═'.repeat(50));
 if (failures === 0) {

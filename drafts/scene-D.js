@@ -1,12 +1,33 @@
-/* ============ LA CASA CHE NON FINISCE — BLOCCO D ============
-   LA CUCINA FREDDA E IL SOTTOSCALA (pista k*, dall'hub h1)
-   Dà: i segnali di Daniele · il Mercante Grigio · la Galleria dei
-   Sonnambuli · il Segreto del Trono · una morte vera (la calata) ·
-   Luca Giunti (mini-boss) · un Cuore di Colore trovabile.       */
-
 const SCENE_D = {
 
   /* ==================== LA CUCINA FREDDA ==================== */
+
+
+  k15_occhio: {
+    location: 'cucina_fredda',
+    caption: 'L\'occhio nel pozzetto',
+    text: `Prima di richiudere il coperchio, Federico fa la cosa che nessun manuale consiglia: si china sul pozzetto e guarda l'occhio di pesce DRITTO, da vicino, senza sbattere le palpebre.
+
+L'occhio lo fissa. Federico lo fissa. Il freezer ronza.
+
+E poi l'occhio fa una cosa che gli occhi di pesce non fanno: **si sposta.** Non verso Federico — OLTRE Federico, verso il soffitto, verso l'angolo della cucina, e poi di nuovo su Federico, e poi ANCORA verso l'angolo. Due volte. Tre volte. Insistente.
+
+> Federico: "...mi sta indicando qualcosa."
+
+> Claudia: "O ti sta prendendo in giro. È carne riorganizzata, Federico."
+
+> Federico: "No, no. Questo è il gesto che fai quando non puoi parlare e vuoi che uno si VOLTI. Me lo fanno i clienti nelle riunioni, quando alle mie spalle il capo sta dicendo una stronzata."
+
+Vi voltate. Nell'angolo indicato, in alto, dove il muro incontra il soffitto, c'è una **crepa sottile** — e dalla crepa filtra un filo di luce COLORATA. Verde, caldo, vivo. Luce che in questa cucina non dovrebbe esistere.
+
+> Federico: *(richiudendo il pozzetto, piano, quasi con gratitudine)* "Il blocco è fatto di spesa VERA. Di cose che erano vive. E le cose vive, pure ridotte così..." *(dà due colpetti sul coperchio)* "...tifano per noi. Grazie, capo. La stronzata l'abbiamo vista."
+
+**(C'è luce viva dietro una crepa della cucina — e perfino il mostro nel freezer sta dalla vostra parte.)**`,
+    sets: { occhio_pozzetto: true },
+    choices: [
+      { text: '🚪 Richiudere il pozzetto e tornare alla cucina', next: 'k1' },
+    ],
+  },
 
   k1: {
     location: 'cucina_fredda',
@@ -29,8 +50,7 @@ Poi Gaetano vede il ripiano centrale, e per un secondo nessuno respira. Dodici l
 
 Da qualche parte, in fondo alla cucina, un citofono comincia a suonare. In una casa che non ha più una porta d'ingresso.
 
-**(🎨 +1 Colore: Daniele sta combattendo, e adesso lo sapete.)**`,
-    gold: 1,
+**(Daniele sta combattendo, e adesso lo sapete.)**`,
     sets: { daniele_sabota: true },
     choices: [
       { text: '🥤 Seguire la freccia di lattine fino alla dispensa', next: 'k3' },
@@ -60,10 +80,34 @@ Venerdì. **Tre giorni fa.** L'aveva fatta per voi. Poi ha aperto la porta sbagl
 
 La mangiate in piedi, al freddo, con le mani. È la cosa più buona che abbiate mai mangiato in vita vostra.
 
-**(+4 PV a tutti. 🎨 +1 Colore. Nessuno lascia indietro Daniele. NESSUNO.)**`,
+**(+4 PV a tutti. Nessuno lascia indietro Daniele. NESSUNO.)**`,
     heal: 4,
-    gold: 1,
     sets: { parmigiana_daniele: true },
+    choices: [
+      { text: '🥤 Ora la freccia di lattine. Fino in fondo.', next: 'k3' },
+      { text: '📝 Il post-it: girarlo — c\'è scritto qualcosa anche dietro', once: true, next: 'k1d' },
+    ],
+  },
+
+  k1d: {
+    location: 'cucina_fredda',
+    caption: 'Il retro del post-it',
+    sets: { postit_retro: true },
+    text: `Claudia gira il post-it. Sul retro c'è la stessa grafia, ma più veloce: scritta dopo, di corsa, con la penna premuta così forte da bucare la carta in due punti.
+
+*"Se leggete questo, io non sono in cucina. TAPPETO. →↓"*
+
+Una freccia a destra. Poi una freccia in GIÙ.
+
+> Federico: "Che cazzo vuol dire 'tappeto giù'—"
+
+> Gaetano: *(già in ginocchio, che tira il tappeto per un angolo)* "Vuol dire che sotto il tappeto c'è una BOTOLA. E che tuo fratello l'ha trovata prima di noi. E che ce l'ha lasciata aperta."
+
+Sotto il tappeto: una fessura quadrata nel pavimento, i bordi sporchi di ditate. Chiusa. Ma non chiusa a chiave.
+
+> Claudia: *(rimette il post-it in tasca, dal lato della parmigiana)* "Ha scritto la cena davanti e le istruzioni dietro. Prima ci ha nutriti, poi ci ha dato la mappa. In quest'ordine. Tipico suo."
+
+**(Sotto il tappeto c'è una botola, e Daniele ve l'ha segnata sul retro di un post-it.)**`,
     choices: [
       { text: '🥤 Ora la freccia di lattine. Fino in fondo.', next: 'k3' },
     ],
@@ -91,6 +135,7 @@ Sul pavimento, davanti alla dispensa, le lattine sembrano quasi impazienti.
     damage: 3,
     choices: [
       { text: '🥤 Basta frigo. Seguite la freccia.', next: 'k3' },
+      { text: '🩹 Emanuela: prima fasciare il braccio, poi camminare', once: true, heal: 1, next: 'k3' },
     ],
   },
 
@@ -136,7 +181,7 @@ Apre lo zaino. I fogli a quadretti sciamano fuori come vespe: esercizi in bianco
 > Claudia: "Gaetano, amore: stavolta la verifica gliela facciamo NOI."
 
 **(Combattimento! Luca Giunti attacca con richieste all'ultimo minuto, esercizi mai fatti e "me lo rispiega?" a raffica.)**`,
-    combat: { enemies: ['luca_giunti'], victory: 'k2c', defeat: 'k_ko' },
+    combat: { enemies: ['luca_giunti'], victory: 'k2c', defeat: 'k_ko', loot: { gold: 1, items: ['taralli'] } },
     choices: [],
   },
 
@@ -160,9 +205,34 @@ Sorride. E si dissolve così, sorridendo, promosso, libero.
 
 > Federico: "Gaetano ha appena sconfitto un demone COL MOTO ARMONICO. Io questa la racconto ai matrimoni."
 
-**(🎨 +2 Colore: insegnare bene una cosa sola vale più di quattro ore.)**`,
-    gold: 2,
+**(🎨 +1 Colore: insegnare bene una cosa sola vale più di quattro ore.)**`,
+    gold: 1,
     sets: { luca_promosso: true },
+    choices: [
+      { text: '🥤 Tornare alla freccia di lattine', next: 'k1' },
+      { text: '📐 Il libro di fisica: Gaetano lo sfoglia e trova un esercizio svolto DA DANIELE', once: true, next: 'k2d' },
+    ],
+  },
+
+  k2d: {
+    location: 'cucina_fredda',
+    caption: 'L\'esercizio a matita — pagina 214',
+    sets: { esercizio_daniele: true },
+    text: `Il libro di fisica di Luca Giunti resta per terra, aperto. Gaetano lo raccoglie per deformazione professionale — e si blocca a pagina 214. Moti armonici. Esercizio 7.
+
+È svolto. A matita, nel margine larghissimo, con una grafia che Federico riconosce prima ancora di leggerla.
+
+*"Molla, k = 40 N/m, massa 0,5 kg. T = 2π√(m/k) ≈ 0,70 s."* E sotto, più piccolo, completamente fuori tema: *"cioè torna al punto di partenza ogni sette decimi di secondo. Per sempre. Senza stancarsi. VOGLIO ESSERE UNA MOLLA."*
+
+> Gaetano: *(che questa pagina l'ha spiegata duecento volte e non l'aveva mai letta così)* "Non è un esercizio. È uno che ha capito la formula e poi ci ha messo dentro se stesso. E il passaggio è pure GIUSTO, il che è la parte che mi commuove professionalmente."
+
+> Federico: "Quando l'ha scritto?"
+
+> Gaetano: "Non c'è la data. Ma la matita è mia: è una di quelle che lasciavo a casa sua quando gli spiegavo statistica." *(chiude il libro, piano)* "Quindi anni fa. Quindi già allora si allenava a tornare."
+
+> Emanuela: "Allora ce lo riprendiamo, che deve tornare a rompere il cazzo sulle molle."
+
+**(Un esercizio svolto a matita, e una nota fuori tema che vale più della soluzione.)**`,
     choices: [
       { text: '🥤 Tornare alla freccia di lattine', next: 'k1' },
     ],
@@ -233,15 +303,15 @@ Il buio, sotto, inspira. Ed espira. La lucina da campeggio, lontanissima, fa un 
     killRoller: true,
     text: `Il terzo piolo regge. Il quarto regge. Il quinto **cede** — non si spezza: si RITRAE, come una lingua che rientra in bocca — e la cordata di tovaglie si tende con uno schiocco da frusta.
 
-Per un secondo tiene. Sentite il peso dell'amico appeso nel buio, lo sentite nelle braccia e nella schiena, e state già tirando su, state URLANDO e tirando su—
+Per un secondo tiene. Sentite il peso dell'amico appeso nel buio, nelle braccia e nella schiena, e state già tirando su, URLANDO e tirando su—
 
 Poi il buio tira dall'altra parte. Ed è più forte.
 
-Il nodo non si scioglie: si APRE, con gentilezza, come slacciato da dita pazienti. E il rumore che fa un amico che cade nel buio che respira è questo: un fruscio, un colpo lontano, umido. E poi il silenzio. Il buio smette di respirare per un momento, come chi trattiene il fiato per assaporare.
+Il nodo non si scioglie: si APRE, con gentilezza, come slacciato da dita pazienti. E il rumore che fa un amico che cade nel buio è questo: un fruscio, un colpo lontano, umido. Poi il silenzio. Il buio smette di respirare, come chi trattiene il fiato.
 
 Nessuno si muove. Nessuno bestemmia. C'è solo il bordo della botola, le tovaglie flosce, e il vapore dei vostri fiati.
 
-Poi dal buio sale una luce fredda, piccola, che risale la scala **senza toccare i pioli**. È l'amico. È il suo Spirito: trasparente, calmo, con addosso una luce da vecchia TV. Vi guarda dalla scala. Sa. E la faccia di chi resta — quella è la cosa peggiore che la casa vi abbia fatto finora.
+Poi dal buio sale una luce fredda, piccola, che risale la scala **senza toccare i pioli**. È l'amico. Il suo Spirito: trasparente, calmo, con addosso una luce da vecchia TV. Vi guarda dalla scala. Sa. E la faccia di chi resta — quella è la cosa peggiore che la casa vi abbia fatto finora.
 
 > Lo Spirito: "...ok. Ok, niente panico. Sono io, sono qui, e vi giuro che fa meno male di quanto sembra. Il problema è che DA QUI si vedono un sacco di cose, e voi dovete scendere lo stesso. Quindi asciugatevi la faccia, rifate quei nodi DECENTEMENTE... e finiamola, questa storia. Per me."
 
@@ -277,6 +347,31 @@ La tirate fuori a forza mentre lo sportello le morde l'aria dietro i talloni. Il
   },
 
   /* ==================== IL SOTTOSCALA ==================== */
+
+
+  k11_oblo: {
+    location: 'sottoscala',
+    caption: 'Dentro gli oblò, da fermi',
+    text: `Vi avvicinate agli oblò adesso che i giorni sono fermi, e guardate dentro come si guarda in un acquario spento.
+
+Ogni lavatrice conteneva un giorno intero, e adesso che non gira più si vede COSA c'era nel carico: la scrivania col post-it "URGENTE" mai staccato. Il divano con l'incavo a forma di persona. La sveglia puntata alle 7:15 di un giorno che non è mai arrivato alle 7:16. Un giorno per oblò, identico a se stesso, piegato e ripiegato da anni di centrifuga.
+
+Ma nell'ultimo oblò, il carico è diverso. Non c'è un giorno: c'è **un calendario.** Da tavolo, di quelli con la spirale. E ha una cosa che nessun altro oggetto del sottoscala ha: una pagina STRAPPATA. Via, di netto — il 17 del mese non c'è più.
+
+> Emanuela: "Qualcuno, in mezzo al ciclo, ha strappato UN giorno ed è scappato."
+
+> Gaetano: "O l'ha nascosto. Un giorno intero, sottratto alla centrifuga. Se la casa ricicla i giorni..." *(si china, e sotto la lavatrice, nella polvere, c'è dell'inchiostro: qualcuno ci ha scritto, a mano, dal basso)* "...c'è scritto qualcosa. 'IL 17 È MIO. NON È IN VENDITA. — D.'"
+
+Silenzio lungo.
+
+> Natalino: *(piano)* "D. Il 17. Ragazzi... Daniele è nato il 17. La casa gli macinava i giorni, e lui gliene ha strappato UNO. Il suo."
+
+**(Perfino qui sotto, Daniele ha lasciato un segno di resistenza. Il suo compleanno non si tocca.)**`,
+    sets: { oblò_ispezionati: true },
+    choices: [
+      { text: '🚶 Risalire, col diciassette in tasca come una bandiera', next: 'k5' },
+    ],
+  },
 
   k5: {
     location: 'sottoscala',
@@ -315,22 +410,104 @@ Indossa un gilet da ferramenta, con le taschine piene di cacciaviti, e questo è
 
 > Il Mercante: "Guardate pure, toccate no. Io compro e vendo l'unica valuta che conta: il **COLORE**. Voi ne avete addosso — si sente, profumate come un'estate — e io ho merce che di sopra non trovate. Facciamo affari?"
 
-Sul banco, sotto una campana di vetro, una cosa che pulsa piano di tutti i colori insieme: un **CUORE DI COLORE**. Il cartellino: *"Resurrezione. Un'anima intera, riaccesa. Prezzo: 12 di Colore E un oggetto del cuore."* Il Mercante segue il vostro sguardo.
+Sul banco, sotto una campana di vetro, una cosa che pulsa piano di tutti i colori insieme: un **CUORE DI COLORE**. Il cartellino: *"Resurrezione. Un'anima intera, riaccesa. Prezzo: 8 di Colore E un oggetto del cuore."* Il Mercante segue il vostro sguardo.
 
 > Il Mercante: "Ah, quello. Quello ripaga i morti, sì. Ma il Colore da solo non basta: serve un oggetto rollato, cucito, comprato CON AMORE. L'affetto fatto a mano, qui sotto, vale oro." *(gli occhi — tutti — puntano il taschino di Natalino)* "Quel tronello, per esempio. Liturgia pura. Lo sento da qui."
 
 > Natalino: "Il tronello no. IL TRONELLO NO."`,
     choices: [
-      { text: '🎨 Boccata di Colore — "un sorso d\'estate, cura il Grigiore" (3🎨)', requiresGold: 3, gold: -3, item: 'boccata_colore' },
-      { text: '🥤 Coca Zero "d\'annata" — "del suo lotto. Lui capirebbe." (2🎨)', requiresGold: 2, gold: -2, item: 'lattina_zero' },
-      { text: '🧨 Lattina agitata — "arma da lancio. Non chiedete." (2🎨)', requiresGold: 2, gold: -2, item: 'lattina_agitata' },
-      { text: '🔊 Cassa bluetooth con la playlist dell\'estate — "le cose grigie la ODIANO" (4🎨)', requiresGold: 4, gold: -4, item: 'cassa_bluetooth' },
-      { text: '💗 ⚠️ CUORE DI COLORE — 12🎨 E il tronello di Natalino. Una vita intera.', requires: { item: 'tronello' }, requiresGold: 12, gold: -12, removeItem: 'tronello', item: 'cuore_colore', once: true },
-      { text: '💗 CUORE DI COLORE, prezzo da colleghi — 8🎨 E il tronello. "Lo sconto è sconto." ', once: true, requires: { flag: 'sconto_mercante', item: 'tronello' }, requiresGold: 8, gold: -8, removeItem: 'tronello', item: 'cuore_colore' },
+      { text: '🎨 Boccata di Colore — "un sorso d\'estate, cura il Grigiore" (2🎨)', requiresGold: 2, gold: -2, item: 'boccata_colore' },
+      { text: '🥤 Coca Zero "d\'annata" — "del suo lotto. Lui capirebbe." (1🎨)', requiresGold: 1, gold: -1, item: 'lattina_zero' },
+      { text: '🧨 Lattina agitata — "arma da lancio. Non chiedete." (1🎨)', requiresGold: 1, gold: -1, item: 'lattina_agitata' },
+      { text: '🔊 Cassa bluetooth con la playlist dell\'estate — "le cose grigie la ODIANO" (3🎨)', requiresGold: 3, gold: -3, item: 'cassa_bluetooth' },
+      { text: '💗 ⚠️ CUORE DI COLORE — 8🎨 E il tronello di Natalino. Una vita intera.', requires: { item: 'tronello' }, requiresGold: 8, gold: -8, removeItem: 'tronello', item: 'cuore_colore', once: true },
+      { text: '💗 CUORE DI COLORE, prezzo da colleghi — 5🎨 E il tronello. "Lo sconto è sconto." ', once: true, requires: { flag: 'sconto_mercante', item: 'tronello' }, requiresGold: 5, gold: -5, removeItem: 'tronello', item: 'cuore_colore' },
       { text: '🗣 "Il Divano-Trono. Cosa sai del Trono?" — pagare con una storia vera', next: 'k7' },
       { text: '🧰 "Cercate manodopera?" — il Mercante ha l\'aria di uno coi crediti in sospeso', once: true, next: 'k12' },
+      { text: '🧮 "Le torna l\'inventario?" — il Mercante paga chi sa contare (paga 2🎨) — 🎮 MINIGIOCO', once: true, next: 'mg_inventario' },
       { text: '🕶 Fregarlo. Una boccata sparisce dal banco mentre Claudia lo distrae.', once: true, tag: 'Prova di Destrezza — CD 13', check: { stat: 'DES', dc: 13, success: 'k7b', fail: 'k7b_fail' } },
+      { text: '👁 Il Mercante ha smesso di sorridere. Sostenere lo sguardo.', requires: { flag: 'furto_riuscito', notFlag: 'furto_a_libro' }, next: 'k6_furto' },
       { text: '🚶 Lasciare il banco: più avanti l\'intercapedine si allarga in una sala', next: 'k8' },
+    ],
+  },
+
+  k6_furto: {
+    location: 'mercante',
+    caption: 'Il conto del collega',
+    sets: { furto_a_libro: true },
+    text: `Tornate al banco e il Mercante non dice niente. È questo, il problema.
+
+Ha smesso di sorridere con generosità eccessiva. Ha rimesso la bilancia in bolla — dritta, perfetta, un rimprovero di ottone — e adesso vi guarda. TUTTA la faccia insieme, tutti gli occhi distribuiti male, fermi su di voi come una batteria di fari.
+
+> Il Mercante: "Ammiro il mestiere. Sinceramente." *(la voce è cordiale e non c'entra niente col resto della faccia)* "Rubare a chi ruba è la forma più pura di rispetto professionale. Dentro di me vi ho applaudito."
+
+> Claudia: "E fuori?"
+
+> Il Mercante: "Fuori tengo i libri." *(apre il quadernone unto a una pagina nuova e ci scrive due righe a matita, senza guardare)* "Una Boccata. Segnata a debito, con la data di stanotte. Non vi mando il Riscossore, tesori: siete colleghi." *(chiude il quaderno con un colpo secco)* "Vi mando la FATTURA. Prima o poi. Quando vi fa più male."
+
+> Natalino: *(a denti stretti, allontanandosi)* "Che è peggio del Riscossore."
+
+> Gaetano: "Molto peggio. Il Riscossore arriva e finisce. Una fattura aperta te la porti in giro."
+
+**(Il furto è a libro contabile, con la data di stanotte. Il Mercante non vi odia: vi ha ARCHIVIATI.)**`,
+    choices: [
+      { text: '↩ Tornare al banco e fare come se niente fosse', next: 'k6' },
+    ],
+  },
+
+
+  mg_inventario: {
+    location: 'mercante',
+    caption: 'L\'inventario del Mercante',
+    text: `Il Mercante tira fuori un quadernone unto, pieno di colonne che non tornano da anni.
+
+> Il Mercante: "Il Grigiore non sa contare. Sorprendente, eh? Sa TOGLIERE, ma i totali li sbaglia. Se mi chiudete quattro conti su cinque, tre Colore sono vostri. Se sbagliate... be', avrò riso gratis, che quaggiù non è poco."
+
+*(🎮 MINIGIOCO — L'Inventario: cinque conti a tempo, si risponde ad alta voce tutti insieme. Ne servono quattro.)*`,
+    minigame: {
+      type: 'calcolo',
+      success: 'k6_inv_ok', fail: 'k6_inv_ko',
+      tag: 'L\'Inventario del Mercante — 5 conti a tempo, ne servono 4',
+      config: {
+        titolo: '🧮 L\'Inventario del Mercante',
+        secondi: 20,
+        domande: [
+          { q: 'Dodici giorni di consegne, tre pacchi al giorno: quanti pacchi nell\'androne?', r: [ { t: '36', ok: true }, { t: '32', ok: false }, { t: '38', ok: false }, { t: '30', ok: false } ] },
+          { q: 'Otto lavatrici, ogni ciclo macina un giorno: quanti giorni a settimana macina il sottoscala?', r: [ { t: '56', ok: true }, { t: '48', ok: false }, { t: '64', ok: false }, { t: '54', ok: false } ] },
+          { q: 'Il Cuore costa 12🎨, lo sconto è di 4: prezzo da colleghi?', r: [ { t: '8', ok: true }, { t: '9', ok: false }, { t: '7', ok: false }, { t: '6', ok: false } ] },
+          { q: 'Sei giorni di fila, due Coca Zero a sera: quante lattine nella freccia?', r: [ { t: '12', ok: true }, { t: '14', ok: false }, { t: '10', ok: false }, { t: '16', ok: false } ] },
+          { q: 'Trentasei Lettori Grigi, e UNO ha il segnalibro: quanti leggono la stessa pagina da anni?', r: [ { t: '35', ok: true }, { t: '36', ok: false }, { t: '34', ok: false }, { t: '30', ok: false } ] },
+        ],
+      },
+    },
+  },
+
+  k6_inv_ok: {
+    location: 'mercante',
+    caption: 'L\'inventario torna',
+    text: `Il Mercante ricontrolla, matita tra i denti, e alla fine fa un verso che non gli sentirete mai più fare: un piccolo grugnito di RISPETTO.
+
+> Il Mercante: "Quadra. Quadra TUTTO. Sapete quanti anni erano che il mio quadernone non vedeva un totale giusto?" *(spinge tre grumi di Colore sul bancone, caldi come sassi d'estate)* "La paga. E un consiglio in omaggio, che qui niente è gratis tranne oggi: il Grigiore sbaglia i conti perché ODIA i numeri precisi. Se stanotte arrivate al Trono... contate AD ALTA VOCE. Lo innervosisce da morire."
+
+**(🎨 Colore +2, guadagnato col pallottoliere. E un'arma in più: i numeri precisi, detti forte.)**`,
+    gold: 2,
+    sets: { inventario_mercante: true },
+    choices: [
+      { text: '↩ Al bancone del Mercante', next: 'k6' },
+    ],
+  },
+
+  k6_inv_ko: {
+    location: 'mercante',
+    caption: 'L\'inventario non torna',
+    sets: { inventario_sbagliato: true },
+    text: `Il Mercante segue le vostre correzioni con la matita, poi si ferma. Ripercorre. Sospira dal profondo del cappotto.
+
+> Il Mercante: "No. Adesso è SBAGLIATO IN UN MODO NUOVO, che quasi quasi è un talento." *(riprende il quadernone, quasi con tenerezza)* "Niente paga. Ma vi dico una cosa consolante: nemmeno il Grigiore sa contare, e guardate che carriera. Andate, andate. E se vi chiedono chi ha pasticciato la colonna dei riporti... io non vi ho mai visti."
+
+**(Niente Colore stavolta. Il quadernone del Mercante vi sopravviverà a tutti.)**`,
+    choices: [
+      { text: '↩ Al bancone, fischiettando innocenza', next: 'k6' },
     ],
   },
 
@@ -342,19 +519,20 @@ Sul banco, sotto una campana di vetro, una cosa che pulsa piano di tutti i color
 
 > Il Mercante: "Il Trono. Domanda da dodici, questa. Il Colore non basta: i segreti si pagano coi segreti. Raccontatemi una storia VERA. Una che non avete mai raccontato. Io mi nutro anche di quelle, nei mesi magri."
 
-Vi guardate. Poi qualcuno parla — chi, resta tra voi e il sottoscala — e racconta una cosa vera: piccola, scomoda, di quelle che si tengono sotto la lingua per anni. Il Mercante ascolta con tutta la faccia, annuisce, e quando la storia finisce se la mette in una taschina del gilet, piegata come una banconota.
+Vi guardate. Poi qualcuno parla — chi, resta tra voi e il sottoscala — e racconta una cosa vera, piccola, scomoda. Il Mercante ascolta con tutta la faccia, annuisce, e quando la storia finisce se la mette in una taschina del gilet, piegata come una banconota.
 
-> Il Mercante: "Onesta. Sa di vero. Va bene: ascoltate." *(si china, e la lampada da campeggio si abbassa da sola)* "Il vostro demone, quello col volto rubato. Va forte, eh? Immortale, dappertutto, la casa è sua. Ma ogni notte — OGNI notte — deve tornare al **Divano-Trono**, nella Sala della Switch. La vita finta che tiene in loop là sopra non è scenografia: è la sua FLEBO. Si ricarica lì, staccato dal Grigiore, spina alla presa. E in quei minuti..." *(sorride di nuovo, e stavolta il sorriso è quasi umano)* "...in quei minuti è solo una cosa stanca su un divano. **Vulnerabile.** Non ditegli chi ve l'ha detto: è il mio padrone di casa, e l'affitto qui è già un furto."
+> Il Mercante: "Onesta. Sa di vero. Va bene: ascoltate." *(si china, la lampada da campeggio si abbassa da sola)* "Il vostro demone, quello col volto rubato. La casa è sua. Ma ogni notte — OGNI notte — deve tornare al **Divano-Trono**, nella Sala della Switch. La vita finta che tiene in loop là sopra non è scenografia: è la sua FLEBO. Si ricarica lì, staccato dal Grigiore, spina alla presa. E in quei minuti..." *(sorride di nuovo, e stavolta il sorriso è quasi umano)* "...in quei minuti è solo una cosa stanca su un divano. **Vulnerabile.** Non ditegli chi ve l'ha detto: è il mio padrone di casa, e l'affitto qui è già un furto."
 
 > Claudia: "Perché ce lo dici davvero, però? Che ci guadagni?"
 
 > Il Mercante: "Se vincete voi, il quartiere si riempie di Colore. E io campo di COMMERCIO, signorina, non di Grigiore. Un mercato morto non serve a nessuno."
 
-**(🎨 +2 Colore: adesso sapete DOVE il demone sanguina. Segreto del Trono acquisito.)**`,
-    gold: 2,
+**(🎨 +1 Colore: adesso sapete DOVE il demone sanguina. Segreto del Trono acquisito.)**`,
+    gold: 1,
     sets: { segreto_trono: true },
     choices: [
       { text: '🚶 Verso la sala più avanti, dove l\'intercapedine si allarga', next: 'k8' },
+      { text: '🛒 Prima di andare: il banco ha qualcosa di nuovo in vetrina', once: true, next: 'k6' },
     ],
   },
 
@@ -382,6 +560,7 @@ Dietro di voi, il Mercante sta ancora litigando con la propria bilancia.
     sets: { furto_riuscito: true },
     choices: [
       { text: '↩️ Tornare al banco con la faccia più innocente del mondo', next: 'k6' },
+      { text: '🚶 Filarsela verso la Galleria, prima che se ne accorga', next: 'k8' },
     ],
   },
 
@@ -401,7 +580,7 @@ Si srotola e si srotola e SI SROTOLA — era piegato come una manichetta perché
 > Emanuela: "Ragazzi, il monologo del regolamento. Questo lo conosco: o lo zittiamo noi o va avanti fino all'articolo quaranta."
 
 **(Combattimento! Il Riscossore riscuote. Il Mercante guarda: per lui è solo amministrazione.)**`,
-    combat: { enemies: ['mercante_guardia'], victory: 'k7c', defeat: 'k_ko' },
+    combat: { enemies: ['mercante_guardia'], victory: 'k7c', defeat: 'k_ko', loot: { gold: 1 } },
     choices: [],
   },
 
@@ -420,10 +599,11 @@ Silenzio nel sottoscala. Poi il Mercante Grigio comincia ad applaudire. **Lento.
 
 Il Riscossore, riavvolto nell'angolo, apre un occhio solo e ve lo tiene addosso. Non ostile. Da collega.
 
-**(🎨 +2 Colore: avete vinto a casa d'altri, secondo le regole d'altri.)**`,
-    gold: 2,
+**(🎨 +1 Colore: avete vinto a casa d'altri, secondo le regole d'altri.)**`,
+    gold: 1,
     choices: [
       { text: '↩️ Tornare al banco — da clienti stimati, stavolta', next: 'k6' },
+      { text: '🚶 Avanti: la Galleria dei Sonnambuli, con lo sconto in tasca', next: 'k8' },
     ],
   },
 
@@ -471,12 +651,13 @@ Nessuno parla. Il Cuore, in mano a Claudia, pulsa caldo e meraviglioso, e nessun
 
 Vi rimettete in marcia. La targhetta della teca spenta dice: *"Casa singola, con giardino."* Chissà che giardino aveva.
 
-**(Ottenuto: un CUORE DI COLORE. 🎨 -2 Colore: certi acquisti scoloriscono chi li fa.)**`,
+**(Ottenuto: un CUORE DI COLORE. 🎨 -1 Colore: certi acquisti scoloriscono chi li fa.)**`,
     item: 'cuore_colore',
-    goldLoss: 2,
+    goldLoss: 1,
     sets: { cuore_rubato_teca: true },
     choices: [
       { text: '🚶 Verso il fondo della Galleria, senza voltarsi', next: 'k9' },
+      { text: '🪦 Leggere la targhetta della teca. Almeno il nome.', once: true, next: 'k8_targhetta' },
     ],
   },
 
@@ -498,12 +679,13 @@ Ci mette un minuto intero. Si guarda le mani, la vestaglia, il vetro. Gaetano ap
 
 > Emanuela: *(e le si rompe la voce a metà)* "Uno buono, signore. Uno buono. Venga, che fuori è meglio."
 
-**(Ottenuto: un CUORE DI COLORE — e un uomo vivo. 🎨 +3 Colore: le due cose insieme. Solo Gaetano.)**`,
+**(Ottenuto: un CUORE DI COLORE — e un uomo vivo. 🎨 +2 Colore: le due cose insieme. Solo Gaetano.)**`,
     item: 'cuore_colore',
-    gold: 3,
+    gold: 2,
     sets: { sonnambulo_salvato: true },
     choices: [
       { text: '🚶 Accompagnarlo verso il fondo della Galleria, dove c\'è il quadro elettrico', next: 'k9' },
+      { text: '👴 Prima: chiedergli cosa vedeva nel programma grigio', once: true, next: 'k8_programma' },
     ],
   },
 
@@ -526,8 +708,56 @@ I sonnambuli si alzano dalle poltrone senza svegliarsi. Escono in pigiama, in ve
 > Claudia: "È la cosa più triste che farò in vita mia e lo faccio SUBITO."
 
 **(Combattimento! I sonnambuli difendono il loro canale. Non svegliateli: fermateli.)**`,
-    combat: { enemies: ['sonnambulo', 'sonnambulo', 'sonnambulo'], victory: 'k9', defeat: 'k_ko' },
+    combat: { enemies: ['sonnambulo', 'sonnambulo', 'sonnambulo'], victory: 'k9', defeat: 'k_ko', loot: { gold: 1 } },
     choices: [],
+  },
+
+
+  k8_targhetta: {
+    location: 'galleria',
+    caption: 'La targhetta della teca',
+    text: `Claudia torna alla vetrina vuota. Se il Cuore è costato quello che è costato, il MINIMO è sapere a chi apparteneva.
+
+La targhetta d'ottone è piccola, avvitata storta, incisa a mano:
+
+*"RINO — piano terra, interno 2. Rideva alle repliche. TUTTE le repliche. Anche quelle che sapeva a memoria. SOPRATTUTTO quelle che sapeva a memoria. — Acquisito per abbandono: nessuno lo chiamava da 3 anni, 2 mesi, 11 giorni."*
+
+> Claudia: *(legge due volte, poi tira fuori il telefono e FOTOGRAFA la targhetta)* "Rino. Piano terra, interno 2. Se usciamo di qui, io al citofono dell'interno 2 ci suono. Mi invento un sondaggio, una raccolta firme, qualsiasi cosa. Una volta a settimana."
+
+> Federico: "Claudia..."
+
+> Claudia: "'Acquisito per abbandono', Federico. La casa non l'ha RAPITO. L'ha RACCOLTO. Come si raccoglie una cosa che nessuno stava tenendo." *(mette via il telefono, e la voce le si indurisce in una cosa che somiglia a un giuramento)* "Il demone non crea il grigio. Il grigio glielo REGALIAMO noi, un numero non chiamato alla volta. Be': io da stanotte richiamo."
+
+**(Il nome era Rino, e la sua storia è un'accusa — la casa raccoglie ciò che noi lasciamo cadere. Claudia non lo dimenticherà.)**`,
+    sets: { teca_nome_letto: true },
+    choices: [
+      { text: '🚶 Avanti, con un nome in più da restituire', next: 'k9' },
+    ],
+  },
+
+
+  k8_programma: {
+    location: 'galleria',
+    caption: 'Cosa dava il programma grigio',
+    text: `Il signore in pigiama a righe — sveglio, confuso, vivo — si massaggia gli occhi come dopo un pomeriggio intero di TV. Natalino gli porge il braccio e la domanda insieme:
+
+> Natalino: "Signò, senza fretta. Ma che davano, là dentro? Che cosa stava guardando da... da tutto questo tempo?"
+
+Il signore ci pensa. E la faccia che fa è la cosa più triste della stanza:
+
+> Il signore: "...il MIO programma. Quello che aspettavo sempre. Solo che non cominciava mai." *(si guarda le mani)* "C'era la sigla, capite? La sigla partiva, e io dicevo 'ecco, adesso inizia'. E ripartiva la sigla. Per anni. E io lì, comodo, che aspettavo. Perché la sigla era BELLA, e aspettare una cosa bella... non sembra tempo perso. Sembra quasi vivere."
+
+Silenzio. Poi aggiunge, piano, la cosa peggiore:
+
+> Il signore: "La poltrona era comodissima. È questo che dovete capire, ragazzi, se volete battere questa casa: non ti LEGA. Ti METTE COMODO."
+
+> Federico: *(sottovoce, a nessuno in particolare)* "La sigla senza il programma. Il trailer senza il film. Lo scroll senza il post che cercavi." *(scuote la testa)* "Questa casa non ha inventato NIENTE. Ha solo alzato il volume."
+
+**(Il Grigiore non incatena — ACCOMODA. E la sigla eterna è la sua arma migliore. Sapere come lavora è già mezza uscita.)**`,
+    sets: { programma_svelato: true },
+    choices: [
+      { text: '🚶 Avanti, e da domani meno sigle per tutti', next: 'k9' },
+    ],
   },
 
   k9: {
@@ -571,9 +801,32 @@ E da tutta la Galleria, uno dopo l'altro, i risvegliati si voltano verso di voi.
 
 > Federico: "Ve l'avevo detto. L'esercito in pigiama. Se stanotte serve una mano, questi se la ricordano, la leva rossa."
 
-**(🎨 +2 Colore. Qualcosa ci dice che li rivedrete quando conterà davvero.)**`,
-    gold: 2,
+**(🎨 +1 Colore. Qualcosa ci dice che li rivedrete quando conterà davvero.)**`,
+    gold: 1,
     sets: { sonnambuli_svegli: true },
+    choices: [
+      { text: '🧗 Risalire: la cucina, e poi il resto della notte', next: 'k10' },
+      { text: '👋 La signora in vestaglia: ha qualcosa da dirvi', once: true, next: 'k9d' },
+    ],
+  },
+
+  k9d: {
+    location: 'galleria',
+    caption: 'Il consiglio della signora in vestaglia',
+    sets: { signora_consiglio: true },
+    text: `La signora in vestaglia si avvicina al vetro rotto della sua teca e vi fa cenno di abbassarvi, come si fa coi nipoti quando c'è da dire la cosa importante.
+
+> La signora: "Voi lo andate a cercare, quello grande. Si vede. Allora sentite una vecchia che ci ha dormito dentro." *(si stringe la vestaglia al collo)* "Non combattetelo coi pugni, il grigio. Coi pugni ci va a nozze: i pugni sono roba che si stanca."
+
+> Federico: "E con cosa, allora?"
+
+> La signora: "Con i **NOMI**. Il grigio odia chi ha un nome, perché il nome è un colore che non sbiadisce. Qua sotto per anni sono stata 'quella della quaranta-due'. Stanotte quel ragazzo là" *(indica Gaetano)* "ha tirato una leva e io sono tornata a essere **ADELE**. Sentite come suona? Suona che esisto."
+
+> Emanuela: *(che si è già asciugata gli occhi due volte facendo finta di no)* "Adele. Piacere. Emanuela."
+
+> La signora: "Piacere mio, tesoro." *(le stringe la mano, e la mano è tiepida)* "Adesso andate. E a quello là in cima diteglielo in faccia, il suo nome. Vedrete che gli si storta la bocca."
+
+**(Il grigio si combatte coi NOMI. Adele, quaranta-due, non la dimenticherete.)**`,
     choices: [
       { text: '🧗 Risalire: la cucina, e poi il resto della notte', next: 'k10' },
     ],
@@ -598,6 +851,26 @@ Dietro di voi, cento piccole TV mormorano il loro programma grigio, imperturbate
     damage: 3,
     choices: [
       { text: '🧗 Risalire: la cucina, e poi il resto della notte', next: 'k10' },
+      { text: '🔧 Gaetano studia lo sportello blindato: la prossima volta non ci frega', once: true, next: 'k9_sportello' },
+    ],
+  },
+
+
+  k9_sportello: {
+    location: 'sottoscala',
+    caption: 'Lo sportello, studiato',
+    text: `Gaetano si prende trenta secondi che nessuno gli vuole concedere e li usa tutti: torcia tra i denti, dita sui bordi dello sportello blindato, la faccia a un palmo dal metallo.
+
+> Gaetano: "Interessante. Non è blindato per tenere FUORI noi." *(indica i cardini: sono montati al contrario, la battuta è interna)* "È blindato per tenere DENTRO qualcosa. E guardate qua—" *(la torcia illumina, lungo il bordo, una fila di graffi sottili, tutti alla stessa altezza)* "—questi non sono attrezzi. Sono UNGHIE. Dall'interno. Qualcosa là dentro gratta da anni, sempre nello stesso punto, con una pazienza da ergastolano."
+
+> Emanuela: "E questo ci aiuta COME, esattamente?"
+
+> Gaetano: "Ci aiuta così: la casa ha cose che TEME. Cose sue, che chiude a chiave. Il che significa due notizie: la prima è che non è onnipotente nemmeno in casa propria." *(spegne la torcia)* "La seconda è che se mai ci servisse un diversivo... sappiamo dove la casa tiene i suoi problemi."
+
+**(La casa ha prigionieri SUOI. Una serratura che teme ciò che chiude è una debolezza con i cardini.)**`,
+    sets: { quadro_studiato: true },
+    choices: [
+      { text: '🚶 Avanti — e quei graffi, meglio non pensarci troppo', next: 'k10' },
     ],
   },
 
@@ -618,9 +891,33 @@ Claudia e Gaetano lo agguantano per i polsi e lo strappano fuori dalla botola ne
 
 Sdraiati sul pavimento della cucina fredda, a pancia in su, ansimando. La botola sotto il tappeto non c'è più: solo piastrelle. Ma quello che avete imparato là sotto, quello risale con voi.
 
-**(🎨 +1 Colore. La via della cucina è vostra: ora sapete cosa nutre la casa, e dove dorme il suo padrone.)**`,
-    gold: 1,
+**(La via della cucina è vostra: ora sapete cosa nutre la casa, e dove dorme il suo padrone.)**`,
     sets: { via_cucina: true },
+    choices: [
+      { text: '🏛 Tornare al Salotto-Cattedrale', next: 'h1' },
+      { text: '🧊 La cucina fredda: adesso che la botola è chiusa, c\'è qualcosa di nuovo sul bancone', once: true, next: 'k10b' },
+    ],
+  },
+
+  k10b: {
+    location: 'cucina_fredda',
+    caption: 'Omaggio della ditta',
+    stinger: 'item',
+    sets: { cucina_dopo_botola: true },
+    item: 'boccata_colore',
+    text: `Sul bancone della cucina fredda, dove dieci minuti prima non c'era niente, c'è un pacchetto. Carta da macellaio, spago, e sopra — appoggiato con cura da orefice — un cartoncino unto:
+
+*"OMAGGIO DELLA DITTA. Voi non avete visto niente della mia contabilità, io non ho visto niente delle vostre mani. — Il M."*
+
+Dentro il pacchetto: una fiala tiepida di **Boccata di Colore**. E un tarallo. Un tarallo solo, di quelli buoni.
+
+> Natalino: "Ci ha mandato un regalo. Una cosa con sei mani e un socio che si chiama RISCOSSORE ci ha mandato un regalo."
+
+> Gaetano: "Non è un regalo. È un patto di non belligeranza redatto in linguaggio commerciale. Il che lo rende più affidabile di un regalo."
+
+> Emanuela: *(si mette la fiala in borsa, poi spacca il tarallo in cinque pezzi identici a occhio, perché è brava)* "Va bene comunque. Stanotte prendo alleati anche brutti."
+
+**(Nello zaino: una Boccata di Colore, omaggio della ditta. La cucina, vista da sotto, ha cambiato idea su di voi.)**`,
     choices: [
       { text: '🏛 Tornare al Salotto-Cattedrale', next: 'h1' },
     ],
@@ -697,10 +994,11 @@ Dentro gli oblò, i giorni si **depositano.** La scrivania smette di girare. Il 
 
 Fa freddo. È il freddo giusto: quello dei posti dove non si lava più niente per forza.
 
-**(🎨 +2 Colore. Otto giorni uguali, restituiti ai legittimi proprietari.)**`,
-    gold: 2,
+**(🎨 +1 Colore. Otto giorni uguali, restituiti ai legittimi proprietari.)**`,
+    gold: 1,
     choices: [
       { text: '🚶 Tornare alle canne d\'organo dei tubi', next: 'k5' },
+      { text: '👀 Guardare dentro gli oblò: cosa resta di un giorno quando smette di girare?', once: true, next: 'k11_oblo' },
     ],
   },
 
@@ -742,7 +1040,7 @@ Davanti alla teca c'è **l'Ufficiale.**
 > Federico: "Menatelo. Menatelo e basta, ho la partita IVA e questo mi offende personalmente."
 
 **(Combattimento! L'Ufficiale timbra a distanza, il sonnambulo difende il vetro. Il barattolo, dentro la teca, fa una luce piccola e tifa per voi.)**`,
-    combat: { enemies: ['mercante_guardia', 'sonnambulo'], victory: 'k14', defeat: 'k_ko' },
+    combat: { enemies: ['mercante_guardia', 'sonnambulo'], victory: 'k14', defeat: 'k_ko', loot: { gold: 1 } },
     choices: [],
   },
 
@@ -786,11 +1084,11 @@ Una confezione di **IPA**. A colori. Con un post-it congelato: *"Scorta d'emerge
 
 > Emanuela: "E invece ci sei andato. Salute, ingegnere."
 
-**(Trovata: l'IPA di Gaetano, gelata al punto giusto. 🎨 +1 Colore: avete guardato in fondo e il fondo ha ceduto per primo.)**`,
+**(Trovata: l'IPA di Gaetano, gelata al punto giusto. Avete guardato in fondo e il fondo ha ceduto per primo.)**`,
     item: 'ipa_gaetano',
-    gold: 1,
     choices: [
       { text: '↩️ Richiudere il coperchio, piano, e tornare al centro della cucina', next: 'k1' },
+      { text: '👁 L\'occhio di pesce: prima di chiudere, guardarlo DRITTO', once: true, next: 'k15_occhio' },
     ],
   },
 
@@ -861,10 +1159,56 @@ Ed è questa domanda che lo smonta: si affloscia dentro la giacca come un ombrel
 
 > Claudia: *(staccando l'avviso dell'articolo 9, piegandolo, intascandolo)* "Souvenir. E ricordatevi tutti la regola di Daniele: un timbro non è un argomento."
 
-**(🎨 +2 Colore: l'incantesimo dell'Autorità si spezza con una domanda sola — "chi l'ha detto?")**`,
-    gold: 2,
+**(🎨 +1 Colore: l'incantesimo dell'Autorità si spezza con una domanda sola — "chi l'ha detto?")**`,
+    gold: 1,
+    choices: [
+      { text: '📬 Frugare l\'archivio dell\'Amministratore: se aveva le chiavi, forse aveva anche i DEBITI', once: true, next: 'k16d' },
+      { text: '🚶 Tornare alle canne d\'organo dei tubi', next: 'k5' },
+    ],
+  },
+
+  k16d: {
+    location: 'sottoscala',
+    caption: 'L\'archivio — le bollette si difendono',
+    stinger: 'jumpscare',
+    text: `Dietro la bacheca, dove prima c'era solo muro, l'Amministratore lascia in eredità un **schedario** — quattro cassetti d'acciaio, ognuno con l'etichetta di un anno, e l'ultimo cassetto non ha anno: ha scritto **"SEMPRE"**.
+
+Federico lo apre. Dentro: **bollette.** Migliaia. Buste bianche con la finestrella, impilate come mattoni, e ognuna — OGNUNA — intestata a Daniele. Gas, luce, acqua, internet, assicurazione, la rata della palestra mai disdetta, l'abbonamento allo streaming che non guarda da mesi e non cancella per pigrizia, e in fondo a tutto una busta rossa con scritto **"MORA"** che pulsa come un cuore malato.
+
+> Gaetano: "Non sono vere. Cioè: sono bollette VERE, ma non sono le SUE — sono la PAURA delle sue. Il Grigiore le ha incubate dalla sua ansia e le ha archiviate qui sotto come munizioni."
+
+Poi il cassetto SEMPRE si spalanca da solo, e le bollette **escono.**
+
+Escono VOLANDO — un vortice di buste bianche con la finestrella, i bordi taglienti come rasoi, che vi frullano intorno tagliando l'aria e la pelle. Ogni taglio brucia il doppio: perché è ADDEBITATO. Sul polso di Natalino, dove una busta ha graffiato, compare un numero rosso piccolo, una cifra con la virgola: il costo del taglio, in euro e centesimi.
+
+> Natalino: "MI STANNO FATTURANDO IL SANGUE. Io queste le cestino TUTTE."
+
+> Emanuela: "Phon. PHON: la carta brucia, e le bollette sono CARTA."
+
+**(Combattimento! Lo Sciame di Bollette taglia a raffica: ogni colpo si propaga al vicino, come gli interessi.)**`,
+    combat: { enemies: ['sciame_bollette', 'sciame_bollette'], victory: 'k16e', defeat: 'k_ko', loot: { gold: 1 } },
+    choices: [],
+  },
+
+  k16e: {
+    location: 'sottoscala',
+    caption: 'Debito estinto',
+    stinger: 'gold',
+    sets: { bollette_incenerite: true },
+    text: `L'ultimo sciame cade come coriandoli — buste bianche che si accartocciano in volo, carbonizzate dal phon o sventrate dalle forbici, e il sottoscala per un momento sembra la mattina dopo Capodanno: carta ovunque, silenzio, e l'odore di qualcosa che è finito.
+
+Sul pavimento, tra i resti, le cifre rosse sui fogli si CANCELLANO una a una — i numeri sbiadiscono, le virgole si sciolgono, e per ultimo sparisce la busta rossa della MORA, che non pulsa più: è solo cartone, adesso, con un numero che non significa niente.
+
+> Gaetano: *(raccogliendo una bolletta mezza bruciata)* "Guardate la data: non ce l'ha. Nessuna di queste ha una data. Erano paure SENZA SCADENZA — il Grigiore le tiene in circolo perché non scadano mai."
+
+> Federico: "Sai cosa, Gaetano? Domani chiamo il commercialista di mio fratello e gli faccio fare un bel check-up. Quello vero. Perché le bollette vere si pagano e si dimenticano. Queste qui erano ALTRE, e adesso sono cenere."
+
+> Claudia: *(fotografando il pavimento coperto di carta bruciata)* "Una per l'album. Didascalia: 'il giorno che abbiamo estinto un mutuo a pugni.'"
+
+**(Il debito era finto: la paura no. Averla bruciata vale.)**`,
     choices: [
       { text: '🚶 Tornare alle canne d\'organo dei tubi', next: 'k5' },
+      { text: '🗄 Perquisire l\'archivio SEMPRE: le bollette coprivano qualcosa', once: true, sets: { archivio_perquisito: true }, next: 'k5' },
     ],
   },
 
@@ -897,23 +1241,23 @@ La mano di qualcuno — di chi, resta tra voi e il sottoscala — vi afferra il 
     caption: 'La cucina accesa — lo stendardo',
     text: `L'idea è di Emanuela, ed è un'idea da generale: *"Questa cucina è morta perché nessuno ci cucina. E allora noi adesso CI CUCINIAMO."*
 
-I fornelli, sotto il grigio, funzionano: la fiamma esce grigia, poi Gaetano la tocca con l'accendino lungo del barbecue e la fiamma **si ricorda di essere arancione.** Da lì è una battaglia, e la combattete come si combatte una battaglia: Claudia al taglio, Federico che apre i barattoli della dispensa e li annusa da sommelier ("questo è pomodoro VERO, si sente che ha sofferto"), Natalino che gestisce le padelle come le forbici giapponesi, Emanuela che comanda, e la ricetta è una sola, ovvia, l'unica possibile: **la parmigiana di Daniele.** Fatta a memoria, a occhio, a sbagli — la vostra versione, quella che lui domani avrà il DOVERE di assaggiare e stroncare.
+I fornelli, sotto il grigio, funzionano: la fiamma esce grigia, poi Gaetano la tocca con l'accendino lungo del barbecue e la fiamma **si ricorda di essere arancione.** Da lì è una battaglia: Claudia al taglio, Federico che apre i barattoli e li annusa da sommelier ("questo è pomodoro VERO, si sente che ha sofferto"), Natalino che gestisce le padelle come le forbici giapponesi, Emanuela che comanda, e la ricetta è una sola, ovvia: **la parmigiana di Daniele.** Fatta a memoria, a occhio, a sbagli — la vostra versione, quella che lui domani avrà il DOVERE di assaggiare e stroncare.
 
-E la cucina si arrende un centimetro alla volta. Il vapore scioglie il freddo. L'odore di frittura invade i ripiani grigi come una truppa di liberazione. Il frigo industriale ronza più piano, quasi imbarazzato. Perfino la cosa nel cassetto delle verdure smette di respirare per annusare.
+La cucina si arrende un centimetro alla volta. Il vapore scioglie il freddo. L'odore di frittura invade i ripiani grigi come una truppa di liberazione. Il frigo ronza più piano, quasi imbarazzato. Perfino la cosa nel cassetto delle verdure smette di respirare per annusare.
 
 > Natalino: "Guardate le piastrelle. GUARDATE. Vicino ai fornelli stanno tornando bianche."
 
 > Claudia: *(fotografando tutto, per la prima volta stanotte non come prova: come ricordo)* "La casa digerisce le case. Ma una cucina accesa non la digerisce nessuno."
 
-Mangiate in piedi, dalle teglie, ustionandovi, ridendo. Non è buona come la sua. È buona come la vostra. Contro il Grigiore, stanotte, è la stessa identica arma.
+Mangiate in piedi, dalle teglie, ustionandovi, ridendo. Non è buona come la sua. È buona come la vostra. Contro il Grigiore, è la stessa arma.
 
 > Federico: "Quando esce, gliela facciamo assaggiare. Dirà che la mozzarella andava asciugata meglio." *(pausa)* "Non vedo l'ora, cazzo."
 
-**(+4 PV a tutto il gruppo. 🎨 +1 Colore. La parmigiana è uno stendardo, e voi l'avete issato.)**`,
+**(+4 PV a tutto il gruppo. La parmigiana è uno stendardo, e voi l'avete issato.)**`,
     heal: 4,
-    gold: 1,
     choices: [
       { text: '↩️ Spegnere i fuochi con rispetto e tornare al centro della cucina', next: 'k1' },
+      { text: '🍽 Lasciare un piatto coperto in frigo: per quando Daniele torna', once: true, sets: { piatto_per_daniele: true }, next: 'k1' },
     ],
   },
 
@@ -936,9 +1280,9 @@ Sul pavimento, accanto alla testa di Gaetano, un biglietto con la grafia fitta d
 
 Vi rialzate. Perché è quello che fa, la vostra qualità.
 
-**(PV al massimo. 🎨 -2 Colore, trattenuti "come penale".)**`,
+**(PV al massimo. 🎨 -1 Colore, trattenuti "come penale".)**`,
     fullHeal: true,
-    goldLoss: 2,
+    goldLoss: 1,
     choices: [
       { text: '⚔️ Tornare giù e finire quello che vi ha steso', next: 'RETRY_COMBAT' },
       { text: '↩️ Riprendere fiato dalla cucina fredda', next: 'k1' },
@@ -964,8 +1308,8 @@ Vi rialzate. Perché è quello che fa, la vostra qualità.
 
    ITEM DATI:
    - k1b: (nessun item — heal+flag) · k3: accendino_bbq, ipa_gaetano (+birra_limone da scelta once)
-   - k6 (negozio): boccata_colore 3🎨 · lattina_zero 2🎨 · lattina_agitata 2🎨 ·
-     cassa_bluetooth 4🎨 · cuore_colore 12🎨+tronello (once, requires tronello)
+   - k6 (negozio): boccata_colore 2🎨 · lattina_zero 1🎨 · lattina_agitata 1🎨 ·
+     cassa_bluetooth 3🎨 · cuore_colore 8🎨+tronello (once, requires tronello)
    - k7b: boccata_colore (furto) · k8_prendi: cuore_colore · k8b: cuore_colore
 
    MORTI VERE POSSIBILI:
@@ -975,3 +1319,6 @@ Vi rialzate. Perché è quello che fa, la vostra qualità.
    COMBATTIMENTI: k2b (luca_giunti) · k7b_fail (mercante_guardia) ·
    k8c (sonnambulo x3) — tutti con defeat → k_ko (fullHeal, goldLoss 2, RETRY_COMBAT).
    ============================================================ */
+
+/* ============ BLOCCO E — LO SNODO (Sala della Switch) + IL FINALE (Cattedrale del Grigiore) + EPILOGHI ============
+   Ingressi: m1 (dall'hub h1), z1 (da m9). Nessuna uscita fuori dal blocco: gli epiloghi chiudono. */

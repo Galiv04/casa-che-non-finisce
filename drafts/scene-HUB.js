@@ -1,5 +1,3 @@
-/* ============ HUB — il Salotto-Cattedrale e le scene di respiro ============ */
-
 const SCENE_HUB = {
 
   h1: {
@@ -35,7 +33,6 @@ E sopra tutto, da qualche parte oltre il soffitto, un suono bassissimo e continu
     location: 'salotto',
     caption: 'Il cerchio del tronello',
     heal: 4,
-    gold: 1,
     sets: { fumo_mappa: true },
     text: `Natalino si siede per terra a gambe incrociate, in mezzo alla navata, e rolla con la calma di un artificiere.
 
@@ -53,16 +50,16 @@ Corridoi. Stanze. E in alto, sopra tutto, un rettangolo grande con dentro un ret
 
 > Natalino: *(piano)* "Daniele, fratello. Ricevuto forte e chiaro."
 
-**(Il fumo vi ha mostrato dov'è: la pianta è nel diario. Colore +1.)**`,
+**(Il fumo vi ha mostrato dov'è: la pianta è nel diario.)**`,
     choices: [
       { text: '↩ Si torna al centro della Casa. Con una direzione in più.', next: 'h1' },
+      { text: '🗺 La pianta nel fumo: Claudia la ridisegna a memoria sul telefono', once: true, sets: { pianta_salvata: true }, next: 'h1' },
     ],
   },
 
   h3: {
     location: 'salotto',
     caption: 'Riscaldamento — stile Gaeta',
-    gold: 1,
     item: 'pallina_racchettoni',
     sets: { racchettoni_pronti: true },
     text: `Gaetano ha portato su i racchettoni per farli vedere a Daniele — quelli nuovi, professionali, che in spiaggia fanno spostare gli ombrelloni. Sono ancora nella borsa, vicino alla porta che non c'è più.
@@ -79,7 +76,32 @@ Quello che succede nei tre minuti seguenti, nella navata del Salotto-Cattedrale,
 
 E la Casa — questo lo notate tutti — per tre minuti interi **non muove niente**. Nessun sussurro, nessuno scricchiolio. Come una cosa enorme e grigia che si è messa in un angolo a guardare due professionisti, e non ha capito **come si fa a essere così vivi.**
 
-**(Una pallina in tasca a Gaetano: là dentro è un'arma. Colore +1.)**`,
+**(Una pallina in tasca a Gaetano: là dentro è un'arma.)**`,
+    choices: [
+      { text: '↩ Il braccio è caldo. Si torna a fare sul serio.', next: 'h1' },
+      { text: '🎾 Un ultimo scambio: il muro della cattedrale ha un segno che non c\'era', once: true, next: 'h5' },
+    ],
+  },
+
+  h5: {
+    location: 'salotto',
+    caption: 'Il segno sul muro',
+    sets: { segno_muro: true },
+    text: `Il segno sta a due metri d'altezza, sulla parete nord della navata, e tre minuti fa non c'era: nessuno di voi ha mai visto questa Casa lasciare una prova.
+
+È un cerchio. GIALLO. La pallina.
+
+Un tondo di vernice gialla, grande esattamente come la pallina, stampato sul grigio come un timbro — e da lì partono quattro crepe sottilissime verso l'alto, come quando un sasso becca un parabrezza.
+
+> Gaetano: *(ci mette un dito sopra, poi si guarda il dito)* "Ha lasciato il colore ADDOSSO. La pallina ha scaricato giallo sul muro. Il muro l'ha assorbito e si è CREPATO."
+
+> Claudia: "Quindi non è che non digerisce il colore. È che il colore, dentro, gli fa danno STRUTTURALE."
+
+> Gaetano: "Esatto. E noi ne abbiamo una borsa piena." *(fa un passo indietro, misura il cerchio a occhio, se lo segna sul telefono)* "Ricordatevi questo punto: se stanotte serve un buco in un muro di questa casa, si tira una pallina."
+
+> Natalino: "Il mio contributo alla scienza sarà lanciare cose gialle alle pareti. Sono in pace con questo."
+
+**(Il colore non lo nutre — lo CREPA. E i vostri colori sono armi da lancio.)**`,
     choices: [
       { text: '↩ Il braccio è caldo. Si torna a fare sul serio.', next: 'h1' },
     ],
@@ -109,6 +131,31 @@ Silenzio. Di quello buono, stavolta.
 > Tutti, in coro, compreso il muro che non dovrebbe avere voce: *"Lo sappiamo."*
 
 **(+3 PV. L'ultima voce non era di nessuno di voi. Nessuno lo commenta. Ma il piano resta il piano.)**`,
+    choices: [
+      { text: '↩ In piedi. Daniele aspetta.', next: 'h1' },
+      { text: '👂 Quella voce dal muro: qualcuno dice il piano', once: true, next: 'h6' },
+    ],
+  },
+
+  h6: {
+    location: 'salotto',
+    caption: 'La voce dentro il muro',
+    sets: { voce_muro: true },
+    text: `Natalino non si alza. Resta seduto contro la parete, l'orecchio appoggiato al grigio come si fa da bambini con la conchiglia, e alza una mano: *zitti*.
+
+C'è una voce. Dentro il muro, a quaranta centimetri dalla sua testa, bassissima. Non urla, non chiede aiuto. **Ripassa il vostro piano.**
+
+> La voce dentro il muro: *(un sussurro dozzinale, la cadenza tutta sbagliata)* "...entriamo, lo riprendiamo, usciamo. Entriamo, lo riprendiamo, usciamo. E domenica grigliata da me. Stile Pasquetta."
+
+> Emanuela: *(gelida)* "Quella è la frase di Gaetano. Parola per parola."
+
+> Natalino: "Sì. Ma la dice MALE." *(stacca l'orecchio dal muro, piano, e si alza)* "Sentite dove mette l'accento su 'grigliata'? Come uno che ha letto la parola e non ha mai mangiato niente in vita sua."
+
+> Gaetano: "Sta imparando il copione. Ci ascolta e RIPASSA — come faceva allo specchio." *(guarda la parete con un disprezzo tranquillo)* "Bene. Allora stanotte il piano lo cambiamo all'ultimo secondo, e non ad alta voce."
+
+> Claudia: "Da adesso i piani si scrivono. Sul mio telefono. Nessuno li dice."
+
+**(La Casa ripassa il vostro piano dentro i muri. Da stanotte il piano si scrive, non si dice.)**`,
     choices: [
       { text: '↩ In piedi. Daniele aspetta.', next: 'h1' },
     ],

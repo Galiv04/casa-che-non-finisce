@@ -1,6 +1,3 @@
-/* ============ BLOCCO E — LO SNODO (Sala della Switch) + IL FINALE (Cattedrale del Grigiore) + EPILOGHI ============
-   Ingressi: m1 (dall'hub h1), z1 (da m9). Nessuna uscita fuori dal blocco: gli epiloghi chiudono. */
-
 const SCENE_E = {
 
   /* ==================== SNODO m* — LA SALA DELLA SWITCH ==================== */
@@ -23,6 +20,31 @@ Daniele che sorride. Daniele che beve una cola senza marca, l'etichetta un retta
 Sullo schermo, il Daniele finto beve un altro sorso di niente. Da qualche parte oltre quella parete di luce c'è quello vero.
 
 > Natalino: "Andiamo a cambiare canale."`,
+    choices: [
+      { text: '📺 Oltre lo schermo: dentro la Sala della Switch', next: 'm2' },
+      { text: '👁 Contare i loop: il sorriso, la cola, la vittoria. Quante volte prima che il prossimo cominci?', once: true, next: 'm1b' },
+    ],
+  },
+
+  m1b: {
+    location: 'sala_switch',
+    caption: 'Quindici secondi',
+    sets: { loop_contato: true },
+    text: `Claudia tira su il cronometro del telefono e conta ad alta voce, e gli altri contano con lei, perché davanti a una cosa così contare insieme è l'unica cosa che si può fare.
+
+**Quindici secondi.** Sorriso, cola, vittoria vuota. Da capo. Ogni quindici secondi esatti, senza una variazione, senza un fotogramma diverso.
+
+> Claudia: "Quindici. In un giorno fanno cinquemilasettecentosessanta cicli. In tre giorni—"
+
+> Gaetano: "Diciassettemiladuecentottanta." *(non ha nemmeno tirato fuori il telefono)*
+
+Silenzio. Sulla parete di luce, il Daniele finto sorride per la diciassettemiladuecentottantunesima volta.
+
+> Federico: *(che non alza la voce, e per questo fa più paura di quando la alza)* "Diciassettemila volte gli ha fatto fare la stessa faccia. A mio fratello. A uno che non ha mai ripetuto due volte la stessa battuta perché 'le battute si consumano'."
+
+> Emanuela: "Contato. Bene. Adesso si smette di contare e si SPEGNE."
+
+**(Più di diciassettemila cicli in tre giorni. Il conto esatto è la prima cosa che gli fa male.)**`,
     choices: [
       { text: '📺 Oltre lo schermo: dentro la Sala della Switch', next: 'm2' },
     ],
@@ -50,6 +72,7 @@ Una forma seduta. Delle dimensioni di un amico.
 Non aspetta. Nessuno di voi aspetta, in realtà: attraversate la moquette che respira tutti insieme, e la moquette, sotto i vostri passi, trattiene il fiato.`,
     choices: [
       { text: '🏃 Al trono. Di corsa.', next: 'm3' },
+      { text: '🔌 Strappare un cavo dalla parete prima di avvicinarsi: potrebbe servire', once: true, sets: { cavo_strappato: true }, next: 'm3' },
     ],
   },
 
@@ -102,6 +125,7 @@ La moquette smette di respirare a metà respiro. Lo schermo-parete si congela su
 La forma dentro il bozzolo si piega in avanti, verso di voi, fuori dalla luce dello schermo.`,
     choices: [
       { text: '🤲 Prenderlo al volo', next: 'm6' },
+      { text: '🗣 Chiamarlo per nome, FORTE — la voce è un colore che il bozzolo non può filtrare', once: true, sets: { nome_gridato: true }, next: 'm6' },
     ],
   },
 
@@ -125,6 +149,7 @@ Qualcosa di lungo, nero, con un solo tasto rosso grande come un piatto, si SROTO
 > Natalino: "Il telecomando. Il telecomando di due metri e mezzo. Certo. CERTO. Perché no."`,
     choices: [
       { text: '⚔ Difendere il bozzolo', next: 'm5' },
+      { text: '🛡 Mettere Daniele dietro il trono prima che il Guardiano arrivi', once: true, next: 'm4_scudo' },
     ],
   },
 
@@ -147,6 +172,59 @@ Si srotola dai cavi come una serpe sazia che avete svegliato voi: due metri e me
 > Emanuela: "Intorno al trono! Nessuno si spegne stasera, e MENO CHE MAI lui!"`,
     choices: [
       { text: '⚔ Combattere il Guardiano del Bozzolo', next: 'm5' },
+      { text: '📸 Claudia: fotografare il tasto rosso — se è un tasto, ha un circuito', once: true, next: 'm4_circuito' },
+    ],
+  },
+
+
+  m4_scudo: {
+    location: 'sala_switch',
+    caption: 'Lo scudo intorno a Daniele',
+    text: `Tre secondi prima che il Guardiano atterri, vi muovete insieme senza bisogno di dirlo: Federico e Natalino spingono il bozzolo dietro lo schienale del trono, Emanuela ci pianta davanti la borsa Kerastase aperta come una barricata, Claudia si mette DI LATO, dove può vedere sia il mostro che l'amico.
+
+E dal bozzolo, dalle dita di Daniele, il Morse cambia ritmo. Claudia traduce al volo, e le viene da ridere e da piangere nello stesso secondo:
+
+*"N-O-N  D-I-E-T-R-O.  D-A-V-A-N-T-I."*
+
+> Claudia: "Dice... dice che non vuole stare dietro. Vuole stare DAVANTI."
+
+> Natalino: "Eh no, bello mio. Stavolta no." *(dà due colpetti sul bozzolo, teneri come uno schiaffo sulla spalla)* "Hai fatto il muro da solo per settimane — il 17 strappato, i sabotaggi, il Morse. Lo sappiamo, abbiamo visto TUTTO. Ma adesso siamo arrivati noi, e funziona così: chi ha fatto il primo turno... il cambio lo ACCETTA."
+
+Le dita si fermano. Poi, piano, battono un'ultima cosa — corta, secca, la più Daniele di tutte:
+
+*"O-K.  M-A  S-B-R-I-G-A-T-E-V-I.  H-O  D-A  F-A-R-E."*
+
+> Federico: *(voltandosi verso il Guardiano che cala, con una faccia che non è più preoccupata: è FERALE)* "Hai sentito il capo. Sbrighiamoci."
+
+**(Daniele protetto — e il gruppo che combatte davanti a lui non è uno scudo. È un CAMBIO TURNO.)**`,
+    sets: { daniele_protetto: true },
+    choices: [
+      { text: '⚔ Il Guardiano atterra. Adesso', next: 'm5' },
+    ],
+  },
+
+
+  m4_circuito: {
+    location: 'sala_switch',
+    caption: 'Il circuito del tasto rosso',
+    text: `Claudia scatta col telefono in modalità macro — il tasto rosso riempie lo schermo — e passa la foto a Gaetano mentre il Guardiano ancora si srotola.
+
+Gaetano ingrandisce. E ride. Una risata corta, cattiva, da ingegnere che ha appena trovato l'errore nel progetto di un rivale.
+
+> Gaetano: "Non è collegato."
+
+> Claudia: "COME non è collegato?!"
+
+> Gaetano: "Guarda tu stessa: sotto il tasto non c'è pista, non c'è contatto, non c'è NIENTE. È un tasto FINTO. Scenografia." *(alza gli occhi verso la serpe di gomma che cala dal soffitto, e la voce diventa quasi divertita)* "'CONTINUA A GUARDARE' non è un comando che lui ESEGUE su di noi. È una scritta luminosa. Un cartello. Funziona solo se CI CREDIAMO — come i finti allarmi sulle vetrine, come le telecamere finte nei condomini."
+
+> Emanuela: "Quindi tutta questa casa..."
+
+> Gaetano: "...ha un solo, VERO superpotere: la nostra collaborazione. Il tasto lo premiamo NOI, ogni volta, da dentro. E una cosa che ho imparato stanotte—" *(raccoglie la pallina dei racchettoni, la fa rimbalzare una volta)* "—è che si può anche NON premere."
+
+**(Il tasto rosso è FINTO. Il potere del Guardiano è la vostra obbedienza — e l'obbedienza, stanotte, è finita.)**`,
+    sets: { tasto_fotografato: true },
+    choices: [
+      { text: '⚔ Combattere il Guardiano del Bozzolo — senza crederci più', next: 'm5' },
     ],
   },
 
@@ -162,7 +240,7 @@ Punta il tasto rosso addosso a Federico, e la stanza si riempie di un ronzio che
 > Claudia: "Racchettoni ALTI. Gaetano: come in spiaggia. Quello è solo un telecomando cresciuto male — e noi le cose che volano le SCHIACCIAMO."
 
 **(Difendete il bozzolo: Daniele è a due metri da voi.)**`,
-    combat: { enemies: ['bozzolo_guardiano'], victory: 'm6', defeat: 'm_ko' },
+    combat: { enemies: ['bozzolo_guardiano'], victory: 'm6', defeat: 'm_ko', loot: { gold: 1, items: ['ipa_gaetano'] } },
   },
 
   m5_sacrificio: {
@@ -238,7 +316,7 @@ E lì, a metà lite, ridono. Tutti e due, insieme, la stessa risata — ed è il
 
 **(DANIELE si unisce al gruppo!)**`,
     choices: [
-      { text: '🥤 Dargli la Zero. Ce l\'avete. L\'avete portata fin qui.', once: true, requires: { item: 'lattina_zero' }, removeItem: 'lattina_zero', sets: { zero_bevuta: true }, gold: 1, next: 'm7' },
+      { text: '🥤 Dargli la Zero. Ce l\'avete. L\'avete portata fin qui.', once: true, requires: { item: 'lattina_zero' }, removeItem: 'lattina_zero', sets: { zero_bevuta: true }, next: 'm7' },
       { text: '🗣 "La Zero dopo. Prima: che cazzo sta succedendo?"', next: 'm7' },
     ],
   },
@@ -246,7 +324,7 @@ E lì, a metà lite, ridono. Tutti e due, insieme, la stessa risata — ed è il
   m7: {
     location: 'sala_switch',
     caption: 'Il briefing di Daniele',
-    gold: 2,
+    gold: 1,
     sets: { dentro_eleinad: true },
     text: `Se gli avete dato la Zero, l'ha scolata in quattro secondi, occhi chiusi, come un rito. Comunque sia: quando riapre la bocca, il Daniele che parla è LUI al settanta per cento e sale.
 
@@ -260,21 +338,109 @@ Silenzio.
 
 > Daniele: "Casa mia è finita tre giorni fa. Sessanta metri quadri, finivano eccome. Guardatevi intorno: la moquette respira. I cavi sono vene. Il divano è un trono perché è il CUORE." *(vi guarda, uno a uno)* "Siamo DENTRO di lui. E lui lo sa, che l'abbiamo capito. Sta arrivando."`,
     choices: [
-      { text: '⚔ Che venga.', next: 'm8' },
+      { text: '🐚 "Tieni. Il mare vero, dentro." — dargli la conchiglia di Gaeta', requires: { item: 'conchiglia_gaeta', notFlag: 'regalo_conchiglia' }, next: 'm7c' },
+      { text: '🍽 "Ti abbiamo tenuto un piatto." — la parmigiana lasciata in frigo', requires: { flag: 'piatto_per_daniele', notFlag: 'regalo_piatto' }, next: 'm7d' },
+      { text: '📷 "Guarda che ti abbiamo portato." — la foto di Gaeta staccata dal muro', requires: { flag: 'foto_gaeta_salvata', notFlag: 'regalo_foto' }, next: 'm7e' },
       { text: '👬 Concedere ai gemelli cinque minuti, da soli, prima di combattere', once: true, next: 'm7g1' },
+      { text: '⚔ Che venga.', next: 'm8' },
+    ],
+  },
+
+  m7c: {
+    location: 'sala_switch',
+    caption: 'La conchiglia, consegnata',
+    heal: 3,
+    sets: { regalo_conchiglia: true },
+    text: `Emanuela tira fuori la conchiglia di Gaeta e la mette in mano a Daniele senza dire niente, perché certe consegne si fanno in silenzio.
+
+> Daniele: "E questa?"
+
+> Emanuela: "Ce l'ha data la tua spiaggia. Quella che ti ha rubato. Mettila all'orecchio e sta' zitto."
+
+Lui la alza. E la faccia gli fa una cosa che nessuno di voi gli aveva mai visto fare: si **arrende**. Occhi chiusi, spalle giù, la bocca aperta di mezzo centimetro.
+
+> Daniele: *(con gli occhi ancora chiusi)* "Si sentono le racchette. E qualcuno che urla 'FUORI!' e ha torto." *(pausa)* "Ero io che urlavo. Avevo torto io."
+
+> Federico: "Avevi torto tu."
+
+> Daniele: *(riapre gli occhi, e sono accesi come non li vedete da tre giorni di schermi)* "Quella cosa mi ha fatto guardare una vita finta a quindici secondi per volta. E voi mi portate quattro secondi di mare VERO." *(si infila la conchiglia in tasca e la tiene stretta con la mano da fuori)* "Adesso combatto meglio. MOLTO meglio."
+
+**(+3 PV a tutti: la conchiglia è consegnata. Daniele ha un pezzo di Serapo in tasca, e il Grigiore lo sente.)**`,
+    choices: [
+      { text: '🍽 "Ti abbiamo tenuto un piatto." — la parmigiana lasciata in frigo', requires: { flag: 'piatto_per_daniele', notFlag: 'regalo_piatto' }, next: 'm7d' },
+      { text: '📷 "Guarda che ti abbiamo portato." — la foto di Gaeta staccata dal muro', requires: { flag: 'foto_gaeta_salvata', notFlag: 'regalo_foto' }, next: 'm7e' },
+      { text: '↩ Il briefing riprende: sta arrivando.', next: 'm7' },
+    ],
+  },
+
+  m7d: {
+    location: 'sala_switch',
+    caption: 'Il piatto tenuto da parte',
+    heal: 4,
+    sets: { regalo_piatto: true },
+    text: `Emanuela apre la borsa Kerastase e tira fuori il piatto coperto di stagnola — quello lasciato in frigo "per quando Daniele torna" — e glielo appoggia sulle ginocchia.
+
+> Emanuela: "L'abbiamo fatta noi. Non è come la tua. Mangia e taci."
+
+Daniele solleva la stagnola. Guarda. La parmigiana è **ancora calda**, e in questa casa niente è caldo.
+
+> Daniele: "La mozzarella andava asciugata meglio."
+
+> Federico: "TE L'AVEVO DETTO. GLIELO AVEVO DETTO, A LEI!"
+
+> Daniele: *(che ha già la bocca piena e parla comunque, perché è lui)* "Federico, sta' zitto. È buonissima." *(a Emanuela, serio, la forchetta a mezz'aria)* "Avete cucinato dentro casa SUA. Avete acceso i fuochi in una cucina che lui aveva spento. Vi rendete conto di cosa gli avete fatto?"
+
+> Gaetano: "Dillo tu."
+
+> Daniele: "Gli avete fatto vedere che si può. In casa sua." *(finisce il piatto in quaranta secondi netti)* "Andiamo a spegnerlo."
+
+**(+4 PV a tutti: il piatto tenuto da parte è arrivato a destinazione. Era ancora CALDO. In questa casa niente è caldo.)**`,
+    choices: [
+      { text: '🐚 "Tieni. Il mare vero, dentro." — dargli la conchiglia di Gaeta', requires: { item: 'conchiglia_gaeta', notFlag: 'regalo_conchiglia' }, next: 'm7c' },
+      { text: '📷 "Guarda che ti abbiamo portato." — la foto di Gaeta staccata dal muro', requires: { flag: 'foto_gaeta_salvata', notFlag: 'regalo_foto' }, next: 'm7e' },
+      { text: '↩ Il briefing riprende: sta arrivando.', next: 'm7' },
+    ],
+  },
+
+  m7e: {
+    location: 'sala_switch',
+    caption: 'La foto che resiste',
+    gold: 1,
+    sets: { regalo_foto: true },
+    text: `Claudia tira fuori la foto di Gaeta — quella staccata dal muro del corridoio, quella che sbiadiva più piano di tutte — e la gira verso Daniele.
+
+Il mare. Il sole cattivo delle due. Emanuela che ride a bocca aperta, tutti mezzi bruciati e felici. E lui, sullo sfondo, addormentato sotto l'ombrellone con un libro sulla faccia.
+
+> Daniele: *(la prende con due dita, come si prende una cosa che scotta)* "Questa era appesa nel corridoio."
+
+> Claudia: "Nel corridoio SUO. Ha appeso le nostre vacanze in casa tua e le ha guardate sbiadire come si guarda la carne che frolla."
+
+> Daniele: "E allora perché questa non è sbiadita?"
+
+> Emanuela: "Perché quel giorno nessuno voleva tornare a casa. Manco tu, che odi la sabbia."
+
+Daniele guarda la foto per cinque secondi interi. Poi la piega in due, con cura, lungo un margine dove non c'è nessuno, e se la mette nella tasca del petto.
+
+> Daniele: "Va bene. Adesso ho una cosa da fargli vedere anch'io."
+
+**(🎨 +1 Colore: la foto che resiste è in mano a Daniele, nella tasca del petto. Quella non gliela mangia.)**`,
+    choices: [
+      { text: '🐚 "Tieni. Il mare vero, dentro." — dargli la conchiglia di Gaeta', requires: { item: 'conchiglia_gaeta', notFlag: 'regalo_conchiglia' }, next: 'm7c' },
+      { text: '🍽 "Ti abbiamo tenuto un piatto." — la parmigiana lasciata in frigo', requires: { flag: 'piatto_per_daniele', notFlag: 'regalo_piatto' }, next: 'm7d' },
+      { text: '↩ Il briefing riprende: sta arrivando.', next: 'm7' },
     ],
   },
 
   m7g1: {
     location: 'sala_switch',
     caption: 'Cinque minuti dei gemelli',
-    text: `Daniele si stacca dal gruppo di un passo, giusto uno, e guarda Federico con la faccia di chi sta per chiedere una cosa che gli costa più di quanto costerebbe ammazzare un mostro.
+    text: `Daniele si stacca dal gruppo di un passo e guarda Federico con la faccia di chi sta per chiedere una cosa che gli costa più di un mostro.
 
 > Daniele: "Cinque minuti. Prima che arrivi quello con la mia faccia peggio pettinata. Cinque minuti, e poi si combatte."
 
-Gli altri si dividono con un tempismo che sembra casuale e non lo è per niente: Gaetano si china sui cavi che escono dalla parete, con un'urgenza tecnica improvvisamente fondamentale; Emanuela apre la borsa Kerastase e la rovescia intera sul pavimento come se contarne il contenuto fosse la priorità della serata; Claudia fotografa il soffitto; Natalino si accende un tronello guardando altrove con una dedizione sospetta. Nessuno controlla davvero niente. Tutti fanno finta benissimo.
+Gli altri si dividono con un tempismo che sembra casuale e non lo è: Gaetano si china sui cavi della parete con un'urgenza tecnica improvvisamente fondamentale; Emanuela rovescia la borsa Kerastase sul pavimento; Claudia fotografa il soffitto; Natalino si accende un tronello guardando altrove con dedizione sospetta. Nessuno controlla davvero niente. Tutti fanno finta benissimo.
 
-I gemelli restano da soli, in mezzo alla moquette che respira più piano, come se anche la casa avesse deciso di dare loro un po' di privacy.
+I gemelli restano da soli. La moquette respira più piano, come se anche la casa avesse deciso di dare loro un po' di privacy.
 
 > Federico: "Allora."
 
@@ -293,13 +459,14 @@ Silenzio. Il tipo di silenzio che tra due che si conoscono da trentadue anni pes
 Ridono, piano, il tipo di risata che non vuole farsi sentire dagli altri.`,
     choices: [
       { text: '🗣 Continuare — c\'è ancora una cosa da dirsi', next: 'm7g2' },
+      { text: '🤝 Lasciare che il silenzio dica il resto: cinque minuti bastano se sono i giusti', once: true, sets: { silenzio_gemelli: true }, next: 'm7g2' },
     ],
   },
 
   m7g2: {
     location: 'sala_switch',
     caption: 'La cosa non detta',
-    text: `Federico si passa una mano sulla faccia — la stessa faccia di Daniele, un po' più tirata dal fumo dello svapo e da vent'anni di call con clienti impossibili — e quando riparla, la voce è quella vera, quella senza pubblico.
+    text: `Federico si passa una mano sulla faccia — la stessa faccia di Daniele, tirata dal fumo dello svapo e da vent'anni di call — e quando riparla, la voce è quella vera, quella senza pubblico.
 
 > Federico: "Ho sempre pensato che tu mi guardassi dall'alto. I soldi, la carriera, le dieci birre al giorno che tu chiami 'autodistruzione con ghiaccio'. Pensavo mi giudicassi."
 
@@ -315,15 +482,15 @@ Federico non risponde subito. Quando lo fa, ha gli occhi lucidi e la voce che fi
 
 > Daniele: "Lo so. Fede."
 
-Si abbracciano — un abbraccio brutto, a scatti, con troppe pacche sulla schiena, esattamente come si abbracciano due che hanno passato trent'anni a fingersi più duri di quanto sono. Dall'altra parte della sala, quattro persone continuano a controllare con grandissima attenzione dei cavi che non richiedono nessuna attenzione.
+Si abbracciano — un abbraccio brutto, a scatti, con troppe pacche sulla schiena, come due che hanno passato trent'anni a fingersi più duri di quanto sono. Dall'altra parte della sala, quattro persone controllano con grandissima attenzione cavi che non richiedono nessuna attenzione.
 
 > Emanuela: *(senza voltarsi, la voce che trema un po')* "Questo cavo qui è FASCINOSO. Non lo tocco per altri dieci minuti buoni."
 
-**(+3 PV a tutti, 🎨 Colore +1: certe paci curano più delle Gocce.)**`,
+**(+3 PV a tutti: certe paci curano più delle Gocce.)**`,
     heal: 3,
-    gold: 1,
     choices: [
       { text: '⚔ Adesso sì: che venga.', next: 'm8' },
+      { text: '🫂 Fare spazio ai gemelli: gli altri si stringono, un cerchio che li aspetta', once: true, sets: { cerchio_completo: true }, next: 'm8' },
     ],
   },
 
@@ -347,13 +514,13 @@ Ha ancora la faccia di Daniele. E per la prima volta da quando lo conoscete, NON
 Eleinad ringhia — e il ringhio ha le voci di tutti quelli che avete deluso, tutte insieme, ed è la cosa peggiore che avete sentito stanotte.
 
 > Emanuela: "Ha finito di parlare. Phon."`,
-    combat: { enemies: ['eleinad_maschera'], victory: 'm9', defeat: 'm_ko' },
+    combat: { enemies: ['eleinad_maschera'], victory: 'm9', defeat: 'm_ko', loot: { gold: 1 } },
   },
 
   m9: {
     location: 'sala_switch',
     caption: 'La maschera cade',
-    gold: 2,
+    gold: 1,
     text: `Il colpo che lo piega è uno solo, ma la caduta è lunga.
 
 Eleinad barcolla, si porta le mani alla faccia — e la faccia di Daniele SI STACCA. Non strappata: si scolla dai bordi come cellophane da un piatto ancora caldo, arriccia, e viene via intera, appesa alle sue dita come una cosa che si butta.
@@ -371,6 +538,7 @@ Dove il buco è passato, la moquette è morta: una scala a chiocciola di molle e
 > Federico: "Fino in fondo, allora. Famiglia al completo."`,
     choices: [
       { text: '🌀 Scendere: verso la Cattedrale del Grigiore', next: 'z1' },
+      { text: '🎭 Raccogliere la maschera di Daniele: leggera come cartapesta, e riflette come un vetro', once: true, item: 'maschera_daniele', sets: { maschera_raccolta: true }, next: 'z1' },
     ],
   },
 
@@ -379,7 +547,7 @@ Dove il buco è passato, la moquette è morta: una scala a chiocciola di molle e
     caption: 'Lo schermo vince un round',
     stinger: 'defeat',
     fullHeal: true,
-    goldLoss: 2,
+    goldLoss: 1,
     text: `Il colpo che vi stende non fa male: fa SONNO. È questo il trucco, ed è per questo che funziona.
 
 Vi risvegliate sulla moquette, in fila ordinata, le teste tutte girate verso lo schermo-parete — la casa vi ha SISTEMATI, come si sistemano i telecomandi sul bracciolo. Sullo schermo, il loop ha aggiunto una scena: ci siete anche voi, adesso, seduti sul divano accanto al Daniele finto, con dei sorrisi che non vi appartengono.
@@ -419,6 +587,7 @@ Il buco si accorge di voi. E la sigla, dall'organo, si ferma a metà nota.`,
     choices: [
       { text: '🚶 Percorrere la navata, fino all\'altare', next: 'z2' },
       { text: '🏆 Prima: cosa c\'è in quella navata laterale illuminata?', once: true, next: 'z1t1' },
+      { text: '🛋 La prima panca non è una panca. È IL DIVANO. Quello di Daniele.', once: true, requires: { hero: 'daniele' }, next: 'z1d' },
       { text: '👂 Ascoltarlo raccontarsi, un momento, prima del duello', once: true, next: 'z1mono' },
     ],
   },
@@ -444,7 +613,7 @@ In fondo alla navata, un'ultima vetrinetta, più grande delle altre, illuminata 
 
 La teca vuota luccica, silenziosa, sotto la sua luce da vetrina. Aspetta.`,
     choices: [
-      { text: '💥 Spaccare il vetro della teca vuota, prendersi la targhetta', once: true, gold: 2, sets: { teca_profanata: true }, next: 'z1t2' },
+      { text: '💥 Spaccare il vetro della teca vuota, prendersi la targhetta', once: true, gold: 1, sets: { teca_profanata: true }, next: 'z1t2' },
       { text: '↩ Non toccarla. Tornare dal gruppo.', next: 'z2' },
     ],
   },
@@ -469,27 +638,145 @@ Da qualche parte oltre l'altare, la voce di Eleinad — ancora non vi vede, ma v
 E il silenzio di un demone che di solito non chiude mai la bocca è, di tutta la serata, la cosa che vi mette più paura.`,
     choices: [
       { text: '🚶 Tornare dal gruppo, la targhetta ancora in pugno', requires: { flag: 'teca_profanata' }, next: 'z2' },
+      { text: '🔨 Spaccare anche il piedistallo: non lasciare niente dove rimontare la teca', once: true, sets: { piedistallo_distrutto: true }, next: 'z2' },
     ],
   },
 
   z1mono: {
     location: 'cattedrale',
     caption: 'Il monologo di Eleinad',
-    text: `Eleinad non aspetta il vostro passo per parlare. Comincia da solo, alla navata vuota, come chi prova un discorso prima del pubblico vero — e vi lascia ascoltare, perché farvi ascoltare è già un modo di nutrirsi.
+    text: `Eleinad non aspetta il vostro passo per parlare. Comincia da solo, alla navata vuota — e vi lascia ascoltare, perché ascoltare è già un modo di nutrirsi.
 
-> Eleinad: "Sapete da dove vengo? Da NESSUNA parte, ed è la parte più elegante della mia storia. Non sono nato: mi sono ACCUMULATO. Un pomeriggio di pioggia rimandato qui, una serie vista due volte per non decidere cosa guardare dopo lì, un 'ci penso domani' lasciato cadere in un angolo trent'anni fa da qualcun altro, in un'altra casa, molto lontano da questa. Il tempo che la gente non voleva più spendere si è incollato, un briciolo alla volta, finché non ha avuto la forma per alzarsi in piedi. Io sono FATTO di rinvii, tesori. Sono l'interesse composto della pigrizia altrui."
+> Eleinad: "Sapete da dove vengo? Da NESSUNA parte, ed è la parte più elegante della mia storia. Non sono nato: mi sono ACCUMULATO. Un pomeriggio di pioggia rimandato qui, una serie vista due volte lì, un 'ci penso domani' lasciato cadere in un angolo trent'anni fa. Il tempo che la gente non voleva più spendere si è incollato, un briciolo alla volta, finché non ha avuto la forma per alzarsi in piedi. Io sono FATTO di rinvii, tesori. Sono l'interesse composto della pigrizia altrui."
 
-Passeggia lungo la navata, e dove passa i televisori si affievoliscono, rispettosi, come luci di sala prima di un monologo teatrale.
+Passeggia lungo la navata; dove passa, i televisori si affievoliscono come luci di sala a monologo iniziato.
 
 > Eleinad: "Mangio colore. Non anime, che parola volgare — il COLORE: la voglia che una cosa ti faccia venire voglia di un'altra cosa. E Daniele—" *(la voce, per un attimo, quasi si commuove di sé stessa)* "—Daniele era un BANCHETTO. Un uomo che pensa così tanto, che sente così forte, che tiene tutto dentro con quella disciplina da monaco... il colore, in uno così, non si consuma mai. Si ACCUMULA. Aspetta solo un inquilino con più appetito di lui."
 
-Si volta, e per un istante — solo un istante — la faccia rubata sembra quasi sincera.
+Si volta, e la faccia rubata sembra quasi sincera.
 
 > Eleinad: "Non sono il suo lato oscuro. Non fate quell'errore da filosofi della domenica. Sono un parassita con buon gusto, che ha scelto la casa più ricca del palazzo. Tutto qui. Nessuna poesia. Solo fame, e un contratto d'affitto che ho scritto io."
 
-**(🎨 Colore +1: guardarlo in faccia senza abboccare vale un pezzo di voi che lui non avrà.)**`,
+**(Guardarlo in faccia senza abboccare vale un pezzo di voi che lui non avrà.)**`,
     choices: [
-      { text: '🗣 Basta ascoltare. È ora del duello.', gold: 1, next: 'z2' },
+      { text: '🗣 Basta ascoltare. È ora del duello.', next: 'z2' },
+      { text: '🧠 Memorizzare ogni parola: le sue debolezze sono nel suo monologo', once: true, sets: { monologo_studiato: true }, next: 'z2' },
+      { text: '🪞 "C\'è un buco nel curriculum." — sbattergli in faccia la contraddizione', requires: { flag: 'segreto_specchio' }, once: true, next: 'z1contro' },
+    ],
+  },
+
+  z1contro: {
+    location: 'cattedrale',
+    caption: 'Il buco nel curriculum',
+    gold: 1,
+    sets: { contraddizione_smascherata: true },
+    text: `Il monologo finisce, il silenzio è pronto per gli applausi — e invece prende la parola Claudia, che di mestiere trova il pixel fuori posto.
+
+> Claudia: "Scusa. Un attimo. C'è un buco nel curriculum."
+
+> Eleinad: "...prego?"
+
+> Claudia: "In biblioteca c'è la tua biografia. L'abbiamo letta allo specchio: quella scritta da uno che ti conosceva bene." *(tira fuori il telefono, perché ovviamente l'ha fotografata)* "Lì c'è scritto che sei un RIFLESSO. Uno rimasto attaccato a uno specchio perché un tizio ci si è fermato davanti troppo a lungo. E adesso invece ci racconti l'interesse composto della pigrizia altrui." *(alza gli occhi dallo schermo)* "Quale delle due, tesoro?"
+
+Nella cattedrale, per la prima volta stanotte, il silenzio è IMBARAZZATO.
+
+> Federico: "Ah, ho capito: la seconda suona meglio." *(allarga le braccia)* "Prima eri un riflesso, ora sei un ACCUMULO. Menti pure sul curriculum. Sei un piazzista che si gonfia il ruolo al colloquio: 'gestivo un team'. Gestivi un DIVANO."
+
+> Eleinad: *(e la voce, per una frazione, esce senza l'eco)* "Sono... entrambe le cose."
+
+> Gaetano: "No. Le origini sono UNA. Se non sai da dove vieni, non sei antico: sei solo VECCHIO." *(un passo avanti)* "E le cose vecchie si buttano."
+
+**(🎨 Colore +1: l'avete beccato a mentire sulla propria storia. Chi si gonfia il curriculum ha paura del colloquio.)**`,
+    choices: [
+      { text: '🗣 Basta ascoltare. È ora del duello.', next: 'z2' },
+    ],
+  },
+
+  z1d: {
+    location: 'cattedrale',
+    caption: 'Il Divano Originale',
+    text: `La prima panca della navata non è una panca. È un **divano a tre posti**, con la penisola, e lo riconoscete tutti nello stesso istante — perché ci siete STATI, su quel divano, mille sere, coi piedi sul bracciolo e la pizza sulle ginocchia.
+
+È il divano di Daniele. Quello VERO, quello dell'appartamento: trapiantato qui, fuso nella navata come un organo in un corpo nuovo, e i cuscini — i cuscini si MUOVONO. Piano. Come una bocca che mastica nel sonno.
+
+> Daniele: *(fermo, bianco, gli occhi fissi sul suo vecchio divano)* "Eccolo. Il trono. L'originale — quello prima che la casa ci costruisse sopra una cattedrale." *(la voce gli trema, e Daniele non trema MAI)* "Tre giorni che mi masticava i pomeriggi. Ogni sera una puntata, ogni puntata un colore in meno. Lo sentivo DIGERIRE."
+
+Il divano vi sente. I cuscini si sollevano — e sotto ci sono i **DENTI**: file di molle a spirale raddrizzate in zanne, imbottitura rosa che si contrae come gengive, e il bracciolo — quello dove Daniele appoggiava la testa — si piega verso di lui con la lentezza affamata di una cosa che rivuole il suo boccone preferito.
+
+> Federico: "No. NO. Quel divano era il posto dove si giocava a Mario Kart e si mangiava la pizza alle due di notte. E adesso ha i DENTI. Io a questa cosa le tolgo i cuscini uno per uno."
+
+> Claudia: "Racchettoni CORTI. Mirare alle molle: quelle sono la spina dorsale."
+
+**(Combattimento! Il Divorente attacca con cuscini pieni di denti e braccioli che afferrano. Tre posti, una fame, nessuna pietà.)**`,
+    combat: { enemies: ['divorente'], victory: 'z1e', defeat: 'z_ko', loot: { gold: 1 } },
+    choices: [],
+  },
+
+  z1e: {
+    location: 'cattedrale',
+    caption: 'Il divano non si alza più',
+    stinger: 'victory',
+    gold: 1,
+    sets: { divorente_distrutto: true },
+    text: `L'ultimo colpo spacca il Divorente lungo la cucitura centrale — quella che Daniele aveva rattoppato col nastro adesivo due estati fa, "tanto regge". Non ha retto.
+
+Il divano si apre come un libro e CROLLA: i cuscini esplodono in una nuvola di imbottitura grigia che si deposita sulla navata come neve sporca. Le molle-zanne tintinnano sul marmo e si fermano. Il bracciolo, quello che cercava ancora Daniele, cade per ultimo — e nel cadere fa un suono che assomiglia a un sospiro.
+
+Tra i resti, incastrata nella struttura del divano come un cuore in un petto, c'è una cosa piccola e calda: il **telecomando** di casa di Daniele. Quello vero, quello con i tasti consumati dal pollice, col copri-batteria tenuto su dallo scotch. Funziona ancora. Non accende niente, ma funziona ancora.
+
+> Daniele: *(lo raccoglie. Lo guarda. Lo mette in tasca.)* "Era un buon divano, prima. Ci ho letto duecento libri, su quel divano." *(pausa)* "Però i denti non ce li aveva. Quelli glieli ha messi LUI."
+
+> Natalino: "Momento di silenzio per il divano. Serio: quel divano meritava di meglio."
+
+> Emanuela: "Meritava di meglio, sì. E adesso lo sa anche la cattedrale: il PADRONE di quel divano è in piedi, e i divani fanno quello che dice il PADRONE."
+
+Le altre panche della navata, tutte insieme, scricchiolano. Non si muovono: scricchiolano e basta. Come sedie che si mettono sull'attenti.
+
+**(🎨 +1 Colore. Daniele ha distrutto il suo divano — quello vero, quello che amava — perché nessun'altra notte sia come quelle tre.)**`,
+    choices: [
+      { text: '🚶 Verso l\'altare. Il padrone di casa vi aspetta.', next: 'z2' },
+      { text: '📺 Il telecomando: Daniele lo accende verso il buio', once: true, next: 'z1f' },
+    ],
+  },
+
+  z1f: {
+    location: 'cattedrale',
+    caption: 'Un comando solo in memoria',
+    sets: { telecomando_acceso: true },
+    text: `Daniele punta il telecomando verso il buio in fondo alla navata e preme l'accensione, così, per vedere che succede. Non si accende niente. Ma lo schermino — quello piccolo dei modelli universali — si illumina di verde.
+
+In memoria c'è un comando solo. Uno. E la cronologia dice: ripetuto per anni. Sempre di notte. Sempre alla stessa ora.
+
+**"RIMANDA."**
+
+> Daniele: *(lo gira tra le dita e ride di una risata brutta)* "Questo tasto non esiste. Non su un telecomando. L'ha aggiunto LUI, e l'ha premuto LUI: guardate l'ora. Tutte le notti alle tre e dieci — che è l'ora in cui io DORMIVO."
+
+> Gaetano: *(scorre la cronologia, e la faccia gli si indurisce)* "Confermo. È un timer. Un timer che qualcuno faceva scattare da fuori, addosso a una casa che dormiva."
+
+> Claudia: "Quindi non era lui che rimandava."
+
+> Daniele: "No. Era lui che me la rimandava INDIETRO, la vita, un pezzo per notte." *(alza il telecomando verso l'altare, come si alza un bicchiere in faccia a qualcuno)* "Bene. Adesso il tasto è mio. Rimanda TU."
+
+E lo schermino, da solo, una lettera alla volta, cambia scritta: **"ADESSO."**
+
+**(In memoria un comando solo — RIMANDA — premuto ogni notte alle tre e dieci, da fuori. Adesso il telecomando dice un'altra cosa.)**`,
+    choices: [
+      { text: '🚶 Verso l\'altare. Il padrone di casa vi aspetta.', next: 'z2' },
+    ],
+  },
+
+
+  z2_ko: {
+    location: 'cattedrale',
+    caption: 'Il vuoto guarda indietro',
+    damage: 2,
+    text: `Le crepe si lasciano mappare — fino a quella centrale. Lì, lo sguardo dello spirito scivola DENTRO, e il vuoto fa quello che il vuoto fa da sempre con chi lo fissa troppo: restituisce lo sguardo.
+
+Non è un'immagine. È una VERTIGINE al contrario: per un istante lo spirito sente com'è essere il buco — l'eco senza voce, la cornice senza quadro — e quell'istante costa caro anche a chi non ha più un corpo per pagarlo.
+
+> Lo spirito: *(riemergendo, con la luce che gli trema ai bordi)* "Ho guardato troppo a lungo. Segnate: le crepe si mappano di SBIECO. Mai frontale. Lui è fatto della stessa fame delle crepe."`,
+    choices: [
+      { text: '👻 Tornare al gruppo, di sbieco', next: 'z2' },
     ],
   },
 
@@ -512,14 +799,70 @@ Il Grigiore attorno al buco si increspa. Aspetta la vostra mossa.`,
       { text: '👥 "Federico. Daniele. La foto." — la via dei Gemelli', requires: { flag: 'foto_ricomposta', flag2: 'segreto_gemelli', hero: 'daniele' }, next: 'z6' },
       { text: '⚔ "Basta parlare." — la via della Forza', next: 'z7' },
       { text: '🕯 Ascoltare l\'offerta fino in fondo', next: 'z9' },
+      { text: '🛋 "Il TRONO, Eleinad. Sappiamo del divano." — staccare la spina alla sua ricarica', requires: { flag: 'segreto_trono' }, once: true, next: 'z_trono' },
+      { text: '🪞 Alzare la maschera come uno specchio e chiamarlo col suo nome VERO', requires: { flag: 'segreto_specchio', item: 'maschera_daniele' }, once: true, next: 'z_nome_vero' },
       { text: '👻 "I morti non ti temono." — la scelta degli Spiriti', requires: { spirit: true }, next: 'z2b' },
+    ],
+  },
+
+
+  z_trono: {
+    location: 'cattedrale',
+    caption: 'La spina del Trono',
+    text: `> Gaetano: *(un passo avanti, e per una volta non ha la voce dell'ingegnere: ha quella di chi ha letto la bolletta)* "Il Divano-Trono. Nella Sala della Switch. Ogni notte torni là a RICARICARTI, perché la vita finta non si accumula: si consuma. Il Mercante ce l'ha detto in cambio di una storia vera — che è più di quanto tu abbia mai pagato per qualcosa."
+
+Il buco a forma di persona si ferma. Non si increspa: si FERMA, come un elettrodomestico a cui qualcuno ha appena nominato il numero di serie.
+
+> Eleinad: *(e la voce, per la prima volta, ha una sfumatura che assomiglia al panico amministrativo)* "Il divano è... comodo. È un dettaglio. Un DETTAGLIO d'arredamento—"
+
+> Emanuela: "È la tua PRESA DI CORRENTE, tesoro. E noi siamo cinque persone che stanotte hanno staccato ottanta cavi."
+
+Claudia solleva il telefono e inquadra il punto esatto: nel salotto-cattedrale, dietro l'altare, si vede il filo grigio che scende dal buco e sparisce nel pavimento — verso la Sala della Switch, verso il divano.
+
+> Daniele: *(sottovoce, e ride piano, incredulo)* "Quello è il MIO divano. Si è seduto sul mio divano per ricaricarsi mentre io stavo appeso ai cavi." *(alza la voce)* "SCENDI DAL MIO DIVANO."
+
+Il filo grigio, sotto le vostre suole, si TENDE. Qualcosa, di là, ha appena cominciato a perdere carica.
+
+**(🎨 Colore +2: la ricarica di Eleinad è esposta. Nello scontro finale combatterà a batteria scarica — i suoi colpi partiranno più deboli e la sua rigenerazione non funzionerà.)**`,
+    gold: 2,
+    sets: { trono_esposto: true, eleinad_vacilla: true },
+    choices: [
+      { text: '⚔ Adesso: il tavolo da gioco è vostro', next: 'z2' },
+    ],
+  },
+
+  z_nome_vero: {
+    location: 'cattedrale',
+    caption: 'Il nome vero, allo specchio',
+    text: `Federico alza la maschera. Non davanti alla propria faccia: davanti a QUELLA di Eleinad — col lato lucido girato verso il buco, come si porge uno specchio a chi ha qualcosa fra i denti.
+
+> Federico: "Guardati. Guardati BENE, perché stasera è l'ultima occasione." *(la mano non trema, e questa è la cosa che spaventa Eleinad più di tutto)* "'Eleinad'. Che nome fantastico. Terrificante. Antico. L'hai scelto tu, vero? Davanti a uno specchio, come i ragazzini col nome d'arte."
+
+Nella superficie lucida della cartapesta, il buco a forma di persona si riflette. E il riflesso — il riflesso DI un riflesso — è la cosa più vuota che abbiate mai visto: una faccia che non c'è che guarda una faccia che non c'è.
+
+> Federico: "Sei DANIELE scritto al contrario. Non un demone antico: un ANAGRAMMA. Ti sei fatto il nome con le lettere di un altro perché non ne avevi di tuoi. E adesso lo dico ad alta voce, davanti a tutti, così tutta la casa lo sente—"
+
+*(e lo dice: sillaba per sillaba, al rovescio, il nome vero)*
+
+**"D-A-N-I-E-L-E. Sei il riflesso di MIO FRATELLO. E mio fratello È QUI, in piedi, accanto a me."**
+
+Il buco EMETTE un suono. Non un urlo: uno stridere di vetro sotto pressione. La maschera, nella mano di Federico, si crepa a metà — e nella crepa, per un istante, si vede il salotto vero: il divano, la Switch, una lattina di Coca Zero. Casa.
+
+> Daniele: *(accanto al fratello, la voce ferma)* "Piacere. Daniele. QUELLO CON IL CORPO."
+
+**(🎨 Colore +2: il demone è stato NOMINATO davanti a testimoni. Ha perso il nome rubato — e con quello, l'aggancio su Daniele: comincerà lo scontro già ferito.)**`,
+    gold: 2,
+    removeItem: 'maschera_daniele',
+    sets: { nome_vero_detto: true, eleinad_vacilla: true },
+    choices: [
+      { text: '⚔ Al tavolo da gioco — con un demone senza nome', next: 'z2' },
     ],
   },
 
   z2b: {
     location: 'cattedrale',
     caption: 'Gli spiriti attraversano il Grigiore',
-    gold: 2,
+    gold: 1,
     sets: { eleinad_vacilla: true },
     text: `Chi di voi è luce si stacca dal gruppo. E cammina verso l'altare.
 
@@ -536,6 +879,27 @@ I televisori sfarfallano tutti insieme. Per la prima volta, la voce di Eleinad e
 > Eleinad: "...i morti non fanno testo."
 
 > Lo spirito: "I morti fanno SOLO testo, tesoro. Chiedi in giro."`,
+    choices: [
+      { text: '↩ Tornare dal gruppo: la mossa adesso è vostra', next: 'z2' },
+      { text: '👻 Restare un altro momento nel vuoto: mappare le crepe', tag: 'Prova di Intelligenza — CD 14', once: true, check: { stat: 'INT', dc: 14, success: 'z2c', fail: 'z2_ko' }, gold: 1 },
+    ],
+  },
+
+  z2c: {
+    location: 'cattedrale',
+    caption: 'La mappa delle crepe',
+    sets: { crepe_mappate: true },
+    text: `Lo spirito rientra nel ritaglio e stavolta ci resta. Trenta secondi. Quaranta. Poi riemerge camminando all'indietro, come chi esce da una stanza tenendo d'occhio la porta.
+
+> Lo spirito: "Ho contato. Dietro l'altare il vuoto non è liscio: è **crepato**. Undici crepe grandi, tutte che partono dal ritaglio e salgono, e in fondo a ognuna c'è un pezzo di qualcuno." *(pausa)* "Ho riconosciuto una vestaglia. Non chiedetemi di chi."
+
+> Gaetano: *(già disegnando col dito sul marmo)* "Undici, e vanno verso l'alto. Quindi il ritaglio non è la bocca: è la crepa PRINCIPALE. Le altre dieci sono i punti dove si è rotto da solo, sotto il proprio peso."
+
+> Lo spirito: "E c'è la regola, sentitela bene: le crepe si aprono se lo guardi DI SBIECO. Frontale si chiudono, si fanno muro, ti mangiano il colpo. Di taglio restano aperte come bocche. Ha la stessa fame delle sue crepe, e la fame non sa fingere."
+
+> Claudia: *(gira il racchettone di quarantacinque gradi)* "Mai fissarlo in faccia. Come i monitor rotti." *(mezzo sorriso)* "Da fotografa vi dico che è la notizia migliore della serata: la luce buona è SEMPRE di taglio."
+
+**(🎨 Colore +1: undici crepe mappate. Mai frontale — sempre di sbieco.)**`,
     choices: [
       { text: '↩ Tornare dal gruppo: la mossa adesso è vostra', next: 'z2' },
     ],
@@ -632,7 +996,7 @@ Nessuno di voi si muove per un secondo che dura un'ora. Poi Daniele raccoglie il
 
 La dicotomia crolla e Eleinad smette di fingere. I televisori si accendono TUTTI, e su tutti c'è la stessa immagine: Daniele. Sul divano. Tra un anno, tra dieci, solo, grigio, con la vostra assenza attorno come polvere.
 
-> Eleinad: "E va bene. Parliamo del futuro, visto che vi piace tanto. Ve lo portate via, stanotte, il vostro trofeo. E poi? Poi tornate alle vostre vite, ai vostri lunedì, e lui torna al suo divano. E RICADRÀ. Lo sapete che ricadrà. E quando succederà — quando la chat tornerà muta — sarà COLPA VOSTRA. Di voi che stanotte avete fatto gli eroi e domani non avrete tempo per un caffè. Potete vivere con questo peso? Potete USCIRE da quella porta sapendo cosa gli state facendo?"
+> Eleinad: "E va bene. Parliamo del futuro, visto che vi piace tanto. Ve lo portate via, stanotte, il vostro trofeo. E poi? Poi tornate alle vostre vite, ai vostri lunedì, e lui torna al suo divano. E IL GRIGIO RISALE. Il grigio risale SEMPRE, come l'umidità nei muri. E quando risalirà — quando un giovedì qualunque nessuno avrà tempo per un messaggio — sarà COLPA VOSTRA. Di voi che stanotte avete fatto gli eroi e domani non avrete tempo per un caffè. Potete vivere con questo peso? Potete USCIRE da quella porta sapendo cosa gli state facendo?"
 
 Silenzio. E nel silenzio, Daniele fa un passo avanti. Da solo.
 
@@ -669,7 +1033,7 @@ Per un momento lo VEDETE, il futuro che ha descritto: la chat muta, il caffè ri
   z5b: {
     location: 'cattedrale',
     caption: 'Eleinad si inceppa',
-    gold: 2,
+    gold: 1,
     sets: { eleinad_smontato: true },
     text: `RICATTO EMOTIVO. Il nome esce, la navata lo sente, e succede la cosa che Daniele aspettava da tre giorni.
 
@@ -707,7 +1071,31 @@ Il buco a forma di persona TREMA. Si nutre di quella lite dal 1994 — e la lite
 
 L'urlo è un'onda. Il gruppo si stringe attorno ai gemelli: adesso si tratta solo di REGGERE.`,
     choices: [
+      { text: '🧠 "L\'hai già detto con paura: TU SEI IL GEMELLO." — ricordarglielo', requires: { flag: 'eleinad_teme_gemelli' }, once: true, next: 'z6_eco' },
       { text: '🛡 Fare scudo attorno alla foto', tag: 'Prova di Carisma — CD 13 (chiunque tiri, il gruppo fa scudo)', check: { stat: 'CAR', dc: 13, success: 'e_gemelli', fail: 'z6b' } },
+      { text: '🗣 Daniele alza la voce: "Fratello mio, TIENI."', tag: 'Prova di Carisma — CD 11 (Daniele aggiunge la sua voce)', requires: { hero: 'daniele' }, check: { stat: 'CAR', dc: 11, success: 'e_gemelli', fail: 'z6b' } },
+    ],
+  },
+
+  z6_eco: {
+    location: 'cattedrale',
+    caption: 'L\'aveva già detto con paura',
+    text: `Federico non alza la foto. La tiene bassa, contro il petto, e fa una cosa più cattiva: **ricorda**.
+
+> Federico: "Sai qual è la cosa che mi tengo di stanotte? Non il contratto. Non il divano. La tua VOCE. Quando ti ho insultato di là, hai perso il ritmo per mezzo secondo e hai detto: 'Tu. TU sei il GEMELLO.'" *(pausa)* "L'hai detto come si dice il nome di una malattia. L'hai detto con PAURA."
+
+I televisori, tutti insieme, abbassano il volume di un gradino. Nessuno ha toccato niente.
+
+> Daniele: *(spalla contro spalla col fratello)* "Eccola. Stessa faccia, stessa risata, e per trent'anni ci siamo usati come coltelli. Il tuo giacimento." *(alza la foto)* "Chiuso per esaurimento."
+
+> Eleinad: *(e la voce esce piccola: la prima cosa piccola che gli sentite fare)* "...non siete uguali. Non lo siete MAI stati."
+
+> Federico: "Su questo hai ragione! È l'unica cosa vera che hai detto stanotte." *(sorride, e non è un bel sorriso)* "Lui è meglio. E siamo d'accordo pure su questo. Prova a mangiarci ADESSO."
+
+**(Gliel'avete ricordato con le sue stesse parole. La sua paura ha un nome, ed è il vostro cognome.)**`,
+    choices: [
+      { text: '🛡 Fare scudo attorno alla foto, adesso che vacilla', tag: 'Prova di Carisma — CD 12 (il gruppo fa scudo)', check: { stat: 'CAR', dc: 12, success: 'e_gemelli', fail: 'z6b' } },
+      { text: '🗣 Daniele alza la voce: "Fratello mio, TIENI."', tag: 'Prova di Carisma — CD 10 (Daniele aggiunge la sua voce)', requires: { hero: 'daniele' }, check: { stat: 'CAR', dc: 10, success: 'e_gemelli', fail: 'z6b' } },
     ],
   },
 
@@ -750,7 +1138,7 @@ Il buco a forma di persona scende dall'altare. Il Grigiore gli si raccoglie addo
 > Daniele: "Hai i televisori, i divani e la moquette. Noi abbiamo due racchettoni professionali e una parrucchiera di Gaeta. Non c'è partita, ma non nel senso che credi tu."
 
 **(Tutto ciò che avete conquistato stanotte — la foto, i sabotaggi, i risvegli, la pace, il manuale — scende in campo con voi.)**`,
-    combat: { enemies: ['eleinad_vero'], victory: 'z8', defeat: 'z_ko' },
+    combat: { enemies: ['eleinad_vero'], victory: 'z8', defeat: 'z_ko', loot: { gold: 2 } },
   },
 
   z8: {
@@ -808,7 +1196,7 @@ Ma la scelta, come tutte quelle vere, non è dei gemelli. È vostra.
     caption: 'La navata vince un round',
     stinger: 'defeat',
     fullHeal: true,
-    goldLoss: 3,
+    goldLoss: 2,
     text: `Cadete tutti insieme, e i divani vi RICEVONO.
 
 Vi risvegliate seduti. In fila, sulla prima panca della navata, composti come a un funerale — e il funerale sarebbe il vostro. Davanti, i televisori trasmettono una cosa sola su tutti gli schermi: VOI. Seduti. Comodi. Lo schermo dentro lo schermo dentro lo schermo.
@@ -833,7 +1221,7 @@ Vi alzate. Uno alla volta, le gambe di piombo, il velluto che non vuole. Ma vi a
     caption: 'Epilogo — La Parola',
     ending: true,
     reviveAll: true,
-    gold: 2,
+    gold: 1,
     sets: { finale_parola: true },
     stinger: 'victory',
     text: `Eleinad frana dentro se stesso senza rumore: un buco che si chiude come acqua sopra un sasso, e quando l'ultima briciola di grigio cade verso l'alto e si accende, la casa intera SI SGONFIA — pareti che tornano pareti, la navata che si ripiega in un salotto, il salotto in un bilocale di sessanta metri quadri che finisce, benedetto, DA TUTTE LE PARTI.
@@ -841,6 +1229,12 @@ Vi alzate. Uno alla volta, le gambe di piombo, il velluto che non vuole. Ma vi a
 E se qualcuno di voi camminava come luce, adesso non più: il colore che torna al mondo torna anche a LORO — peso, fiato, battito, tutto in una volta — e c'è chi si tocca le mani senza credere alle mani, e c'è chi abbraccia e chi viene abbracciato e non si capisce più chi dei due piange di più. Va bene così. Nessuno lo racconterà giusto, comunque.
 
 La porta d'ingresso RIAPPARE. Dietro, l'alba: e i colori fanno MALE agli occhi, nel senso buono — il rosa sguaiato, l'arancione maleducato, il cielo che non si vergogna di niente.
+
+E se stanotte uno di voi è passato dalla sala d'aspetto dei morti — sedie di formica, una signora che sferruzza un filo che non c'è, un ragazzo curvo su un cruciverba — adesso si ferma sul pianerottolo col telefono in mano, e cerca. *Settantaquattro orizzontale, sei lettere: "ciò che resta quando nessuno ti nomina più".* La casella non voleva GRIGIO. Voleva un NOME.
+
+> Chi c'è stato: *(verso la porta che si sta richiudendo, ad alta voce, scandendo)* "TERESA. Ti chiami TERESA, signora. L'ho detto qua fuori, e adesso lo sanno tutti."
+
+Dentro, per un secondo, qualcuno smette di sferruzzare.
 
 Daniele esce per primo. Si volta a guardare il suo bilocale tornato bilocale.
 
@@ -860,7 +1254,7 @@ Un'ora dopo: il bar sotto casa, sei caffè, una Zero. E il primo litigio POST-vi
     caption: 'Epilogo — I Gemelli',
     ending: true,
     reviveAll: true,
-    gold: 2,
+    gold: 1,
     sets: { finale_gemelli: true },
     stinger: 'victory',
     text: `L'urlo di Eleinad si spegne a metà, perché non trova più l'appiglio: due gemelli che si danno ragione sono una lingua che il demone non ha mai imparato a leggere. Prova a sfogliarli — lo sentite, un frugare gelido nella memoria, in cerca di una lite, UNA — e trova solo la foto: due bambini su una spiaggia, uno che ride, uno che sta per ridere.
@@ -868,6 +1262,8 @@ Un'ora dopo: il bar sotto casa, sei caffè, una Zero. E il primo litigio POST-vi
 E allora si richiude. Come un libro. Le pagine grigie che si accostano piano, la copertina che cala, il buco a forma di persona che diventa una fessura, poi una riga, poi un niente ordinato — e la casa si sgonfia attorno a quel niente fino a tornare un bilocale con la porta al suo posto e l'alba dietro la porta.
 
 E il colore, tornando al mondo, ripassa a saldare i conti: se qualcuno di voi era luce, torna CARNE — e viene travolto dall'abbraccio più disordinato della storia del pianerottolo.
+
+E se stanotte uno di voi è passato dalla sala d'aspetto dei morti, sul pianerottolo si ferma un attimo col telefono in mano: *settantaquattro orizzontale, sei lettere, "ciò che resta quando nessuno ti nomina più".* Non era GRIGIO. Era **TERESA** — e viene detto ad alta voce verso la porta che si chiude, scandito, come si fanno i nomi che contano. Dentro, un ferro da maglia si ferma a metà punto.
 
 Una settimana dopo, il salotto di Daniele è ridipinto — l'hanno fatto in sei, male, con più vernice sui gemelli che sulle pareti. E sopra il divano NUOVO, appesa con quattro pezzi di nastro adesivo perché nessuno è andato a comprare una cornice e ormai è una questione di principio, c'è LEI: la foto intera, la piega al centro come una cicatrice ben chiusa.
 
@@ -884,7 +1280,7 @@ E nessuno dei due ride, stavolta. Che è il loro modo di ridere più forte.`,
     location: 'alba_colori',
     caption: 'Epilogo — I Colori',
     ending: true,
-    gold: 2,
+    gold: 1,
     sets: { finale_colori: true },
     stinger: 'victory',
     text: `Il colore vince come vincono le inondazioni: senza chiedere. Dilaga dalla navata in su, stanza per stanza, e la casa si sgonfia sotto la piena finché non resta che un bilocale sbalordito, con i mobili veri, la polvere vera, e una porta d'ingresso che stavolta c'è.
@@ -945,6 +1341,8 @@ Natalino ha un tronello in mano che non accende. Claudia non fotografa. Federico
 
 Qualcuno di voi, forse, pensa ancora di alzarsi. Tra un episodio e l'altro. Tra questo e il prossimo. Dal prossimo, sicuro.
 
+E c'è una cosa che Eleinad non vi dirà mai, perché non riesce a spiegarsela: le dita di Daniele, sul bracciolo, BATTONO ancora. Piano. A intervalli. Punto-linea-punto. Nessuno le ascolta più — ma non hanno smesso. In questa stanza c'è uno che si arrende peggio di tutti gli altri, e lo sta facendo alla sua maniera: senza mollare la discussione a metà.
+
 Fuori, il sole sorge su una città a colori. Dentro, la luce blu non cambia mai.
 
 La casa, finalmente, finisce. Voi no. **Rigiocate: là fuori c'è un'alba che vi aspetta.**`,
@@ -990,3 +1388,5 @@ USCITE DEL BLOCCO: nessuna (gli epiloghi chiudono). Ingressi: m1 (da h1), z1 (da
 STINGER USATI: jumpscare (m3, m4c, z4_colpo), victory (m6, e_parola, e_gemelli, e_colori),
 campana (m8, z1, e_scambio), defeat (m_ko, z_ko, e_grigio).
 ======================================================================== */
+
+/* ============ HUB — il Salotto-Cattedrale e le scene di respiro ============ */

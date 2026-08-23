@@ -20,5 +20,24 @@ const parts = [
   read('drafts/campaign-footer.js'),
 ];
 
-writeFileSync(join(root, 'js/campaign.js'), parts.join('\n'));
-console.log('✔ js/campaign.js assemblato:', parts.join('\n').length, 'caratteri');
+/* GUARDIA ANTI-DISASTRO (ago 2026). In questo repo i draft si erano scollati dal
+   gioco: js/campaign.js aveva 248 scene, i draft 184. Lanciare l'assemble avrebbe
+   cancellato 64 scene in silenzio. Da ora si rifiuta di scrivere se il risultato
+   perde scene rispetto al file che sta per sovrascrivere. */
+function contaScene(testo) {
+  return (testo.match(/^  [a-z0-9_]+: \{$/gm) || []).length;
+}
+const nuovo = parts.join('\n');
+const dest = join(root, 'js/campaign.js');
+let vecchio = '';
+try { vecchio = readFileSync(dest, 'utf8'); } catch (e) {}
+const nNuovo = contaScene(nuovo), nVecchio = contaScene(vecchio);
+if (vecchio && nNuovo < nVecchio) {
+  console.error(`\n❌ RIFIUTO DI SCRIVERE: i draft producono ${nNuovo} scene, il file attuale ne ha ${nVecchio}.`);
+  console.error(`   Perderesti ${nVecchio - nNuovo} scene. I draft sono scollati dal gioco: vanno`);
+  console.error(`   rigenerati dal file vero prima di poter riusare la pipeline.\n`);
+  process.exit(1);
+}
+writeFileSync(dest, nuovo);
+console.log(`✔ js/campaign.js assemblato: ${nuovo.length} caratteri, ${nNuovo} scene` +
+  (vecchio && nNuovo > nVecchio ? ` (+${nNuovo - nVecchio} rispetto a prima)` : ''));

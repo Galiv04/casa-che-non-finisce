@@ -304,6 +304,9 @@ function checkInvariants(G, where) {
       throw new Error(`STATO INCOERENTE: h.preso non booleano per "${h.id}" (${JSON.stringify(h.preso)}) @ ${where}`);
     }
   }
+  if (G.ritiri && (!Number.isFinite(G.ritiri.n) || G.ritiri.n < 0)) {
+    throw new Error(`STATO INCOERENTE: contatore dei ritiri invalido (${JSON.stringify(G.ritiri)}) @ ${where}`);
+  }
   const vivi = G.party.filter(h => !h.morto).length;
   if (G.party.length && vivi === 0 && !/e_scambio|sacrificio/.test(where)) {
     throw new Error(`STATO INCOERENTE: TUTTO il gruppo risulta morto (killRoller sull'ultimo vivo?) @ ${where}`);
@@ -321,9 +324,27 @@ function checkInvariants(G, where) {
 /* ==================== STRATEGIA DI COMBATTIMENTO ==================== */
 
 function classifyCombatMenu(btns) {
+  // il menu del RITIRO in Colore (colpo mancato): si riconosce dall'id del bottone,
+  // non dal testo, e NON è un menu principale — non deve far avanzare il contatore
+  // dei turni del bot, o l'intera traiettoria dello scontro cambierebbe (LESSON #6).
+  if (btns.some(b => b.id === 'btn-colore-combat')) return 'ritiro';
   if (btns.some(b => /^🎯/.test(b.innerHTML))) return 'target';
   if (btns.some(b => /^❤|^💀/.test(b.innerHTML))) return 'ally';
   return 'main';
+}
+
+/* La prova fallita offre il RITIRO (d20 di Daniele e/o Colore): il bot, per default,
+   accetta il fato. Usata dalle verifiche dirette che pilotano una prova a mano. */
+function accettaIlFato(game) {
+  if (game.doc.getElementById('modal-generic').classList.contains('hidden')) return false;
+  const content = game.doc.getElementById('modal-generic-content');
+  if (!/btn-reroll-no/.test(content.innerHTML)) return false;
+  const no = game.doc.getElementById('btn-reroll-no');
+  if (typeof no.onclick !== 'function') return false;
+  const fn = no.onclick;
+  no.onclick = null;
+  game.act(() => fn());
+  return true;
 }
 
 function pickWeakestTarget(btns) {
@@ -410,7 +431,10 @@ function runCombat(game, scenario, state) {
 
     const kind = classifyCombatMenu(btns);
     let chosen;
-    if (state.strategy === 'passive' && kind === 'main') {
+    if (kind === 'ritiro') {
+      // "↩ Lascia perdere": il turno prosegue e il Colore resta in tasca
+      chosen = btns.find(b => /Lascia perdere/.test(b.innerHTML)) || btns[0];
+    } else if (state.strategy === 'passive' && kind === 'main') {
       chosen = btns.find(b => /Difesa totale/.test(b.innerHTML)) || enabledButtons(box)[0];
     } else if (kind === 'target') {
       chosen = pickWeakestTarget(btns);
@@ -516,15 +540,26 @@ function runGame(scenario) {
       if (!modalGeneric.classList.contains('hidden')) {
         const content = doc.getElementById('modal-generic-content');
 
-        if (/btn-reroll-yes/.test(content.innerHTML)) {
-          const yes = doc.getElementById('btn-reroll-yes');
+        /* Offerta di RITIRO su prova fallita: il d20 di Daniele (btn-reroll-yes),
+           il ritiro pagato in Colore (btn-colore-yes), o accettare il fato
+           (btn-reroll-no, il default del bot: così gli scenari restano deterministici). */
+        if (/btn-reroll-yes|btn-colore-yes/.test(content.innerHTML)) {
+          const conD20 = /btn-reroll-yes/.test(content.innerHTML);
+          const conColore = /btn-colore-yes/.test(content.innerHTML);
+          const yes = conD20 ? doc.getElementById('btn-reroll-yes') : null;
+          const colore = conColore ? doc.getElementById('btn-colore-yes') : null;
           const no = doc.getElementById('btn-reroll-no');
-          const btn = scenario.acceptReroll ? yes : no;
-          if (typeof btn.onclick !== 'function') throw new Error('modale del d20 di Daniele senza handler');
+          let btn = no;
+          if (conD20 && scenario.acceptReroll) btn = yes;
+          else if (conColore && scenario.acceptColorReroll) btn = colore;
+          if (typeof btn.onclick !== 'function') throw new Error('modale di ritiro (d20 / Colore) senza handler');
           const fn = btn.onclick;
-          yes.onclick = null; no.onclick = null; // niente handler stantii al prossimo giro
+          // niente handler stantii al prossimo giro
+          if (yes) yes.onclick = null;
+          if (colore) colore.onclick = null;
+          no.onclick = null;
           game.act(() => fn());
-          checkInvariants(getG(), `dopo offerta di ritiro (d20) in "${sceneId}"`);
+          checkInvariants(getG(), `dopo offerta di ritiro in "${sceneId}"`);
           continue;
         }
 
@@ -606,6 +641,8 @@ function runGame(scenario) {
   log.flags = { ...(G.flags || {}) };
   log.inventory = [...(G.inventory || [])];
   log.gold = G.gold;
+  log.goldEarned = (G.stats || {}).goldEarned || 0;   // 🎨 RACCOLTO in tutta la partita
+  log.ritiriPagati = (G.stats || {}).ritiriPagati || 0;
   log.finalParty = G.party.map(h => ({ id: h.id, hp: h.hp, maxHp: h.maxHp, morto: !!h.morto, down: !!h.down }));
   log.partyBar = partyBarText(doc);
   log.everMorto = [...log.everMorto];
@@ -1219,6 +1256,27 @@ coverageItem('Oggetti chiave posseduti almeno una volta', [
   'cuore_colore', 'boccata_colore', 'conchiglia_gaeta', 'pallina_racchettoni', 'tronello', 'gocce_dottore',
 ]);
 
+/* ==================== ECONOMIA DEL COLORE (riga permanente) ====================
+   Il Colore compra il SECONDO TENTATIVO (2🎨 il primo ritiro, poi 3, 5, 8). Perché
+   la valuta significhi qualcosa, il raccolto di UNA partita deve valere pochi ritiri:
+   la fascia sana è 15-30 (3-4 ritiri), non 150. Questa riga è il termometro: se
+   torna a gonfiarsi, la valuta è tornata decorativa. */
+section('Economia del Colore (🎨 raccolto per partita)');
+{
+  const raccolti = okRuns.map(r => r.log.goldEarned || 0).sort((a, b) => a - b);
+  if (raccolti.length) {
+    const mediana = raccolti[Math.floor(raccolti.length / 2)];
+    const media = Math.round(raccolti.reduce((t, x) => t + x, 0) / raccolti.length);
+    const min = raccolti[0], max = raccolti[raccolti.length - 1];
+    const ritiri = okRuns.reduce((t, r) => t + (r.log.ritiriPagati || 0), 0);
+    console.log(`  🎨 raccolto per partita — min ${min} · mediana ${mediana} · media ${media} · max ${max}  (su ${raccolti.length} partite)`);
+    console.log(`  🎨 in cassa alla fine — min ${Math.min(...okRuns.map(r => r.log.gold))} · max ${Math.max(...okRuns.map(r => r.log.gold))} · ritiri pagati in totale: ${ritiri}`);
+    console.log(`  🎲 col raccolto MEDIANO (${mediana}🎨) il gruppo compra ~${(() => { let s = mediana, n = 0, k = 0; const c = i => (i < 4 ? [2, 3, 5, 8][i] : 8 + 3 * (i - 3)); while (s >= c(n)) { s -= c(n); n++; k++; } return k; })()} ritiri di dado in una notte`);
+    if (media > 45) fail(`INFLAZIONE del Colore: raccolto medio ${media}🎨 per partita (atteso ≲ 40: la valuta si satura e smette di significare qualcosa)`);
+    if (media < 8) fail(`Colore troppo avaro: raccolto medio ${media}🎨 per partita (atteso ≳ 8: il secondo tentativo diventa irraggiungibile)`);
+  }
+}
+
 const EXPECTED_ENDINGS = ['e_parola', 'e_gemelli', 'e_colori', 'e_scambio', 'e_grigio'];
 console.log(`  ${allEndings.size >= 5 ? '✅' : '❌'} Finali raggiunti (${allEndings.size}/5): ${[...allEndings].join(', ') || '(nessuno)'}`);
 if (!EXPECTED_ENDINGS.every(e => allEndings.has(e))) {
@@ -1246,6 +1304,7 @@ if (!EXPECTED_ENDINGS.every(e => allEndings.has(e))) {
   game.withForcedRandom(0, () => game.act(() => heroBtn.onclick())); // 1 naturale: fallita
   const cont = game.doc.getElementById('btn-dice-continue');
   if (typeof cont.onclick === 'function') game.act(() => cont.onclick());
+  accettaIlFato(game); // la modale del ritiro: qui il fato si accetta
   if (G.sceneId !== 'u6_morte') { fail(`killRollerUltimoVivo: attesa u6_morte, trovata ${G.sceneId}`); return; }
   if (G.party[0].morto) fail('killRollerUltimoVivo: l\'ULTIMO vivo è stato ucciso da killRoller (vietato dal design)');
   else console.log('  ✅ u6_morte raggiunta in solitaria: il Sopravvissuto NON muore (mai sull\'ultimo vivo)');
@@ -1267,13 +1326,14 @@ if (!EXPECTED_ENDINGS.every(e => allEndings.has(e))) {
   game.withForcedRandom(0, () => game.act(() => heroBtn.onclick()));
   const cont = game.doc.getElementById('btn-dice-continue');
   if (typeof cont.onclick === 'function') game.act(() => cont.onclick());
+  accettaIlFato(game); // la modale del ritiro: qui il fato si accetta
   const spirito = G.party.find(h => h.morto);
   if (!spirito) { fail('morteSpiritoRevive: nessun morto vero dopo u6 fallita (killRoller rotto)'); return; }
   if (spirito.hp !== 0) fail(`morteSpiritoRevive: lo spirito ha ${spirito.hp} PV (attesi 0)`);
   if (!new RegExp(rollerName.split(' ')[0]).test(spirito.name)) fail(`morteSpiritoRevive: morto ${spirito.name}, ma a tirare era ${rollerName}`);
   if (!/SPIRITO/.test(partyBarText(game.doc))) fail('morteSpiritoRevive: la barra del gruppo non mostra 👻 SPIRITO');
 
-  // dal Mercante: il Cuore costa 12🎨 e il tronello (di partenza)
+  // dal Mercante: il Cuore costa 8🎨 e il tronello (di partenza)
   G.gold = 20;
   game.act(() => game.api.Engine.gotoScene('k6'));
   const cuoreBtn = matchButton(enabledButtons(game.doc.getElementById('choices')), 'CUORE DI COLORE');
@@ -1281,7 +1341,7 @@ if (!EXPECTED_ENDINGS.every(e => allEndings.has(e))) {
   game.act(() => cuoreBtn.onclick());
   if (!G.inventory.includes('cuore_colore')) { fail('morteSpiritoRevive: cuore_colore non in zaino dopo l\'acquisto'); return; }
   if (G.inventory.includes('tronello')) fail('morteSpiritoRevive: il tronello non è stato ceduto al Mercante');
-  if (G.gold !== 9) fail(`morteSpiritoRevive: Colore atteso 9 dopo l'acquisto, trovato ${G.gold}`);
+  if (G.gold !== 12) fail(`morteSpiritoRevive: Colore atteso 12 dopo l'acquisto (20 − 8), trovato ${G.gold}`);
 
   // resurrezione: useRevive popola la modale, applyRevive fa il lavoro (il bottone
   // reale ha l'onclick DENTRO l'HTML, come per l'antidoto: si chiama la funzione)
@@ -1398,11 +1458,15 @@ if (!EXPECTED_ENDINGS.every(e => allEndings.has(e))) {
   const G1 = game.getG();
   G1.inventory.push('manuale_annotato'); G1.gold = 7;
   game.act(() => E.gotoScene('a3'));   // l'auto-save fotografa lo stato
+  /* Il Colore atteso si LEGGE dallo stato, non si scrive a mano: dopo la
+     ricalibrazione dell'economia (ago 2026) non tutte le scene ne danno più, e un
+     numero fisso qui rendeva il test una fotografia di com'era il gioco allora. */
+  const coloreAtteso = game.getG().gold;
   // ricarica dallo stesso slot
   game.act(() => E.loadGame(1));
   let G2 = game.getG();
   if (G2.sceneId !== 'a3') fail(`saveLoad: scena attesa a3 dopo loadGame, trovata ${G2.sceneId}`);
-  if (!G2.inventory.includes('manuale_annotato') || G2.gold !== 8) fail('saveLoad: zaino o Colore persi nella ricarica');
+  if (!G2.inventory.includes('manuale_annotato') || G2.gold !== coloreAtteso) fail(`saveLoad: zaino o Colore persi nella ricarica (atteso ${coloreAtteso}, trovato ${G2.gold})`);
   if (G2.party[0].player !== 'Gali') fail('saveLoad: nome del giocatore perso');
   // "altro dispositivo": export → import su slot diverso → load
   const code = E.exportCode(1);
@@ -1411,7 +1475,7 @@ if (!EXPECTED_ENDINGS.every(e => allEndings.has(e))) {
   if (err) { fail('saveLoad: importCode ha rifiutato il proprio codice: ' + err); return; }
   game.act(() => E.loadGame(3));
   G2 = game.getG();
-  if (G2.sceneId !== 'a3' || G2.gold !== 8) fail('saveLoad: stato corrotto dopo il viaggio export/import');
+  if (G2.sceneId !== 'a3' || G2.gold !== coloreAtteso) fail(`saveLoad: stato corrotto dopo il viaggio export/import (Colore atteso ${coloreAtteso}, trovato ${G2.gold})`);
   if (E.importCode('non-un-codice!!!', 3) === null) fail('saveLoad: un codice spazzatura è stato accettato');
   console.log('  ✅ Salvataggio, ricarica, export/import tra slot: stato integro (scena, zaino, Colore, nomi) e spazzatura rifiutata');
 })();
@@ -1464,6 +1528,142 @@ if (!EXPECTED_ENDINGS.every(e => allEndings.has(e))) {
   else console.log('  ✅ Spiriti esclusi dalle prove e dai menu di cura in combattimento');
 })();
 
+(function testRitiroInColoreProvaDiScena() {
+  section('Verifica diretta: il Colore compra il SECONDO TENTATIVO in una prova di scena');
+  const game = buildGame(8181);
+  const E = game.api.Engine;
+  game.act(() => E.newGame([{ heroId: 'claudia', player: '' }, { heroId: 'gaetano', player: '' }]));
+  const G = game.getG();
+  const ctx = 'scena:a0';
+  const content = () => game.doc.getElementById('modal-generic-content');
+  const chiudiDado = () => {
+    const cont = game.doc.getElementById('btn-dice-continue');
+    if (typeof cont.onclick === 'function') game.act(() => cont.onclick());
+  };
+  // una prova che si può fallire a comando: "Claudia guarda le finestre" a a0
+  const provaFallita = () => {
+    game.act(() => matchButton(buttons(game.doc.getElementById('choices')), 'Claudia guarda').onclick());
+    const heroBtn = buttons(content())[0];
+    if (!heroBtn) throw new Error('modale della prova senza eroi');
+    game.withForcedRandom(0, () => game.act(() => heroBtn.onclick())); // 1 naturale
+    game.withForcedRandom(0, () => chiudiDado());
+  };
+
+  G.gold = 10;
+  game.act(() => E.gotoScene('a0'));
+  provaFallita();
+  if (!/btn-colore-yes/.test(content().innerHTML)) { fail('ritiroColore: con 10🎨 la prova fallita non offre il ritiro pagato (btn-colore-yes assente)'); return; }
+  if (E.costoRitiroOra(ctx) !== 2) fail(`ritiroColore: il primo ritiro deve costare 2🎨, non ${E.costoRitiroOra(ctx)}`);
+  if (!/2 🎨/.test(content().innerHTML)) fail('ritiroColore: la modale non dice al tavolo quanto costa il ritiro');
+
+  // primo ritiro: si paga 2, il dado torna in aria (e lo facciamo fallire di nuovo)
+  const primo = game.doc.getElementById('btn-colore-yes').onclick;
+  if (typeof primo !== 'function') { fail('ritiroColore: btn-colore-yes senza handler'); return; }
+  game.withForcedRandom(0, () => game.act(() => primo()));
+  if (G.gold !== 8) fail(`ritiroColore: dopo il primo ritiro attesi 8🎨 (10−2), trovati ${G.gold}`);
+  if (G.sceneId !== 'a0') fail(`ritiroColore: il ritiro non deve cambiare scena (siamo in ${G.sceneId})`);
+  if (game.doc.getElementById('dice-overlay').classList.contains('hidden')) fail('ritiroColore: il dado non è tornato in aria dopo il ritiro pagato');
+  game.withForcedRandom(0, () => chiudiDado());
+
+  // secondo ritiro nella STESSA scena: costa più del primo
+  if (E.costoRitiroOra(ctx) !== 3) fail(`ritiroColore: il secondo ritiro nella stessa scena deve costare 3🎨, non ${E.costoRitiroOra(ctx)}`);
+  if (!/btn-colore-yes/.test(content().innerHTML)) { fail('ritiroColore: il secondo ritiro non viene offerto con 8🎨 in mano'); return; }
+  const secondo = game.doc.getElementById('btn-colore-yes').onclick;
+  game.withForcedRandom(0, () => game.act(() => secondo()));
+  if (G.gold !== 5) fail(`ritiroColore: dopo il secondo ritiro attesi 5🎨 (8−3), trovati ${G.gold}`);
+  if ((G.ritiri || {}).n !== 2 || G.ritiri.ctx !== ctx) fail(`ritiroColore: contatore dei ritiri sbagliato: ${JSON.stringify(G.ritiri)}`);
+  if (E.costoRitiroOra(ctx) !== 5) fail(`ritiroColore: il terzo ritiro deve costare 5🎨, non ${E.costoRitiroOra(ctx)}`);
+  if (G.stats.ritiriPagati !== 2) fail(`ritiroColore: ritiriPagati atteso 2, trovato ${G.stats.ritiriPagati}`);
+
+  // saldo insufficiente: il bottone NON deve comparire (e senza il d20 nemmeno la modale)
+  G.gold = 1;
+  game.withForcedRandom(0, () => chiudiDado());
+  if (/btn-colore-yes/.test(content().innerHTML) && !game.doc.getElementById('modal-generic').classList.contains('hidden')) {
+    fail('ritiroColore: con 1🎨 in mano il ritiro pagato viene offerto comunque');
+  }
+  if (G.sceneId === 'a0') fail('ritiroColore: senza ritiri disponibili la prova fallita deve andare avanti (scena invariata)');
+
+  // e il prezzo si azzera cambiando stanza
+  if (E.costoRitiroOra('scena:' + G.sceneId) !== 2) fail('ritiroColore: in una scena NUOVA il ritiro deve tornare a costare 2🎨');
+  // quanti ritiri compra il saldo: 10🎨 → 2+3+5 = 3 ritiri
+  G.gold = 10; G.ritiri = { ctx: null, n: 0 };
+  if (E.ritiriDisponibili('scena:x') !== 3) fail(`ritiroColore: con 10🎨 si comprano 3 ritiri (2+3+5), non ${E.ritiriDisponibili('scena:x')}`);
+  if (!failures) console.log('  ✅ prova fallita: ritiro a 2🎨, poi 3🎨 nella stessa stanza, 2 in una nuova; con 1🎨 niente offerta');
+})();
+
+(function testRitiroInColoreCombattimento() {
+  section('Verifica diretta: il Colore ritira anche un COLPO mancato (dentro #combat-actions)');
+  const game = buildGame(8282);
+  const E = game.api.Engine;
+  game.act(() => E.newGame([{ heroId: 'claudia', player: '' }, { heroId: 'gaetano', player: '' }]));
+  const G = game.getG();
+  G.gold = 10;
+  const azioni = () => buttons(game.doc.getElementById('combat-actions'));
+  const dadoAperto = () => !game.doc.getElementById('dice-overlay').classList.contains('hidden');
+  const chiudiDado = () => {
+    const cont = game.doc.getElementById('btn-dice-continue');
+    if (typeof cont.onclick === 'function') game.withForcedRandom(0, () => game.act(() => cont.onclick()));
+  };
+
+  /* newGame apre la modale con "La Storia" (l'incipit obbligatorio della serie):
+     va chiusa come farebbe una persona, sennò più avanti il test la trova aperta
+     e crede che sia il combattimento ad aprire modali. */
+  const modaleIniziale = game.doc.getElementById('modal-generic');
+  if (!modaleIniziale.classList.contains('hidden')) {
+    const chiudi = buttons(game.doc.getElementById('modal-generic-content')).find(b => typeof b.onclick === 'function');
+    if (chiudi) game.act(() => chiudi.onclick());
+    else modaleIniziale.classList.add('hidden');
+  }
+
+  // a7: i topi nel corridoio. Si attacca con un 1 naturale: il colpo va a vuoto.
+  game.act(() => E.gotoScene('a7'));
+  game.act(() => matchButton(buttons(game.doc.getElementById('choices')), 'INIZIA IL COMBATTIMENTO').onclick());
+  let guard = 0, trovato = false;
+  while (guard++ < 60 && !trovato) {
+    if (dadoAperto()) { chiudiDado(); continue; }
+    if (!game.doc.getElementById('screen-combat').classList.contains('active')) break;
+    const btns = azioni();
+    if (!btns.length) break;
+    const kind = classifyCombatMenu(btns);
+    if (kind === 'ritiro') { trovato = true; break; }
+    if (kind === 'target') { game.withForcedRandom(0, () => game.act(() => btns[0].onclick())); continue; }
+    const atk = btns.find(b => /^⚔/.test(b.innerHTML) && !b.disabled);
+    game.act(() => (atk || btns.find(b => !b.disabled)).onclick());
+  }
+  if (!trovato) { fail('ritiroCombat: dopo un colpo mancato non è comparso il menu del ritiro in #combat-actions'); return; }
+
+  const menu = azioni();
+  const btnColore = menu.find(b => b.id === 'btn-colore-combat');
+  if (!btnColore) { fail('ritiroCombat: manca btn-colore-combat nel menu del colpo mancato'); return; }
+  if (!/Lascia perdere/.test(menu[0].innerHTML)) fail('ritiroCombat: "↩ Lascia perdere" deve essere il PRIMO bottone (il bot ci conta)');
+  if (menu.some(b => /^🎯|^❤|^💀/.test(b.innerHTML))) fail('ritiroCombat: i bottoni del ritiro non devono sembrare un menu bersaglio/alleato');
+  if (!game.doc.getElementById('modal-generic').classList.contains('hidden')) fail('ritiroCombat: in combattimento non si aprono modali — contenuto: ' + String(game.doc.getElementById('modal-generic-content').innerHTML).replace(/<[^>]*>/g,' ').slice(0,180));
+
+  // si paga e si ritira: −2🎨 e il dado torna in aria
+  const prima = G.gold;
+  game.withForcedRandom(0, () => game.act(() => btnColore.onclick()));
+  if (G.gold !== prima - 2) fail(`ritiroCombat: atteso ${prima - 2}🎨 dopo il ritiro, trovati ${G.gold}`);
+  if (!dadoAperto()) fail('ritiroCombat: il dado non è tornato in aria dopo il ritiro pagato');
+  if (G.stats.ritiriPagati !== 1) fail(`ritiroCombat: ritiriPagati atteso 1, trovato ${G.stats.ritiriPagati}`);
+  chiudiDado(); // di nuovo un 1: si manca ancora
+
+  // il secondo ritiro nello STESSO scontro costa di più
+  const ctx = 'scontro:a7';
+  if (E.costoRitiroOra(ctx) !== 3) fail(`ritiroCombat: il secondo ritiro nello stesso scontro deve costare 3🎨, non ${E.costoRitiroOra(ctx)}`);
+  const menu2 = azioni();
+  if (classifyCombatMenu(menu2) !== 'ritiro') { fail('ritiroCombat: il secondo colpo mancato non offre più il ritiro'); return; }
+  // "Lascia perdere": il turno prosegue e il Colore resta in tasca
+  const saldo = G.gold;
+  game.act(() => menu2[0].onclick());
+  if (G.gold !== saldo) fail(`ritiroCombat: "Lascia perdere" non deve costare niente (${saldo} → ${G.gold})`);
+  const dopo = azioni();
+  if (dopo.some(b => b.id === 'btn-colore-combat')) fail('ritiroCombat: dopo "Lascia perdere" il menu del ritiro deve sparire (niente azione extra)');
+  if (!/manca/.test(game.doc.getElementById('combat-log').children.map(p => p.innerHTML).join(' '))) {
+    fail('ritiroCombat: il log non racconta il colpo mancato dopo "Lascia perdere"');
+  }
+  if (!failures) console.log('  ✅ colpo mancato: btn-colore-combat in #combat-actions, −2🎨 e ritiro, poi 3🎨; "Lascia perdere" prosegue il turno gratis');
+})();
+
 /* ==================== ESITO FINALE ==================== */
 
 section('Copertura totale della campagna');
@@ -1474,6 +1674,55 @@ section('Copertura totale della campagna');
   console.log(`  Scene distinte visitate: ${allScenesSeen.size} / ${allCampaignIds.length}`);
   console.log(`  Scene MAI visitate (${unseen.length}): ${unseen.join(', ') || '(nessuna)'}`);
 }
+
+
+/* ==================== SCHEDA DEL PERSONAGGIO ====================
+   Nessuna partita simulata clicca su un eroe, quindi per mesi la scheda ha potuto
+   crashare senza che nessun test lo notasse: `conditions` era dichiarata dentro il
+   ciclo delle abilità e il template la cercava fuori — ReferenceError a ogni click,
+   proprio sulla schermata che il committente aveva chiesto per vedere gli stati.
+   Questa prova apre la scheda di OGNI eroe in OGNI combinazione di stati. */
+(function testSchedaPersonaggio() {
+  section('Scheda del personaggio: si apre sempre, in ogni stato');
+  const game = buildGame(424242);
+  const E = game.api.Engine;
+  const tuttiGliEroi = game.api.HEROES;
+  game.act(() => E.newGame(tuttiGliEroi.filter(h => !h.locked).slice(0, 2).map(h => ({ heroId: h.id, player: '' }))));
+  /* Solo gli stati che QUESTO motore conosce: cercare un blocco "Condizioni attive"
+     per uno stato che il gioco non ha mai sarebbe un test che chiede l'impossibile.
+     La lista si deduce dal codice del motore, non si scrive a memoria. */
+  const engineSrc = readFileSync(join(root, 'js/engine.js'), 'utf8');
+  const STATI_NOTI = ['veleno', 'down', 'preso', 'morto', 'rimasto']
+    .filter(s => new RegExp(`h\\.${s}\\b`).test(engineSrc) && new RegExp(`if \\(h\\.${s}\\) conditions\\.push`).test(engineSrc));
+  const STATI = [{}, ...STATI_NOTI.map(s => ({ [s]: true }))];
+  if (STATI_NOTI.length >= 2) STATI.push({ [STATI_NOTI[0]]: true, [STATI_NOTI[1]]: true });
+  let rotte = 0, aperte = 0;
+  for (const base of tuttiGliEroi) {
+    for (const stato of STATI) {
+      // una copia dell'eroe con lo stato addosso, come lo vedrebbe il giocatore
+      const h = Object.assign(JSON.parse(JSON.stringify(base)), { hp: 3, player: 'Gali' }, stato);
+      try {
+        const html = E.heroSheetHTML(h);
+        aperte++;
+        if (typeof html !== 'string' || html.length < 200) { fail(`scheda di "${base.id}" con stato ${JSON.stringify(stato)}: HTML vuoto o troppo corto`); rotte++; }
+        const conStato = Object.keys(stato).length > 0;
+        if (conStato && !/Condizioni attive/.test(html)) { fail(`scheda di "${base.id}" con stato ${JSON.stringify(stato)}: nessun blocco "Condizioni attive" — lo stato è invisibile al giocatore`); rotte++; }
+        if (/undefined|\[object Object\]|NaN/.test(html)) { fail(`scheda di "${base.id}" con stato ${JSON.stringify(stato)}: contiene "undefined"/"NaN" nel testo mostrato`); rotte++; }
+      } catch (e) {
+        fail(`scheda di "${base.id}" con stato ${JSON.stringify(stato)} ESPLODE: ${e.message}`);
+        rotte++;
+      }
+    }
+  }
+  // e la modale vera, quella che si apre cliccando nella barra del gruppo
+  try {
+    game.act(() => E.showHeroSheetIdx(0));
+    const box = game.doc.getElementById('modal-generic-content');
+    if (!box.innerHTML || box.innerHTML.length < 200) { fail('showHeroSheetIdx(0): la modale resta vuota'); rotte++; }
+    if (game.doc.getElementById('modal-generic').classList.contains('hidden')) { fail('showHeroSheetIdx(0): la modale non si apre'); rotte++; }
+  } catch (e) { fail(`showHeroSheetIdx(0) esplode: ${e.message}`); rotte++; }
+  if (!rotte) console.log(`  ✅ ${aperte} schede aperte (${tuttiGliEroi.length} eroi × ${STATI.length} stati), tutte complete e con le condizioni visibili`);
+})();
 
 console.log('\n' + '═'.repeat(60));
 if (failures === 0) {

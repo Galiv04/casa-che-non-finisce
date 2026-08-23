@@ -1,7 +1,3 @@
-/* ============ LA CASA CHE NON FINISCE — BLOCCO A: PROLOGO + SOGLIA ============
-   Scene a0-a8 (prologo) + s1-s6 (soglia). Uscita unica fuori dal blocco: h1.
-   Valuta: G.gold = COLORE 🎨. Nessuna morte in questo blocco.                  */
-
 const SCENE_A = {
 
   /* ==================== PROLOGO — LA CHAT MUTA ==================== */
@@ -59,11 +55,37 @@ Come un respiro.
 
 La luce si spegne. Di colpo, tutta insieme. Come se al terzo piano qualcuno avesse sentito la frase di Gaetano e avesse deciso che lo spettacolo, per il pubblico di sotto, era finito.
 
-**(🎨 Colore +1: l'avete visto, e non avete distolto lo sguardo.)**`,
-    gold: 1,
+**(L'avete visto, e non avete distolto lo sguardo.)**`,
     sets: { finestra_vista: true },
     choices: [
       { text: '🔔 Al citofono. Subito.', next: 'a1' },
+      { text: '📸 Claudia: fotografare la finestra ORA, prima che cambi', once: true, next: 'a0_foto' },
+    ],
+  },
+
+  a0_foto: {
+    location: 'strada',
+    caption: 'La foto della finestra',
+    text: `Claudia scatta tre volte, in raffica, prima che la luce si spenga del tutto. È il suo mestiere: quando una cosa sta per sparire, prima si scatta e poi si ragiona.
+
+Guarda lo schermo. Ingrandisce. E gira il telefono verso gli altri senza dire niente, perché certe cose è meglio che ognuno le veda con i suoi occhi.
+
+Nella foto, la finestra di Daniele non mostra una TV. Il blu che da giù sembrava luce di schermo, ingrandito, è **un rettangolo grigio perfetto, verticale** — in piedi, in mezzo al salotto, con le proporzioni esatte di una porta. E la luce non gli esce DA dentro: gli gira INTORNO, come l'acqua intorno a un sasso.
+
+> Gaetano: "Le TV sono orizzontali."
+
+> Claudia: "Grazie, Gaetano."
+
+> Gaetano: "No, non hai capito. Le TV sono orizzontali. Le PORTE sono verticali. In quel salotto c'è una porta accesa. E Daniele..." *(non finisce la frase, perché la frase finisce da sola in testa a tutti)*
+
+Nella seconda foto, il rettangolo è mezzo passo più vicino alla finestra. Nella terza, i vetri sono neri, e in un angolo — piccolissimo, e nessuno di voi lo indica per primo — c'è il riflesso di **cinque persone col naso in su**, fotografate dall'INTERNO.
+
+> Federico: "Ok. Si suona quel cazzo di citofono e si sale."
+
+**(Tre foto che nessun perito vorrà mai periziare. La casa vi ha già visti — e voi avete visto la sua PORTA.)**`,
+    sets: { finestra_fotografata: true },
+    choices: [
+      { text: '🔔 Al citofono. SUBITO', next: 'a1' },
     ],
   },
 
@@ -92,6 +114,33 @@ Le scale sono buie. L'interruttore della luce scatta a vuoto, due volte, e al te
     item: 'chiavi_scorta',
     choices: [
       { text: '🪜 Terzo piano. Insieme.', next: 'a2' },
+      { text: '📦 Controllare i pacchi: le etichette raccontano cosa ordinava', once: true, next: 'a1_pacchi' },
+    ],
+  },
+
+  a1_pacchi: {
+    location: 'palazzo',
+    caption: 'Le etichette dei pacchi',
+    text: `Emanuela si inginocchia tra i pacchi e comincia a leggerle davvero, le etichette, una per una, in ordine di data. È il suo modo di volere bene alle persone: fare l'inventario dei loro guai.
+
+I primi sono Daniele da manuale: Coca Zero, un caricatore, una custodia per la Switch. Poi, dodici giorni fa, gli ordini **cambiano**:
+
+*"Lampadina LED RGB 16 milioni di colori."* *"Poster — Tramonto sul Vesuvio, stampa HD."* *"Set 48 pennarelli professionali."* *"Tenda arancione 140x280."* E l'ultimo, il più pesante, quello in fondo alla pila: *"Lampada di luce naturale 10.000 lux."*
+
+> Emanuela: *(piano)* "Ragazzi. Guardate cosa stava ordinando."
+
+> Gaetano: "Colore. Stava ordinando COLORE. Litri di colore, da dodici giorni."
+
+> Natalino: "Quindi l'aveva capito. Prima di noi, da solo, senza dirlo a nessuno: qualcosa gli stava sbiadendo la casa, e lui... lui ha fatto quello che fa Daniele. Niente drammi. Ha aperto l'app e ha ordinato ARTIGLIERIA."
+
+Silenzio nell'androne. Federico prende il pacco della lampada da 10.000 lux e se lo mette sotto il braccio senza chiedere il parere di nessuno.
+
+> Federico: "Questo glielo portiamo su. È suo. L'ha comprato per combattere e gli è arrivato tardi: al MASSIMO gli è arrivata la cavalleria insieme."
+
+**(Daniele lo sapeva, e stava combattendo a modo suo. Non siete un soccorso. Siete i RINFORZI.)**`,
+    sets: { pacchi_controllati: true },
+    choices: [
+      { text: '🪜 Terzo piano. Insieme, con la lampada sottobraccio', next: 'a2' },
     ],
   },
 
@@ -144,6 +193,7 @@ Dietro la porta, la cosa capisce di avere sbagliato. I passi si allontanano — 
     sets: { voce_sbagliata: true },
     choices: [
       { text: '🔑 Dentro. SUBITO.', next: 'a3' },
+      { text: '👂 Tendere l\'orecchio: cos\'altro si muove là dentro?', once: true, sets: { ascoltato_porta: true }, next: 'a3' },
     ],
   },
 
@@ -223,11 +273,31 @@ Silenzio. Poi Federico ride — una risata corta, strozzata, che è per metà un
 
 Claudia fotografa il biglietto, poi lo piega e lo rimette nella moka. Regola del gruppo, non detta: le cose di Daniele restano dove Daniele le ha messe.
 
-**(🎨 Colore +1: la voce vera di Daniele vale più di cento lampadine.)**`,
-    gold: 1,
+**(La voce vera di Daniele vale più di cento lampadine.)**`,
     sets: { nota_daniele: true },
     choices: [
+      { text: '☕ Rimontare la moka e fare il caffè di Daniele', once: true, item: 'caffe_moka', next: 'a4c' },
       { text: '📺 Al salotto. Con una ragione in più.', next: 'a5' },
+    ],
+  },
+
+  a4c: {
+    location: 'appartamento',
+    caption: 'Il caffè nero e VIVO',
+    text: `Emanuela rimonta la moka con le mani di chi lo fa tutti i giorni — filtro, caffè dal barattolo, avvita, fuoco. Il fornello si accende al primo colpo, la fiamma azzurra è l'unica cosa a colori dopo le lattine di Coca.
+
+Il caffè gorgheggia su — e il rumore è giusto, è VERO, è una cosa che non può appartenere al Grigiore. Esce nero, denso, profumato di bruciato buono e di mattina vera. La tazzina scotta e il calore è reale.
+
+> Federico: "Non è diventato grigio. Non è grigio."
+
+> Gaetano: "È il caffè di Daniele. Certo che non è grigio."
+
+> Natalino: *(annusando la tazzina da sopra la spalla di Emanuela)* "Fortissimo. Lo fa come mio nonno: se non ti sveglia il sapore, ti sveglia lo spavento."
+
+Lo mettono da parte con cura. Quando servirà — e servirà — quello sarà il caffè che rimette in piedi qualcuno.`,
+    choices: [
+      { text: '📺 Al salotto. Con una ragione in più, e un caffè in più.', next: 'a5' },
+      { text: '☕ Annusare il fondo della tazzina: l\'odore racconta qualcosa', once: true, next: 'a4_fondo' },
     ],
   },
 
@@ -275,6 +345,7 @@ Il riflesso di Gaetano, quando lui si sposta, resta un attimo indietro — e in 
 Non è un difetto dello specchio. È un difetto di chi ci vive dentro.`,
     choices: [
       { text: '🪞 Guardare bene, cercare il trucco', tag: 'Prova di Saggezza — CD 12', check: { stat: 'SAG', dc: 12, success: 's7b', fail: 's7c' } },
+      { text: '🚫 Non dargli la soddisfazione: coprire lo specchio col telo della doccia', once: true, sets: { specchio_coperto: true }, next: 's7c' },
     ],
   },
 
@@ -297,8 +368,30 @@ Non è una buona notizia. Ma è un NOME, e le cose col nome fanno un po' meno pa
 
 > Natalino: "Bene. Allora sorvegliaci pure, stronzo. Tanto usciamo di qua PRIMA che tu finisca di scrivere il rapporto."
 
-**(🎨 Colore +1: capire il trucco è già un pezzetto di libertà.)**`,
-    gold: 1,
+**(Capire il trucco è già un pezzetto di libertà.)**`,
+    choices: [
+      { text: '📺 Al salotto — la TV pulsa ancora', next: 'a5' },
+      { text: '🪞 Invertire il trucco: spiare LUI attraverso lo specchio', tag: 'Prova di Intelligenza — CD 13', once: true, check: { stat: 'INT', dc: 13, success: 's7d', fail: 's7_ko' }, gold: 1 },
+    ],
+  },
+
+  s7d: {
+    location: 'appartamento',
+    caption: 'Il camerino dello specchio',
+    sets: { camerino_visto: true },
+    text: `Gaetano ribalta il trucco: si mette di traverso allo specchio, conta i fotogrammi al contrario, e in quel secondo e quattro decimi di ritardo — nel buco di tempo in cui il riflesso non è ancora tornato in posa — guarda DALL'ALTRA PARTE.
+
+E dall'altra parte c'è un salotto. QUESTO salotto: stessa disposizione, stesso divano, stessa TV. Solo scolorito di un tono, come la fotocopia di una fotocopia. E in mezzo, girato verso il vetro, c'è LUI.
+
+Non sta spiando. Sta **PROVANDO**. Fa il sorriso di Daniele e lo cancella. Lo rifà mezzo centimetro più su. Lo cancella. Alza un sopracciglio come fa Daniele quando ha già vinto una discussione, si guarda, non è soddisfatto, riprova. Otto volte lo stesso sorriso, come un attore in camerino la sera del debutto.
+
+> Gaetano: *(la voce che gli si secca in gola)* "Ragazzi. Non ci sta studiando noi. Sta studiando LUI. Si sta imparando la faccia di Daniele davanti a uno specchio come uno si impara una lingua straniera."
+
+> Claudia: "Otto tentativi per un sorriso. OTTO. Vuol dire che non gli viene. Vuol dire che non gli verrà MAI."
+
+> Natalino: "Quindi sotto quella faccia c'è uno che si esercita di nascosto perché ha il terrore di essere sgamato." *(sputa per terra, nel salotto di un amico, e nessuno lo rimprovera)* "Bene. Lo sgamiamo."
+
+**(🎨 Colore +1: avete visto il camerino del mostro. Un mostro che prova le espressioni allo specchio è un mostro che PUÒ sbagliarle.)**`,
     choices: [
       { text: '📺 Al salotto — la TV pulsa ancora', next: 'a5' },
     ],
@@ -326,6 +419,49 @@ Poi il grigio entra. Non dagli occhi: dal RICORDO di quel sorriso, che si strusc
     poisonRoller: true,
     choices: [
       { text: '📺 Al salotto — la TV pulsa ancora', next: 'a5' },
+      { text: '🪞 Coprire lo specchio: nessun altro ci casca stasera', once: true, sets: { specchio_coperto: true }, next: 'a5' },
+    ],
+  },
+
+
+  a4_fondo: {
+    location: 'appartamento',
+    caption: 'La lettura dei fondi',
+    text: `> Natalino: "Date qua. Mia nonna leggeva i fondi a mezzo rione, e diceva sempre: il caffè non mente, al massimo esagera."
+
+Prende la tazzina, la gira tre volte controsenso, la capovolge sul piattino con un colpetto da professionista. Aspetta. Rigira.
+
+Il fondo si è disposto a raggiera, e Natalino lo studia con una serietà che nessuno gli ha mai visto usare nemmeno coi capelli.
+
+> Natalino: "Allora. Questa è una casa, e fin qua ci arrivavo pure senza nonna. Queste cinque gocce che salgono... siamo noi, e va bene. Questo qui è un sesto puntino che ci aspetta in fondo, e va bene pure quello." *(si ferma. avvicina la tazzina agli occhi. la allontana.)* "Questa cosa qua invece non la so leggere."
+
+La gira verso il gruppo. In mezzo alla raggiera, il fondo ha lasciato **un rettangolo pulito.** Perfetto. Senza un granello. Come se il caffè, colando, avesse dovuto girare INTORNO a qualcosa che sul fondo della tazzina non c'è — ma nella casa sì.
+
+> Gaetano: "Una porta. È in scala, porca miseria. Il caffè ci ha disegnato la piantina e ha lasciato bianca LA PORTA."
+
+> Natalino: *(posando la tazzina con rispetto)* "Nonna diceva pure un'altra cosa: quando il fondo ti mostra una porta... vuol dire che qualcuno di là sta aspettando che gli porti il caffè."
+
+**(Perfino i fondi del caffè di Daniele lavorano per voi. La porta esiste, e ora sapete che il caffè le va portato FIN LÀ.)**`,
+    sets: { fondo_caffe_letto: true },
+    choices: [
+      { text: '📺 Al salotto, col caffè in mano come un\'arma', next: 'a5' },
+    ],
+  },
+
+
+  s7_ko: {
+    location: 'salotto',
+    caption: 'Lo specchio ricambia',
+    damage: 1,
+    text: `Il tempismo è quasi giusto. QUASI: un decimo di secondo di ritardo, e invece di cogliere il riflesso a guardare altrove... lo cogliete mentre TORNA. E lui coglie voi.
+
+Per un istante intero lo specchio smette di fingere: il riflesso vi guarda dritto, senza copiare nessuno, con l'interesse pulito di un entomologo — e il vetro si APPANNA dal suo lato, come da un fiato.
+
+> Gaetano: *(indietreggiando)* "Ha il fiato. Il riflesso ha il FIATO."
+
+Il capogiro arriva subito dopo, gelido, come una mano dentro la nuca: essere GUARDATI da uno specchio costa qualcosa che non ha nome.`,
+    choices: [
+      { text: '📺 Al salotto, e MAI più di traverso agli specchi', next: 'a5' },
     ],
   },
 
@@ -356,6 +492,7 @@ Non chiusa. Non sparita nel buio. NON C'È. Al suo posto, muro: intonaco liscio,
 Entrare, a quanto pare, era la parte facile.`,
     choices: [
       { text: '🧱 Al muro. Toccarlo, batterlo, capire.', next: 'a6' },
+      { text: '🎮 La Switch è in pausa a metà curva: salvare la partita di Daniele', once: true, sets: { partita_salvata: true }, next: 'a6' },
     ],
   },
 
@@ -408,11 +545,11 @@ Il metro corre lungo il corridoio. Cinque metri: fin qui, il bilocale è d'accor
 
 Ma sotto il sarcasmo, il gruppo si è raddrizzato. Perché Gaetano ha fatto la cosa che sa fare: ha preso il mostro e gli ha dato un NUMERO. E le cose con un numero addosso sembrano già un po' meno onnipotenti.
 
-**(🎨 Colore +1: misurare l'impossibile è il primo modo di sconfiggerlo.)**`,
-    gold: 1,
+**(Misurare l'impossibile è il primo modo di sconfiggerlo.)**`,
     sets: { misure_impossibili: true },
     choices: [
       { text: '🚶 Nel corridoio che non c\'era. In fila stretta.', next: 'a7' },
+      { text: '📐 Segnare il muro col nastro: se lo spazio cambia, i segni lo diranno', once: true, sets: { muri_segnati: true }, next: 'a7' },
     ],
   },
 
@@ -449,15 +586,15 @@ Silenzio. Poi il muro **rutta**. Non c'è un'altra parola: è un rutto, sordo e 
   a9: {
     location: 'pianerottolo',
     caption: 'Il pianerottolo impossibile',
-    text: `In fondo al corridoio infinito, dove per logica non dovrebbe esserci niente — un corridoio inventato non ha bisogno di finire da nessuna parte — c'è una porta. VERDE. Verniciata come quella di Daniele, con lo zerbino sotto ("NON SIETE I BENVENUTI, MA ENTRATE") anche se lo zerbino vero, quello reale, è rimasto ai piedi del muro nel salotto, un corridoio e un'eternità fa.
+    text: `In fondo al corridoio infinito, dove per logica non dovrebbe esserci niente, c'è una porta. VERDE. Verniciata come quella di Daniele, con lo zerbino sotto ("NON SIETE I BENVENUTI, MA ENTRATE") anche se lo zerbino vero è rimasto ai piedi del muro nel salotto, un corridoio e un'eternità fa.
 
 > Federico: "È la nostra. È LA PORTA DI CASA. Come cazzo è arrivata qua in fondo?"
 
 > Claudia: "Non chiedertelo con quella voce, ti si sente la crepa."
 
-La apre. E dietro, invece del salotto da cui siete usciti — c'è il **pianerottolo**. Il vostro pianerottolo, quello vero, di sotto: la porta di Daniele verde-condominio, il citofono, la lampadina fioca che scatta a vuoto due volte prima di accendersi. Tutto identico. Tutto al suo posto.
+La apre. E dietro, invece del salotto da cui siete usciti — c'è il **pianerottolo**. Il vostro pianerottolo, quello vero, di sotto: la porta di Daniele verde-condominio, il citofono, la lampadina fioca che scatta a vuoto due volte prima di accendersi. Tutto identico.
 
-Solo che il pianerottolo, adesso, **è dentro una stanza**. Ha pareti tutt'intorno — la stessa carta da parati del corridoio da cui siete arrivati — e il soffitto è basso, il soffitto di un bilocale, non l'altezza vera di una tromba delle scale. Il rettangolo di cielo che dovrebbe vedersi dal lucernaio, tre piani più in su, è un lucernaio finto, dipinto, con tre stelle sempre nella stessa identica posizione.
+Solo che il pianerottolo, adesso, **è dentro una stanza**. Ha pareti tutt'intorno — la stessa carta da parati del corridoio — e il soffitto è basso, da bilocale, non l'altezza vera di una tromba delle scale. Il lucernaio è finto, dipinto, con tre stelle sempre nella stessa posizione.
 
 > Gaetano: *(la voce sottile di chi sta ricalcolando tutto da capo)* "Il fuori è finito dentro il dentro. Non c'è più un fuori da tornare a cercare. C'è solo... altra casa."
 
@@ -465,9 +602,10 @@ Un rumore di unghie, da qualche parte oltre la nuova parete. Familiare, adesso.
 
 > Natalino: "Rimettiamoci in marcia. Prima che decida di incorniciare pure noi."
 
-Richiudono la porta verde dietro di sé. Non serve più tenerla aperta: la casa l'ha già digerita.`,
+Richiudono la porta verde. Non serve più tenerla aperta: la casa l'ha già digerita.`,
     choices: [
       { text: '🚶 Nel corridoio che non c\'era.', next: 'a7' },
+      { text: '⭐ Le tre stelle dipinte: contarle, segnarle, non dimenticare il cielo vero', once: true, sets: { stelle_finte_contate: true }, next: 'a7' },
     ],
   },
 
@@ -493,7 +631,7 @@ Uno-due-tre-scatto. Uno-due-tre-scatto.
 > Federico: *(si sfila la cintura, se la avvolge sul pugno)* "Allora facciamole venire l'asma."
 
 Il primo topo apre la bocca. Dentro non c'è lingua: c'è **altro pelo**, fitto, che si muove da solo. E carica.`,
-    combat: { enemies: ['topo_grigio', 'topo_grigio'], victory: 'a8', defeat: 'a7_ko', loot: { gold: 2 } },
+    combat: { enemies: ['topo_grigio', 'topo_grigio'], victory: 'a8', defeat: 'a7_ko', loot: { gold: 1 } },
   },
 
   a7_ko: {
@@ -517,9 +655,9 @@ Restate a terra un tempo che nessuno misura. Il soffitto del corridoio, sopra di
 
 Vi rimettete in piedi. Il grigio, intorno, sembra quasi deluso.
 
-**(PV ripristinati. 🎨 Colore -2: la casa vi ha assaggiati, e le è piaciuto.)**`,
+**(PV ripristinati. 🎨 Colore -1: la casa vi ha assaggiati, e le è piaciuto.)**`,
     fullHeal: true,
-    goldLoss: 2,
+    goldLoss: 1,
     choices: [
       { text: '⚔️ Ai topi. Stavolta si morde per primi.', next: 'RETRY_COMBAT' },
       { text: '🏃 Superarli di corsa mentre sono nel buio (non è vigliaccheria, è cardio)', gold: -1, next: 'a8' },
@@ -556,10 +694,34 @@ Davanti, il corridoio continua. Alle pareti, adesso, ci sono delle cornici. E de
     item2: 'taralli',
     choices: [
       { text: '🖼 Le foto. Guardare le foto.', next: 's1' },
+      { text: '🔬 La cenere dei topi: raccoglierne un pizzico, studiarla', once: true, next: 'a8_cenere' },
     ],
   },
 
   /* ==================== SOGLIA — LA CASA SI PRESENTA ==================== */
+
+
+  a8_cenere: {
+    location: 'corridoio',
+    caption: 'La cenere, da vicino',
+    text: `Gaetano ne raccoglie un pizzico su un biglietto da visita di Federico ("tanto ne ho novecento") e ci punta sopra la torcia del telefono, alla massima potenza.
+
+E la cenere fa una cosa che la cenere non fa.
+
+Sotto la luce diretta, il grigio **si apre.** Per un secondo — meno, mezzo — dentro il mucchietto si vedono i colori: un filo di ruggine, una scaglia di verde bottiglia, un granello blu elettrico. Poi la luce passa, e il grigio si richiude sopra come acqua.
+
+> Gaetano: "Non è cenere. È... compressione. Il grigio non CANCELLA i colori. Li schiaccia. Li impacchetta. Sono ancora TUTTI lì dentro — ruggine, verde, blu — pressati così stretti che da fuori si vede solo la media." *(alza la testa, e ha la faccia delle intuizioni che non vorrebbe avere)* "Ragazzi. Se questo vale per i topi... vale per tutto quello che il Grigiore tocca. Niente viene distrutto. Viene MESSO VIA."
+
+> Emanuela: "Quindi tutto quello che questa casa ha preso..."
+
+> Gaetano: "...è recuperabile. Da qualche parte, qua dentro, c'è il MAGAZZINO. E se c'è un magazzino, c'è un inventario. E se c'è un inventario..." *(soffia via la cenere dal biglietto, piano)* "...si può fare un RESO."
+
+**(La scoperta più importante della serata — il Grigiore non distrugge: ACCUMULA. E ciò che è accumulato si può riprendere.)**`,
+    sets: { cenere_studiata: true },
+    choices: [
+      { text: '🖼 Avanti, verso le foto alle pareti', next: 's1' },
+    ],
+  },
 
   s1: {
     location: 'corridoio',
@@ -584,6 +746,7 @@ Ma una resiste. La foto di Gaeta — il mare, il sole cattivo delle due, Emanuel
     sets: { foto_gaeta_vista: true },
     choices: [
       { text: '📺 Un rumore dal salotto: la TV ha cambiato voce', next: 's2' },
+      { text: '📷 Staccare la foto di Gaeta dal muro: questa la salviamo NOI', once: true, sets: { foto_gaeta_salvata: true }, next: 's2' },
     ],
   },
 
@@ -604,8 +767,7 @@ Lo schermo muore. L'ultima parola arriva dal buio, solo audio, con dentro un sor
 
 > Daniele: "—stai perdendo a Mario Kart contro una casa. Riflettici."
 
-**(🎨 Colore +1: è vivo. È LUI. E sta combattendo.)**`,
-    gold: 1,
+**(È vivo. È LUI. E sta combattendo.)**`,
     sets: { daniele_vivo: true },
     choices: [
       { text: '🚶 E adesso troviamolo. Da dove si—', next: 's3' },
@@ -616,24 +778,65 @@ Lo schermo muore. L'ultima parola arriva dal buio, solo audio, con dentro un sor
   s8: {
     location: 'salotto',
     caption: 'La chat dei tre giorni',
-    text: `Claudia si è già impossessata del telecomando smart — deformazione professionale, non sa restare tre secondi vicino a uno schermo senza controllarci sopra — e con due tocchi proietta sulla parete accanto alla TV la chat di Daniele. Gli ultimi mesi, tutti, di fila.
+    text: `Claudia si è già impossessata del telecomando smart — deformazione professionale — e con due tocchi proietta sulla parete la chat di Daniele. Gli ultimi mesi, tutti, di fila.
 
 > Claudia: "Prima di andare oltre voglio farvi vedere una cosa. TUTTA, non un frammento. Fidatevi di chi fa scrolling per lavoro."
 
-Scorre lenta. All'inizio è Daniele normalissimo: messaggi lunghi, pieni di virgole, le sue tirate su Cialdini, le prese in giro a Federico condite di note a piè di pagina immaginarie. Poi, mese dopo mese, le righe si accorciano. Le battute si fanno più corte. Le risposte, che erano paragrafi, diventano frasi. Poi parole singole. Poi solo emoji — un pollice, una faccina, sempre la stessa, sempre più tardi nella giornata. Infine, per settimane, sotto ogni messaggio del gruppo: **solo "Visualizzato".** Niente altro. Una spunta blu, unica prova che dall'altra parte c'è ancora qualcuno.
+Scorre lenta. All'inizio è Daniele normalissimo: messaggi lunghi, pieni di virgole, le sue tirate su Cialdini, le prese in giro a Federico. Poi, mese dopo mese, le righe si accorciano. Le risposte, che erano paragrafi, diventano frasi. Poi parole singole. Poi solo emoji — un pollice, una faccina, sempre più tardi nella giornata. Infine, per settimane, sotto ogni messaggio del gruppo: **solo "Visualizzato".** Niente altro. Una spunta blu, unica prova che dall'altra parte c'è ancora qualcuno.
 
 > Federico: *(la voce che si incrina, per la prima volta stanotte davvero)* "L'ho vista, questa roba. L'ho vista succedere IN TEMPO REALE e ho pensato che fosse pigrizia. Che gli girasse. Che—"
 
-> Emanuela: "Fede. Non era pigrizia. Guarda le date: coincidono con quelle delle Gocce. Qualcosa gli stava mangiando le parole una alla volta, e lui ha resistito FINO ALL'ULTIMA. 'Visualizzato' non è arrendersi. È restare, con quel poco di fiato che gli lasciavano."
+> Emanuela: "Fede. Non era pigrizia. Guarda le date: coincidono con gli ordini di COLORE — la lampada, i pennarelli, il poster. Qualcosa gli stava mangiando le parole una alla volta, e lui ha resistito FINO ALL'ULTIMA. 'Visualizzato' non è arrendersi. È restare, con quel poco di fiato che gli lasciavano."
 
 > Gaetano: "Un uomo che scrive romanzi in chat e manda un pollice in su non ha smesso di parlare. Gli hanno tolto le parole di bocca, una a una."
 
-Il gelo nella stanza, per un secondo, lascia il posto a qualcos'altro: la certezza tenera e furiosa che Daniele, fino all'ultimo respiro utile, non ha ceduto un centimetro.
+Il gelo nella stanza lascia il posto a qualcos'altro: la certezza che Daniele, fino all'ultimo respiro utile, non ha ceduto un centimetro.
 
-**(🎨 Colore +1: avere visto il diminuire, e capito che non era resa.)**`,
-    gold: 1,
+**(Avere visto il diminuire, e capito che non era resa.)**`,
     choices: [
       { text: '🚶 Adesso troviamolo.', next: 's3' },
+      { text: '📱 Cercare un messaggio nascosto: Daniele sapeva lasciare tracce', tag: 'Prova di Saggezza — CD 12', once: true, check: { stat: 'SAG', dc: 12, success: 's8b', fail: 's8_ko' } },
+    ],
+  },
+
+  s8b: {
+    location: 'salotto',
+    caption: 'Le maiuscole fuori posto',
+    text: `Claudia riparte dall'inizio, e stavolta non legge le frasi: legge le LETTERE. Perché negli ultimi messaggi lunghi di Daniele c'è una cosa che uno come lui non farebbe MAI: maiuscole fuori posto. *"va tutto Bene"*, *"ci Sento poco"*, *"sto solo rIposando"*...
+
+> Claudia: "Non sono errori. NIENTE è un errore, in uno che sottolinea in tre colori." *(le isola una per una, le mette in colonna, gira lo schermo verso il gruppo)*
+
+**F U S I B I L I.**
+
+> Gaetano: "'Io sono nei fusibili.' Ce l'ha scritto per MESI. In chiaro, in faccia a tutti. Aspettava solo qualcuno che leggesse in colonna."
+
+> Federico: *(alla parete, ad alta voce)* "Ricevuto, fratello. Con tre mesi di ritardo, ma ricevuto."
+
+Le luci del salotto — solo quelle — calano e risalgono. Una volta. Come un cenno.
+
+**(Il messaggio nascosto diceva FUSIBILI: Daniele è nell'impianto, e adesso ve l'ha detto LUI.)**`,
+    sets: { messaggio_nascosto: true },
+    choices: [
+      { text: '🚶 Adesso troviamolo.', next: 's3' },
+    ],
+  },
+
+
+  s8_ko: {
+    location: 'salotto',
+    caption: 'Lo scroll che scrolla da solo',
+    damage: 1,
+    text: `Claudia cerca il messaggio nascosto — e la chat comincia a scorrere DA SOLA. Piano, poi più veloce, mese dopo mese, come una pellicola che si riavvolge: e più scorre, più il pollice di Claudia resta incollato allo schermo, e gli occhi le si fanno fissi, comodi, GRIGI ai bordi.
+
+> Natalino: *(le sfila il telecomando di mano, di forza)* "EHI. Torna qua."
+
+> Claudia: *(sbattendo le palpebre)* "Stavo... quanto tempo è passato?"
+
+> Natalino: "Troppo. E l'hai chiesto con la voce di uno che NON vuole saperlo."
+
+Il muro si spegne. La casa, da qualche parte, digerisce il boccone di attenzione che le avete appena regalato gratis.`,
+    choices: [
+      { text: '🗣 Da Eleinad, con gli occhi VOSTRI', next: 's3' },
     ],
   },
 
@@ -686,6 +889,35 @@ Dalle pareti, debolissimo, un ronzio elettrico. Se il ronzio fosse una frase, di
     sets: { daniele_sabota: true },
     choices: [
       { text: '🗣 Eleinad si ricompone. E cambia strategia.', next: 's4' },
+      { text: '⚡ Ringraziare Daniele ad alta voce: farglielo sapere', once: true, sets: { daniele_ringraziato: true }, next: 's3f' },
+    ],
+  },
+
+  s3f: {
+    location: 'salotto',
+    caption: 'Grazie, Daniele',
+    sets: { daniele_ringraziato: true },
+    text: `Federico non parla al soffitto e non parla alla TV esplosa. Si gira verso la parete — verso l'impianto, verso i fusibili, verso il punto della casa dove suo fratello ha detto di essere — e lo dice normale, come si dice a uno che sta in un'altra stanza.
+
+> Federico: "Grazie, Dani. La TV era la tua, mi dispiace."
+
+Le luci del salotto sfarfallano. **Due volte.**
+
+> Emanuela: "Ha risposto."
+
+> Gaetano: "Due lampi. Su un canale radio, due lampi vogliono dire 'ricevuto'."
+
+> Natalino: *(alla parete, ad alta voce, come si grida a un vicino sul balcone)* "PREGO DI CHE! Ce ne facciamo un'altra di TV, quella era pure vecchia!"
+
+Tre lampi, stavolta. Uno lunghissimo. Se un impianto elettrico potesse ridere, somiglierebbe molto a questo.
+
+> Eleinad: *(da dietro i denti, e la maschera non regge la frase)* "Smettete. Di. Parlargli."
+
+> Claudia: *(dolcissima, verso la parete)* "Ah, ti dà fastidio? Buono a sapersi. **CIAO DANIELE!**"
+
+**(Gli avete detto grazie ad alta voce e lui ha risposto con le luci. Il padrone di casa lo odia.)**`,
+    choices: [
+      { text: '🗣 Eleinad si ricompone. E cambia strategia.', next: 's4' },
     ],
   },
 
@@ -708,11 +940,12 @@ E il sorriso di Eleinad **slitta**. Un millimetro, non di più — ma su una fac
 
 > Eleinad: *(si ricompone, ma la voce ha perso l'eco per una sillaba)* "...Che gruppo DELIZIOSO. Educati. Compatti. Pieni di colore." *(e la parola "colore" gliela sentite masticare come una fame)* "Faremo grandi cose insieme."
 
-**(🎨 Colore +2: gli avete detto no, e gliel'avete detto BENE.)**`,
-    gold: 2,
+**(🎨 Colore +1: gli avete detto no, e gliel'avete detto BENE.)**`,
+    gold: 1,
     sets: { rifiuto_stile: true },
     choices: [
       { text: '🗣 Ma lui non ha finito: cambia strategia.', next: 's4' },
+      { text: '👁 Il sorriso che slitta: osservare la faccia nel momento dell\'errore', once: true, next: 's3_slitta' },
     ],
   },
 
@@ -744,6 +977,7 @@ La risata vi ha lasciato addosso qualcosa: una stanchezza fredda nelle braccia, 
     damage: 2,
     choices: [
       { text: '🗣 Eleinad alza le mani, teatrale: "Facciamo sul serio."', next: 's4' },
+      { text: '💪 Radunare il gruppo: "Il pullman lo dicevamo così, no?"', once: true, heal: 1, next: 's4' },
     ],
   },
 
@@ -768,11 +1002,51 @@ Eleinad apre la bocca. La richiude. La riapre. E per la prima volta in tre giorn
 
 E qualcosa, nella sua voce, è cambiato per sempre.
 
-**(🎨 Colore +1: quaranta secondi di arte.)**`,
-    gold: 1,
+**(Quaranta secondi di arte.)**`,
     sets: { federico_insulto: true, eleinad_teme_gemelli: true },
     choices: [
       { text: '🗣 Eleinad si scrolla, si ricompone, e cambia arma.', next: 's4' },
+      { text: '⚡ Incalzare: Federico, ancora, finché barcolla!', tag: 'Prova di Carisma — CD 14', once: true, check: { stat: 'CAR', dc: 14, success: 's4', fail: 's3e_ko' }, gold: 1 },
+    ],
+  },
+
+
+  s3_slitta: {
+    location: 'salotto',
+    caption: 'Dietro il sorriso',
+    text: `Claudia non distoglie lo sguardo. È l'unica: gli altri, per istinto, guardano altrove quando una faccia si rompe. Lei no. Lei ha passato la vita a guardare i fotogrammi che gli altri saltano.
+
+E nel mezzo secondo in cui il sorriso di Eleinad slitta, Claudia vede cosa c'è sotto.
+
+Niente. Non "niente di spaventoso": NIENTE. Sotto l'espressione non c'è una faccia — c'è una superficie liscia e grigia, in attesa, come un manichino prima che il vetrinista decida chi deve essere. L'espressione di Eleinad non è una maschera sopra un volto. È una maschera sopra **un posto vuoto** — un vuoto a forma di persona che ha studiato Daniele alla finestra per chissà quanto, e lo indossa come si indossa un cappotto rubato: quasi giusto. Quasi.
+
+> Claudia: *(dopo, agli altri, sottovoce)* "Non è una copia di Daniele. Capite? Non c'è NESSUNO, là sotto. È un vuoto che ha imparato la faccia di qualcuno che ha colore da vendere. Daniele non è dentro quella cosa. Daniele è da un'altra parte, ed è INTERO."
+
+> Natalino: "E questa è la migliore notizia della serata."
+
+> Claudia: "E c'è la seconda migliore: quella cosa ha PROVATO la faccia allo specchio per giorni. E ha ancora sbagliato il sorriso davanti a cinque sconosciuti. È un attore col terrore del palco. Ricordatevelo, quando urlerà."
+
+**(Eleinad non è Daniele e non ha niente di suo — solo una parte imparata male. Il vostro amico è intero, altrove. E il mostro ha PAURA del pubblico.)**`,
+    sets: { sorriso_errore: true },
+    choices: [
+      { text: '🗣 Tornare a Eleinad, che cambia strategia', next: 's4' },
+    ],
+  },
+
+
+  s3e_ko: {
+    location: 'salotto',
+    caption: 'Il contrattacco',
+    damage: 2,
+    text: `Federico rincara — e stavolta il colpo passa DI LÀ. Eleinad smette di barcollare a metà del secondo insulto, si raddrizza, e restituisce con la voce di famiglia:
+
+> Eleinad: "Hai finito? Bene. Perché lui di te parlava POCHISSIMO, sai. Contavo le ore di conversazione: sei al QUARTO posto. Dopo il corriere."
+
+È una bugia. Lo sapete tutti, lo sa perfino lui. Ma le bugie dette con la faccia giusta pesano come sassi, e Federico incassa senza riuscire a nasconderlo del tutto.
+
+> Emanuela: *(prendendogli il braccio)* "Quarto posto un cazzo. Respira. È un VENTRILOQUO senza pupazzo, e lo sa."`,
+    choices: [
+      { text: '🗣 Ricomporsi. Il duello continua', next: 's4' },
     ],
   },
 
@@ -821,11 +1095,12 @@ E intorno a voi succede una cosa che vedrete per sempre: **il grigio arretra**. 
 
 > Eleinad: *(già dentro il muro fino alla cintola, se ne va come si scende in acqua)* "Godetevela, la tinta fresca. Tanto avete già perso: avete solo il fiato per non accorgervene. Ci vediamo A CASA. Cioè ovunque."
 
-**(🎨 Colore +2: la prima parola spezzata. La prima crepa in lui.)**`,
-    gold: 2,
+**(🎨 Colore +1: la prima parola spezzata. La prima crepa in lui.)**`,
+    gold: 1,
     sets: { duello_tutorial_vinto: true },
     choices: [
       { text: '👀 Il salotto, alle sue spalle, comincia a MUOVERSI', next: 's5' },
+      { text: '🧠 Segnarsi il punto esatto della frase dove si è inceppato: servirà', once: true, sets: { punto_inceppato_segnato: true }, next: 's5' },
     ],
   },
 
@@ -844,7 +1119,7 @@ Milioni di persone. I vostri stessi amici, guardali. Tutti quanti. Tutti.
 
 > Eleinad: "Con calma, eh. Io non ho fretta." *(sorride)* "Io ho VOI."
 
-**(-3 PV: la stanchezza vi entra nelle ossa come acqua fredda.)**`,
+**(-3 PV: la stanchezza vi pesa addosso come piombo tiepido.)**`,
     damage: 3,
     choices: [
       { text: '🗣 Riprovare. Il trucco ha un nome, e lo troverete.', next: 's4' },
@@ -876,6 +1151,7 @@ La casa non finisce. Ma nemmeno voi.`,
     sets: { casa_aperta: true },
     choices: [
       { text: '⛪ Avanzare nella cattedrale — da dove si comincia?', next: 'h1' },
+      { text: '📐 Gaetano: misurare le tre porte. Le dimensioni raccontano la priorità', once: true, sets: { porte_misurate: true }, next: 'h1' },
     ],
   },
 
@@ -916,3 +1192,8 @@ La casa non finisce. Ma nemmeno voi.`,
 
    USCITE FUORI DAL BLOCCO: solo h1 (da s5)
    ======================================================================== */
+
+/* ============ LA CASA CHE NON FINISCE — BLOCCO B: LA BIBLIOTECA CHE SUSSURRA ============
+   Pista non esclusiva dall'hub h1. Dà: il Manuale Annotato (arma per i Duelli di Parole),
+   il SEGRETO 1 su Eleinad (segreto_specchio), il Bibliotecario, un duello, paura e cuore.
+   Uscita ammessa: SOLO h1.                                                              */

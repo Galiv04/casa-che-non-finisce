@@ -70,11 +70,16 @@ const Engine = (() => {
       usedChoices: {},   // sceneId -> [testi scelti "once"]
       enteredScenes: {}, // sceneId -> true (per effetti one-shot)
       lastCombatSceneId: null,
+      checkpointsDone: [],  // flag di CHECKPOINT_FLAGS già scattati
+      lastCheckpoint: null, // { sceneId, flag, snapshot } — il punto di ripartenza
+      koCount: {},          // sceneId del combattimento -> quante volte ci siete caduti
+      ritiri: { ctx: null, n: 0 }, // ritiri pagati in Colore nel contesto corrente (scena o scontro)
       history: [],       // tappe della storia (per il riepilogo alla ripresa)
       seenEnemies: [],   // nemici incontrati (per il bestiario)
       slot,
       difficulty,
-      stats: { combats: 0, checksPassed: 0, checksFailed: 0, scenes: 0, start: Date.now() },
+      stats: { combats: 0, checksPassed: 0, checksFailed: 0, scenes: 0, start: Date.now(),
+               goldEarned: 0, ritiriPagati: 0 },
     };
     for (const h of G.party) {
       G.uses[h.id] = {};
@@ -103,6 +108,71 @@ const Engine = (() => {
     if (!G) return;
     G.savedAt = Date.now();
     try { localStorage.setItem(slotKey(G.slot || 1), JSON.stringify(G)); } catch (e) { /* storage pieno o disabilitato */ }
+  }
+
+  /* UNICO punto in cui il Colore CRESCE (scene, scelte, loot dei combattimenti):
+     così il totale raccolto in una partita è un numero misurabile — e misurato,
+     perché una valuta che nessuno conta è una valuta che nessuno tara. */
+  function guadagnaColore(n) {
+    if (!G || !(n > 0)) return;
+    G.gold = Math.max(0, G.gold + n);
+    if (!G.stats) G.stats = {};
+    G.stats.goldEarned = (G.stats.goldEarned || 0) + n;
+  }
+
+  /* ============ IL COLORE COMPRA IL SECONDO TENTATIVO ============
+     La valuta della Casa fa UNA cosa, e la fa sempre: quando un dado va male,
+     ci si rimette il proprio colore e si ritira. Costa poco la prima volta e
+     sempre di più se si insiste nella STESSA stanza (o nello stesso scontro):
+     il Grigiore impara a difendersi da chi bara sempre allo stesso modo.
+     Contesto in G.ritiri = { ctx, n }: cambiando stanza il conto riparte da 0. */
+
+  const RITIRO_COSTI = [2, 3, 5, 8];   // oltre il quarto: +3 a ogni ritiro in più
+
+  function costoRitiro(n) {
+    n = Math.max(0, n | 0);
+    if (n < RITIRO_COSTI.length) return RITIRO_COSTI[n];
+    return RITIRO_COSTI[RITIRO_COSTI.length - 1] + 3 * (n - RITIRO_COSTI.length + 1);
+  }
+
+  function ctxCorrente() { return 'scena:' + (G ? G.sceneId : '?'); }
+
+  function ritiriFatti(ctx) {
+    if (!G || !G.ritiri || G.ritiri.ctx !== ctx) return 0;
+    return G.ritiri.n || 0;
+  }
+
+  function costoRitiroOra(ctx) { return costoRitiro(ritiriFatti(ctx || ctxCorrente())); }
+
+  function puoiRitirare(ctx) {
+    if (!G) return false;
+    return G.gold >= costoRitiroOra(ctx || ctxCorrente());
+  }
+
+  /* Scala il costo e incrementa il contatore. Va chiamata PRIMA di ritirare il
+     dado (LESSON #11: la risorsa si spende all'inizio dell'azione, non alla fine,
+     o un ritorno indietro regala un tentativo gratis). Restituisce quanto è costato. */
+  function spendiRitiro(ctx) {
+    if (!G) return 0;
+    ctx = ctx || ctxCorrente();
+    const costo = costoRitiroOra(ctx);
+    if (G.gold < costo) return 0;
+    G.gold = Math.max(0, G.gold - costo);
+    if (!G.ritiri || G.ritiri.ctx !== ctx) G.ritiri = { ctx, n: 0 };
+    G.ritiri.n = (G.ritiri.n || 0) + 1;
+    if (!G.stats) G.stats = {};
+    G.stats.ritiriPagati = (G.stats.ritiriPagati || 0) + 1;
+    saveGame();
+    return costo;
+  }
+
+  /* Quanti ritiri compra il saldo di ADESSO, ai costi crescenti: il numero che
+     la HUD mostra al tavolo (perché "18 di Colore" da solo non dice niente). */
+  function ritiriDisponibili(ctx) {
+    if (!G) return 0;
+    let n = ritiriFatti(ctx || ctxCorrente()), saldo = G.gold, k = 0;
+    while (saldo >= costoRitiro(n) && k < 99) { saldo -= costoRitiro(n); n++; k++; }
+    return k;
   }
 
   function listSaves(profile = null) {
@@ -143,6 +213,11 @@ const Engine = (() => {
       if (!raw) return false;
       G = JSON.parse(raw);
       G.slot = slot;
+      // salvataggi vecchi: i campi nuovi vanno riempiti o il motore leggerebbe undefined
+      if (!G.ritiri) G.ritiri = { ctx: null, n: 0 };
+      if (!G.stats) G.stats = {};
+      if (G.stats.goldEarned == null) G.stats.goldEarned = G.gold || 0;
+      if (G.stats.ritiriPagati == null) G.stats.ritiriPagati = 0;
       if (!CAMPAIGN[G.sceneId]) G.sceneId = CAMPAIGN_START;
       renderScene(CAMPAIGN[G.sceneId], true);
       showRecap();
@@ -250,6 +325,39 @@ const Engine = (() => {
     } catch (e) {}
   }
 
+  /* Un CHECKPOINT è scattato: si segna, si fa lo SNAPSHOT dello stato di adesso
+     (se la Casa vi stende due volte nello stesso punto si riparte da qui: vedi
+     riprendiDaCheckpoint), si cura e si ricarica il gruppo, e si dice al tavolo. */
+  function scattaCheckpoint(flag) {
+    if (!G) return;
+    if (!G.checkpointsDone) G.checkpointsDone = [];
+    if (G.checkpointsDone.includes(flag)) return;
+    G.checkpointsDone.push(flag);
+    try {
+      G.lastCheckpoint = { sceneId: G.sceneId, flag, snapshot: JSON.stringify({
+        party: G.party, uses: G.uses, gold: G.gold, inventory: G.inventory,
+        flags: G.flags, checkpointsDone: G.checkpointsDone, koCount: G.koCount || {},
+        enteredScenes: G.enteredScenes, usedChoices: G.usedChoices,
+      }) };
+    } catch (e) {}
+    for (const h of G.party) {
+      if (h.morto) continue;
+      h.hp = h.maxHp; h.down = false;
+      if (G.uses[h.id]) for (const ab of h.abilities) G.uses[h.id][ab.id] = ab.uses;
+    }
+    if (typeof Sound !== 'undefined') Sound.play('heal');
+    setTimeout(() => {
+      const box = $('modal-generic-content');
+      box.innerHTML = `<h2>🎨 PISTA COMPLETATA — Checkpoint</h2>
+        <p style="font-size:20px;line-height:1.6;margin:10px 0">La Casa arretra di un passo e il gruppo tira il fiato: <b>PV al massimo</b> e <b>mosse ricaricate</b>.<br>
+        <span style="color:var(--text-dim)">Le condizioni (🩶 INGRIGITO, 🕸 preso, 👻 spirito) restano: quelle vogliono le loro cure.</span><br>
+        <span style="color:var(--text-dim)">Da qui si riparte, se la Casa vi stende due volte nello stesso punto.</span></p>
+        <button class="btn btn-gold" onclick="document.getElementById('modal-generic').classList.add('hidden')">▶ Si continua</button>`;
+      $('modal-generic').classList.remove('hidden');
+      renderPartyBar('party-bar');
+    }, 900);
+  }
+
   function gotoScene(id) {
     if (id === 'RETRY_COMBAT') id = G.lastCombatSceneId || CAMPAIGN_START;
     const scene = CAMPAIGN[id];
@@ -266,29 +374,11 @@ const Engine = (() => {
       if (scene.sets) Object.assign(G.flags, scene.sets);
       // CHECKPOINT: prima volta che si completa una pista (CHECKPOINT_FLAGS in campaign.js)
       if (typeof CHECKPOINT_FLAGS !== 'undefined' && scene.sets) {
-        if (!G.checkpointsDone) G.checkpointsDone = [];
-        const nuovo = CHECKPOINT_FLAGS.find(f => scene.sets[f] && !G.checkpointsDone.includes(f));
-        if (nuovo) {
-          G.checkpointsDone.push(nuovo);
-          for (const h of G.party) {
-            if (h.morto) continue;
-            h.hp = h.maxHp; h.down = false;
-            if (G.uses[h.id]) for (const ab of h.abilities) G.uses[h.id][ab.id] = ab.uses;
-          }
-          if (typeof Sound !== 'undefined') Sound.play('heal');
-          setTimeout(() => {
-            const box = $('modal-generic-content');
-            box.innerHTML = `<h2>🎨 PISTA COMPLETATA — Checkpoint</h2>
-              <p style="font-size:20px;line-height:1.6;margin:10px 0">La Casa arretra di un passo e il gruppo tira il fiato: <b>PV al massimo</b> e <b>mosse ricaricate</b>.<br>
-              <span style="color:var(--text-dim)">Le condizioni (🩶 INGRIGITO, 🕸 preso, 👻 spirito) restano: quelle vogliono le loro cure.</span></p>
-              <button class="btn btn-gold" onclick="document.getElementById('modal-generic').classList.add('hidden')">▶ Si continua</button>`;
-            $('modal-generic').classList.remove('hidden');
-            renderPartyBar('party-bar');
-          }, 900);
-        }
+        const nuovo = CHECKPOINT_FLAGS.find(f => scene.sets[f] && !(G.checkpointsDone || []).includes(f));
+        if (nuovo) scattaCheckpoint(nuovo);
       }
       if (scene.rep) G.flags.reputazione = (G.flags.reputazione || 0) + scene.rep;
-      if (scene.gold) G.gold = Math.max(0, G.gold + scene.gold);
+      if (scene.gold) guadagnaColore(scene.gold);
       if (scene.goldLoss) G.gold = Math.max(0, G.gold - scene.goldLoss);
       if (scene.item) G.inventory.push(scene.item);
       if (scene.item2) G.inventory.push(scene.item2);
@@ -326,6 +416,14 @@ const Engine = (() => {
           G.uses[hero.id] = {};
           for (const ab of hero.abilities) G.uses[hero.id][ab.id] = ab.uses;
           G.flags[hero.id + '_in_squadra'] = true;
+          // il checkpoint di "daniele_in_squadra" NON passa da scene.sets: lo imposta
+          // il motore qui. Senza questa riga era un checkpoint morto (trovato dal
+          // validatore, ago 2026) e la liberazione di Daniele non curava nulla.
+          if (typeof CHECKPOINT_FLAGS !== 'undefined' &&
+              CHECKPOINT_FLAGS.includes(hero.id + '_in_squadra') &&
+              !(G.checkpointsDone || []).includes(hero.id + '_in_squadra')) {
+            scattaCheckpoint(hero.id + '_in_squadra');
+          }
           setTimeout(() => {
             const box = $('modal-generic-content');
             box.innerHTML = `<h2>🎮 ${hero.name} si unisce al gruppo!</h2>
@@ -503,10 +601,27 @@ const Engine = (() => {
       let inner = c.text;
       if (c.tag) inner += ` <span class="choice-check">🎲 ${c.tag}</span>`;
       const poor = c.requiresGold && G.gold < c.requiresGold;
-      if (poor) inner += ` <span class="choice-tag">(vi servono ${c.requiresGold} monete — ne avete ${G.gold})</span>`;
+      if (poor) inner += ` <span class="choice-tag">(vi servono ${c.requiresGold} 🎨 di Colore — ne avete ${G.gold})</span>`;
       b.innerHTML = inner;
       b.disabled = !!poor;
       b.onclick = () => resolveChoice(scene, c);
+      choicesEl.appendChild(b);
+    }
+
+    /* ↩ SI RIPARTE DAL CHECKPOINT — offerta ESPLICITA nelle scene di sconfitta,
+       dalla SECONDA caduta nello stesso scontro (la prima volta il gioco vi
+       raccoglie e basta). È una scelta vera, non una punizione: tornare indietro
+       vi restituisce il pezzo di storia che la sconfitta vi fa saltare, e vi costa
+       tutto quello che avete raccolto da lì in poi (la modale lo dice per nome). */
+    if (haCheckpoint() && isSceneDiSconfitta(G.sceneId) &&
+        (G.koCount || {})[G.lastCombatSceneId] > 1) {
+      const nodo = (CAMPAIGN[G.lastCheckpoint.sceneId] || {}).caption || 'l\'ultimo checkpoint';
+      const b = document.createElement('button');
+      b.className = 'choice-btn';
+      b.id = 'btn-checkpoint-return';
+      b.innerHTML = `↩ <b>🎨 Tornare indietro</b>: la Casa riavvolge fino a «${nodo}»` +
+        ` <span class="choice-tag">Riprendete da lì: PV pieni, Grigiore sciolto, la pista di nuovo intera — ma quello che avete raccolto dopo, la Casa se lo tiene</span>`;
+      b.onclick = () => riprendiDaCheckpoint();
       choicesEl.appendChild(b);
     }
   }
@@ -517,7 +632,8 @@ const Engine = (() => {
       if (!G.usedChoices[G.sceneId]) G.usedChoices[G.sceneId] = [];
       G.usedChoices[G.sceneId].push(c.text);
     }
-    if (c.gold) G.gold = Math.max(0, G.gold + c.gold);
+    if (c.gold > 0) guadagnaColore(c.gold);
+    else if (c.gold) G.gold = Math.max(0, G.gold + c.gold); // le scelte che COSTANO colore (il nome proibito)
     if (c.item) G.inventory.push(c.item);
     if (c.removeItem) {
       const i = G.inventory.indexOf(c.removeItem);
@@ -605,42 +721,167 @@ const Engine = (() => {
       b.onclick = () => {
         G.lastRoller = hIdx;   // la Casa ricorda chi ha osato tirare
         $('modal-generic').classList.add('hidden');
-        const rollIt = (isReroll) => Dice.showRoll({
-          title: `${h.name} ${isReroll ? 'RITIRA (il d20 di Daniele!)' : 'tenta'}:<br>${STAT_NAMES[check.stat]} — CD ${check.dc}`,
+        const ctx = 'scena:' + G.sceneId;
+        const rollIt = (tipo) => Dice.showRoll({
+          title: `${h.name} ${tipo === 'd20' ? 'RITIRA (il d20 di Daniele!)' : tipo === 'colore' ? 'RITIRA (col colore in faccia!)' : 'tenta'}:<br>${STAT_NAMES[check.stat]} — CD ${check.dc}`,
           mod, dc: check.dc,
           onDone: res => {
-            if (!res.success && !isReroll && G.inventory.includes('d20_daniele')) {
-              return offerReroll(() => {
-                const i = G.inventory.indexOf('d20_daniele');
-                if (i >= 0) G.inventory.splice(i, 1);
-                saveGame();
-                rollIt(true);
-              }, () => {
-                G.stats.checksFailed++;
-                gotoScene(check.fail);
-              });
+            if (!res.success) {
+              // due modi di NON accettare il dado: il d20 di Daniele (una volta sola)
+              // e il Colore (si paga, e nella stessa stanza rincara)
+              const conD20 = tipo !== 'd20' && G.inventory.includes('d20_daniele');
+              const conColore = puoiRitirare(ctx);
+              if (conD20 || conColore) {
+                return offerReroll({
+                  d20: conD20,
+                  colore: conColore,
+                  costo: costoRitiroOra(ctx),
+                  restanti: ritiriDisponibili(ctx),
+                  onD20: () => {
+                    const i = G.inventory.indexOf('d20_daniele');
+                    if (i >= 0) G.inventory.splice(i, 1);
+                    saveGame();
+                    rollIt('d20');
+                  },
+                  onColore: () => {
+                    if (!spendiRitiro(ctx)) { G.stats.checksFailed++; return gotoScene(check.fail); }
+                    renderPartyBar('party-bar');
+                    rollIt('colore');
+                  },
+                  onNo: () => {
+                    G.stats.checksFailed++;
+                    gotoScene(check.fail);
+                  },
+                });
+              }
             }
             if (res.success) G.stats.checksPassed++; else G.stats.checksFailed++;
             gotoScene(res.success ? check.success : check.fail);
           },
         });
-        rollIt(false);
+        rollIt(null);
       };
       box.appendChild(b);
     });
     $('modal-generic').classList.remove('hidden');
   }
 
-  // proposta di ritiro con il d20 portafortuna di Daniele
-  function offerReroll(onYes, onNo) {
+  /* Proposta di RITIRO su prova fallita: il d20 portafortuna di Daniele (oggetto,
+     una volta sola) e/o il ritiro pagato in COLORE (sempre disponibile, se il saldo
+     basta, e sempre più caro nella stessa stanza). Compaiono solo le strade valide;
+     se non ce n'è nessuna, la modale non si apre affatto (lo decide il chiamante). */
+  function offerReroll(o) {
     const box = $('modal-generic-content');
-    box.innerHTML = `<h2>🎲 Il d20 di Daniele scalda la tasca...</h2>
-      <p style="margin-bottom:12px">La prova è fallita, ma il d20 portafortuna di Daniele <i>vibra</i>. "Statisticamente non significa niente", direbbe lui. E poi lo tirerebbe. Un uso solo: questo momento lo merita?</p>
-      <button class="choice-btn" id="btn-reroll-yes">🎲 <b>SÌ: tirate il d20 di Daniele!</b> (si consuma)</button>
-      <button class="choice-btn" id="btn-reroll-no">🙅 No, accettate il fato: sarà per un momento più importante</button>`;
+    const titolo = o.d20 && o.colore ? '🎲 Il dado è andato male. Ci sono DUE modi di non accettarlo.'
+      : o.d20 ? '🎲 Il d20 di Daniele scalda la tasca...'
+      : '🎨 Vi torna il colore in faccia. Ci riprovate?';
+    let html = `<h2>${titolo}</h2>`;
+    if (o.d20) {
+      html += `<p style="margin-bottom:12px">La prova è fallita, ma il d20 portafortuna di Daniele <i>vibra</i>. "Statisticamente non significa niente", direbbe lui. E poi lo tirerebbe. Un uso solo: questo momento lo merita?</p>`;
+    }
+    if (o.colore) {
+      html += `<p style="margin-bottom:12px">Il grigio si era già preso il risultato. Poi qualcuno bestemmia, qualcuno ride, e per un secondo tornate <b>a colori</b>: la mano si riscalda, il dado torna in aria e la Casa deve ricontare.<br>
+        <span style="color:var(--text-dim)">Costa <b>${o.costo} 🎨</b> — ne avete ${G.gold}. Insistere in questa stessa stanza costa di più ogni volta: qui dentro vi restano <b>${o.restanti}</b> ritiri.</span></p>`;
+    }
+    if (o.d20) html += `<button class="choice-btn" id="btn-reroll-yes">🎲 <b>SÌ: tirate il d20 di Daniele!</b> (si consuma)</button>`;
+    if (o.colore) html += `<button class="choice-btn" id="btn-colore-yes">🎨 <b>Rimetteteci il colore e RITIRATE</b> <span class="choice-tag">−${o.costo} 🎨 di Colore</span></button>`;
+    html += `<button class="choice-btn" id="btn-reroll-no">🙅 No, accettate il fato: sarà per un momento più importante</button>`;
+    box.innerHTML = html;
     $('modal-generic').classList.remove('hidden');
-    $('btn-reroll-yes').onclick = () => { $('modal-generic').classList.add('hidden'); onYes(); };
-    $('btn-reroll-no').onclick = () => { $('modal-generic').classList.add('hidden'); onNo(); };
+    if (o.d20) $('btn-reroll-yes').onclick = () => { $('modal-generic').classList.add('hidden'); o.onD20(); };
+    if (o.colore) $('btn-colore-yes').onclick = () => { $('modal-generic').classList.add('hidden'); o.onColore(); };
+    $('btn-reroll-no').onclick = () => { $('modal-generic').classList.add('hidden'); o.onNo(); };
+  }
+
+  /* Le scene che un combattimento usa come SCONFITTA: sono i punti in cui il
+     gioco offre il ritorno al checkpoint (e non possono essere checkpoint loro). */
+  let _sconfitte = null;
+  function isSceneDiSconfitta(id) {
+    if (!_sconfitte) {
+      _sconfitte = new Set();
+      for (const s of Object.values(CAMPAIGN)) {
+        if (s.combat && s.combat.defeat) _sconfitte.add(s.combat.defeat);
+      }
+    }
+    return _sconfitte.has(id);
+  }
+
+  /* Quante volte siete già caduti in QUESTO scontro (la prima volta la Casa vi
+     risputa fuori, dalla seconda si torna al checkpoint). */
+  function registraCaduta(sceneId) {
+    if (!G) return 1;
+    if (!G.koCount) G.koCount = {};
+    const k = sceneId || G.sceneId || '?';
+    G.koCount[k] = (G.koCount[k] || 0) + 1;
+    return G.koCount[k];
+  }
+
+  function haCheckpoint() { return !!(G && G.lastCheckpoint && G.lastCheckpoint.snapshot); }
+
+  /* ============ SE CADETE TUTTI: SI RIPARTE DAL CHECKPOINT ============
+     Non «game over, ricomincia». La PRIMA volta che la Casa vi stende in uno
+     scontro vi risputa fuori (le scene *_ko scritte restano, intatte). Dalla
+     SECONDA nello stesso punto no: la Casa RIAVVOLGE la stanza fino all'ultima
+     pista completata, con lo stato di ALLORA. Quello che avete capito dopo se
+     lo tiene lei — e la modale vi dice PER NOME cosa vi manca.
+     Torna false se non c'è nessun checkpoint: in quel caso vale la sconfitta scritta. */
+  function riprendiDaCheckpoint() {
+    const cp = G && G.lastCheckpoint;
+    if (!cp || !cp.snapshot) return false;
+    let s;
+    try { s = JSON.parse(cp.snapshot); } catch (e) { return false; }
+    if (!s || !s.party || !s.party.length) return false;
+
+    const restanti = [...(s.inventory || [])];
+    const perse = [];
+    for (const it of (G.inventory || [])) {
+      const i = restanti.indexOf(it);
+      if (i >= 0) restanti.splice(i, 1); else perse.push(it);
+    }
+    const nomiPersi = perse.map(i => (ITEMS[i] ? ITEMS[i].name : i));
+    const colorePerso = Math.max(0, (G.gold || 0) - (s.gold || 0));
+    const spiriti = (G.party || []).filter(h => h.morto).map(h => h.name.split(' ')[0]);
+
+    G.party = s.party;
+    G.uses = s.uses;
+    G.gold = s.gold;
+    G.inventory = s.inventory;
+    G.flags = s.flags;
+    G.checkpointsDone = s.checkpointsDone || [];
+    G.koCount = s.koCount || {};
+    // si riavvolge ANCHE cosa è stato visitato: senza questo i flag one-shot
+    // delle scene già entrate non si rimettono più e il contenuto si soft-locka.
+    if (s.enteredScenes) G.enteredScenes = s.enteredScenes;
+    if (s.usedChoices) G.usedChoices = s.usedChoices;
+    for (const h of G.party) {
+      h.hp = h.maxHp; h.down = false; h.preso = false; h.veleno = false; h.morto = false; h.luckUsed = false;
+    }
+    G.stats = G.stats || {};
+    G.stats.checkpointRitorni = (G.stats.checkpointRitorni || 0) + 1;
+
+    // prima si NAVIGA, poi si racconta: la modale è informativa e non un cancello
+    // (un onclick inline non lo esegue né lo stub dei test né chi chiude con Esc).
+    gotoScene(cp.sceneId);
+
+    const nodo = CAMPAIGN[cp.sceneId] ? CAMPAIGN[cp.sceneId].caption : 'una pista che avevate chiuso';
+    const box = $('modal-generic-content');
+    box.innerHTML = `<h2 style="color:var(--red)">🎨 LA CASA HA RIAVVOLTO LA STANZA</h2>
+      <div class="backstory" style="white-space:pre-wrap">Non c'è il buio, questa volta. C'è il <b>ronzio all'indietro</b>: la Casa che riavvolge, come una cassetta, con quel rumore di nastro che risucchia.
+
+Vi ritrovate in piedi, respirando normale, esattamente dove eravate quando avevate chiuso <i>${nodo}</i>. Le stesse crepe sul muro. La stessa luce grigia dalla stessa finestra.
+
+> Federico: "Aspetta. Aspetta aspetta aspetta. Noi qui c'eravamo già. Io questa macchia sul muro l'ho GIÀ ODIATA."
+
+> Emanuela: <i>(controllando la borsa, e la voce le si abbassa)</i> "Sì. E ci ha tenuto la roba."
+
+Non vi ha uccisi. Vi ha <b>rimessi a posto</b>: è quello che si fa con una cosa che serve ancora.${nomiPersi.length ? `\n\n<span style="color:var(--red)">Vi manca:</span> ${nomiPersi.join(', ')}.` : `\n\n<span style="color:var(--text-dim)">La borsa, almeno, è come l'avevate lasciata.</span>`}${colorePerso ? `\n<span style="color:var(--red)">🎨 Colore:</span> ne avevate accumulato ${colorePerso} in più. Si ricomincia da ${G.gold}.` : ''}${spiriti.length ? `\n\n<span style="color:var(--green)">${spiriti.join(' e ')} ${spiriti.length > 1 ? 'sono' : 'è'} qui. In carne. ${spiriti.length > 1 ? 'Respirano' : 'Respira'}.</span> È l'unica cosa che il riavvolgimento vi regala, e vale tutto il resto.` : ''}
+
+<span style="color:var(--green)">PV al massimo, mosse ricaricate, Grigiore sciolto.</span> La Casa, invece, sa già come finisce.</div>
+      <button class="btn btn-gold" style="margin-top:14px" onclick="document.getElementById('modal-generic').classList.add('hidden')">🎨 Rifarla meglio</button>`;
+    $('modal-generic').classList.remove('hidden');
+    if (typeof Sound !== 'undefined') Sound.play('defeat');
+    saveGame();
+    return true;
   }
 
   /* ---------- barra del gruppo ---------- */
@@ -672,15 +913,20 @@ const Engine = (() => {
   /* ---------- schede e modali ---------- */
 
   function heroSheetHTML(h, withUses = true) {
-    const stats = Object.entries(h.stats).map(([k, v]) =>
-      `<div class="stat-chip"><span class="stat-label">${k}</span><span class="stat-val">${v >= 0 ? '+' + v : v}</span></div>`).join('');
-    const abilities = h.abilities.map(ab => {
-      const left = withUses && G && G.uses[h.id] ? ` — usi rimasti: <b>${G.uses[h.id][ab.id]}</b>` : ` — usi per avventura: <b>${ab.uses}</b>`;
+    /* Le CONDIZIONI vanno calcolate al livello della funzione, non dentro il
+       ciclo delle abilità: là dentro `conditions` nasceva e moriva a ogni
+       abilità, e il template in fondo trovava una variabile inesistente —
+       cioè la scheda del personaggio CRASHAVA a ogni click (trovato il 23
+       ago 2026 guardando il gioco vero). */
       const conditions = [];
     if (h.veleno) conditions.push(`<div class="ability-box" style="border-left:5px solid var(--red)"><span class="ability-name">🩶 INGRIGITO</span><div class="ability-desc">Il Grigiore gli è entrato addosso: <b>−2 a TUTTE le prove e agli attacchi</b> finché dura. Si cura con le <b>Gocce del Dottore</b> o una <b>Boccata di Colore</b> (Zaino). Il grigio non passa da solo: va SCACCIATO.</div></div>`);
     if (h.preso) conditions.push(`<div class="ability-box" style="border-left:5px solid var(--red)"><span class="ability-name">🕸 PRESO dalla Casa</span><div class="ability-desc">Fuori gioco finché il gruppo non lo libera.</div></div>`);
     if (h.morto) conditions.push(`<div class="ability-box" style="border-left:5px solid var(--red)"><span class="ability-name">👻 SPIRITO</span><div class="ability-desc">La Casa lo ha preso DAVVERO. Resta col gruppo come spirito: vede porte che i vivi non vedono, ma non tira dadi né combatte. Torna con un <b>Cuore di Colore</b> — o nei finali che se lo meritano.</div></div>`);
     if (h.down) conditions.push(`<div class="ability-box" style="border-left:5px solid var(--red)"><span class="ability-name">💀 A TERRA</span><div class="ability-desc">Serve una cura per rialzarlo.</div></div>`);
+    const stats = Object.entries(h.stats).map(([k, v]) =>
+      `<div class="stat-chip"><span class="stat-label">${k}</span><span class="stat-val">${v >= 0 ? '+' + v : v}</span></div>`).join('');
+    const abilities = h.abilities.map(ab => {
+      const left = withUses && G && G.uses[h.id] ? ` — usi rimasti: <b>${G.uses[h.id][ab.id]}</b>` : ` — usi per avventura: <b>${ab.uses}</b>`;
     return `<div class="ability-box"><span class="ability-name">✨ ${ab.name}</span>${left}<div class="ability-desc">${ab.desc}</div></div>`;
     }).join('');
     return `
@@ -735,8 +981,17 @@ const Engine = (() => {
       const loreBtn = item.lore ? `<button class="btn btn-small" onclick="Engine.inspectItem('${it}')">📖 Ispeziona</button>` : '';
       return `<div class="inv-item"><span class="inv-name">${item.name}${n > 1 ? ' ×' + n : ''}</span><span class="inv-desc">${item.desc}</span>${useBtn}${loreBtn}</div>`;
     }).join('') || '<p style="color:var(--text-dim)">Lo zaino è vuoto. Succede ai migliori.</p>';
+    // Il Colore non è un punteggio: è il SECONDO TENTATIVO. La HUD lo dice, con i numeri
+    // di adesso (LESSON: una risorsa che il giocatore non sa spendere non esiste).
+    const k = ritiriDisponibili();
+    const costoOra = costoRitiroOra();
     box.innerHTML = `<h2>🎒 Le Vostre Cose</h2>
       <div class="gold-display">🎨 Colore: ${G.gold}</div>
+      <div class="ability-box" style="border-left-color:var(--gold)">
+        <span class="ability-name">🎨 A che serve il Colore</span>
+        <div class="ability-desc">Quando un dado va male — una prova o un colpo in combattimento — il gioco vi chiede se volete <b>rimetterci del vostro colore e ritirare</b>. Il primo ritiro costa <b>2</b>, poi 3, poi 5, poi 8: più insistete nella stessa stanza, più il Grigiore si difende. Cambiate stanza (o scontro) e il prezzo torna a 2.<br>
+        <span style="color:var(--gold)">Adesso: il prossimo ritiro costa <b>${costoOra} 🎨</b>, e con ${G.gold} in mano ne comprate <b>${k}</b>${k === 0 ? ' — cioè nessuno: andate a prendervi del colore' : ''}.</span></div>
+      </div>
       ${itemsHtml}
       <button class="btn" style="margin-top:14px" onclick="document.getElementById('modal-generic').classList.add('hidden')">✔ Chiudi</button>`;
     $('modal-generic').classList.remove('hidden');
@@ -1130,7 +1385,7 @@ const Engine = (() => {
         <div class="ability-desc">
           ${spiriti.length ? `Usciti vivi: ${G.party.filter(h => !h.morto).map(h => h.name.split(' ')[0]).join(', ')} · 👻 Rimasti spiriti: ${spiriti.map(h => h.name.split(' ')[0]).join(', ')}` : `Usciti tutti: ${G.party.map(h => h.name.split(' ')[0]).join(', ')}`}<br>
           Scontri vinti: ${G.stats.combats} · Prove superate: ${G.stats.checksPassed} · Prove fallite: ${G.stats.checksFailed} (le più memorabili)<br>
-          Colore finale: 🎨 ${G.gold} · Durata: circa ${mins} minuti<br>
+          Colore finale: 🎨 ${G.gold} · raccolto in tutta la notte: 🎨 ${G.stats.goldEarned || 0}${G.stats.ritiriPagati ? ` · dadi ritirati col colore: ${G.stats.ritiriPagati}` : ''} · Durata: circa ${mins} minuti<br>
           Esplorazione della Casa: ${Math.round(Object.keys(G.enteredScenes || {}).length / Object.keys(CAMPAIGN).length * 100)}% (${Object.keys(G.enteredScenes || {}).length} stanze su ${Object.keys(CAMPAIGN).length})<br>
           Segreti su Eleinad: ${['segreto_specchio','segreto_gemelli','segreto_trono'].filter(n => G.flags[n]).length}/3 ${G.flags.daniele_in_squadra ? '· 🎮 Daniele si è unito alla squadra' : ''} ${G.flags.foto_ricomposta ? '· 📷 La foto dei gemelli è intera' : ''}
         </div>
@@ -1184,6 +1439,8 @@ const Engine = (() => {
     showScreen, gotoScene, currentScene, renderPartyBar,
     showParty, showHeroSheet, showHeroSheetIdx, showInventory, showRules, showMap, showMenu, showDiary, showBestiary, showRevive, startChapter, reviveUnlocked,
     usePotionOutside, applyPotion, useAntidote, applyAntidote, inspectItem, useRevive, applyRevive, backToTitle, confirmRestart, doRestart,
+    riprendiDaCheckpoint, registraCaduta, haCheckpoint,
+    guadagnaColore, costoRitiro, costoRitiroOra, puoiRitirare, spendiRitiro, ritiriDisponibili,
     heroSheetHTML, formatText,
   };
 })();

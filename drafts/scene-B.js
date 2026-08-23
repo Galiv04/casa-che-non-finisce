@@ -1,8 +1,3 @@
-/* ============ LA CASA CHE NON FINISCE — BLOCCO B: LA BIBLIOTECA CHE SUSSURRA ============
-   Pista non esclusiva dall'hub h1. Dà: il Manuale Annotato (arma per i Duelli di Parole),
-   il SEGRETO 1 su Eleinad (segreto_specchio), il Bibliotecario, un duello, paura e cuore.
-   Uscita ammessa: SOLO h1.                                                              */
-
 const SCENE_B = {
 
   /* ---------- b1 — L'INGRESSO: I LIBRI CHE LEGGONO VOI ---------- */
@@ -138,11 +133,34 @@ Federico prende il Cialdini e lo apre a caso. A margine, la grafia fitta del gem
 
 Vi rialzate diversi. Le parole, adesso, le vedete arrivare.
 
-**(Avete LETTO il manuale: il gruppo conosce le fallacie. 🎨 +2 Colore.)**`,
+**(Avete LETTO il manuale: il gruppo conosce le fallacie. 🎨 +1 Colore.)**`,
     sets: { manuale_annotato_letto: true },
-    gold: 2,
+    gold: 1,
     choices: [
       { text: '🚶 Verso la sala di lettura, con le note ancora in testa', next: 'b5' },
+      { text: '📖 Un\'ultima pagina: Daniele ha sottolineato qualcosa TRE volte', once: true, sets: { nota_tripla: true }, next: 'b3c' },
+    ],
+  },
+
+  b3c: {
+    location: 'biblioteca',
+    caption: 'Sottolineato tre volte',
+    sets: { trucco_conosciuto: true },
+    text: `L'ultima pagina del Cialdini di Daniele non è di Cialdini. È sua. Una riga sola, in stampatello grosso, e sotto **tre righe di sottolineatura**: tre penne diverse, tre inchiostri diversi — uno che è tornato su quella frase tre volte, in tre momenti, per essere sicuro di crederci ancora.
+
+*"Se conosci il trucco, il trucco non funziona. **VALE ANCHE PER QUELLO GRANDE.**"*
+
+> Claudia: "'Quello grande.' Non 'quelli'. QUELLO. Al singolare."
+
+> Gaetano: "Non sospettava: SAPEVA. E si stava preparando. Questa non è una nota di studio, ragazzi. È un ordine operativo lasciato a chi arrivava dopo."
+
+> Federico: *(passa il dito sulle tre sottolineature, una per volta, come si conta un battito)* "Tre volte. Mio fratello ha sottolineato tre volte perché la terza era per NOI."
+
+> Natalino: "E allora impariamocelo, cazzo. Tutto quanto, dalla prima pagina."
+
+**("Se conosci il trucco, il trucco non funziona. VALE ANCHE PER QUELLO GRANDE." Adesso lo sapete anche voi.)**`,
+    choices: [
+      { text: '🚶 Verso la sala di lettura, con la frase in testa', next: 'b5' },
     ],
   },
 
@@ -167,15 +185,43 @@ Si volta e cammina, e capite che dovete seguirlo. Vi porta in fondo alla bibliot
 > Il Bibliotecario: "Due stelle e mezzo alla domanda. Nessuno legge più, qui. Sapete cosa diventa una biblioteca dove nessuno legge?" *(indica se stesso, tutto se stesso)* "**Questo.**"`,
     choices: [
       { text: '📕 Aprire lo scaffale proibito: la biografia di Eleinad', next: 'b8' },
+      { text: '↩ Troppo rischioso. Tornare alla sala di lettura col segreto del nome', next: 'b5' },
     ],
   },
 
   /* ---------- b5 — LA SALA DI LETTURA: I LETTORI GRIGI ---------- */
 
+
+  b16_capitolo: {
+    location: 'biblioteca',
+    caption: 'Pagina 1987 di 4000',
+    text: `Prima che il Capobranco si assesti nel suo nuovo, beato disordine, Gaetano legge l'ultima pagina scritta — la 1987, quella dove sessant'anni di ostinazione hanno mollato la presa.
+
+Non è quello che si aspettava. Non è epica, non è tragedia. È un **elenco.**
+
+*"Capitolo 84 — Le cose lasciate a metà che stavano bene così: il muro del giardino (il glicine ci passa attraverso, e va bene). La lettera a mio fratello (l'ho chiamato invece, e va bene). Il maglione di lana (mezza manica, d'estate, e va bene). La casa che non finisce—"*
+
+E lì, a metà dell'ultima riga, la grafia cambia. Si fa più larga, più libera, quasi allegra:
+
+*"—che forse non va FINITA. Va ABITATA."*
+
+> Gaetano: *(rileggendo ad alta voce, due volte)* "La casa che non finisce non va finita. Va abitata." *(alza gli occhi)* "Ragazzi. Questo manoscritto ha capito la casa meglio di noi. Il Grigiore vuole COMPLETARE tutto — catalogare, chiudere, finire. E le cose vive... le cose vive restano a metà. È la METÀ che le tiene vive."
+
+> Natalino: "Quindi il piano è: restare incompiuti con orgoglio."
+
+> Gaetano: "Il piano è esattamente questo, sì."
+
+**(La lezione di pagina 1987 — vivo è ciò che resta a metà. Al demone che vuole CHIUDERE ogni conto, adesso, avete una risposta.)**`,
+    sets: { ultimo_capitolo_letto: true },
+    choices: [
+      { text: '🚶 La sala si riapre: verso la sala di lettura', next: 'b5' },
+    ],
+  },
+
   b5: {
     location: 'biblioteca',
     caption: 'La sala di lettura — i Lettori Grigi',
-    text: `La sala di lettura è vasta e silenziosa come una sala d'attesa dell'eternità. Ai tavoli, sotto lampade verdi che non scaldano niente, siedono i **Lettori Grigi**: una dozzina di figure in pigiama e vestaglia, immobili, con davanti libri aperti dalle pagine completamente **bianche**.
+    text: `La sala di lettura è vasta e silenziosa come una sala d'attesa dell'eternità. Ai tavoli, sotto lampade verdi che non scaldano niente, siedono i **Lettori Grigi**: trentasei figure in pigiama e vestaglia, immobili, con davanti libri aperti dalle pagine completamente **bianche**.
 
 Non dormono. Leggono. Gli occhi sono aperti — ma spenti, come schermi in standby, e si muovono da sinistra a destra, riga dopo riga, su pagine dove non c'è scritto NIENTE.
 
@@ -187,10 +233,12 @@ Uno di loro è diverso. Un uomo sulla cinquantina, vestaglia grigia come gli alt
 
 Sul fondo della sala, uno scaffale girevole cigola piano, mezzo aperto su un vano buio. Da dentro viene — giuro — un odore di **crêpes**.`,
     choices: [
-      { text: '🤫 Attraversare la sala in silenzio assoluto, tra i tavoli', tag: 'Prova di Destrezza — CD 12', check: { stat: 'DES', dc: 12, success: 'b7', fail: 'b6b' } },
-      { text: '👀 Fermarsi a osservarli: capire COSA leggono', tag: 'Prova di Saggezza — CD 12', check: { stat: 'SAG', dc: 12, success: 'b5b', fail: 'b6b' } },
+      { text: '🤫 Attraversare la sala in silenzio assoluto, tra i tavoli', once: true, tag: 'Prova di Destrezza — CD 12', check: { stat: 'DES', dc: 12, success: 'b7', fail: 'b6b' } },
+      { text: '👀 Fermarsi a osservarli: capire COSA leggono', once: true, tag: 'Prova di Saggezza — CD 12', check: { stat: 'SAG', dc: 12, success: 'b5b', fail: 'b6b' } },
       { text: '🌈 Lo scaffale girevole che odora di crêpes: guardarci dentro', once: true, next: 'b12' },
       { text: '🗄 Una porticina bassa, targa d\'ottone: "ARCHIVIO — DIARI IN CONSULTAZIONE"', once: true, next: 'b13' },
+      { text: '🏃 La sfida di Federico: attraversare di CORSA, saltando i libri-trappola — 🎮 MINIGIOCO', once: true, next: 'mg_corsa_libri' },
+      { text: '🚶 Attraversare la sala e basta, senza fermarsi', next: 'b7' },
     ],
   },
 
@@ -211,11 +259,11 @@ E poi l'uomo col segnalibro. La sua pagina è sbiadita come le altre — ma dove
 
 > Emanuela: "Per te conta, amore. Purtroppo per te, conta."
 
-**(🎨 +1 Colore. Annotato nel diario: un'àncora di colore tiene a galla.)**`,
-    gold: 1,
+**(Annotato nel diario: un'àncora di colore tiene a galla.)**`,
     sets: { ancora_colore_nota: true },
     choices: [
       { text: '🤫 Ora sapete dove NON guardare: attraversare la sala', next: 'b7' },
+      { text: '🌈 Il segnalibro: provare a toccarlo, piano', once: true, next: 'b5_segnalibro' },
     ],
   },
 
@@ -236,7 +284,7 @@ Gli scaffali intorno si piegano verso di voi come spettatori. I libri smettono d
 Vi stanno già assegnando lo scaffale.
 
 > Gaetano: "Ormai è fatta. ABBATTIAMO LA BIBLIOGRAFIA."`,
-    combat: { enemies: ['bibliotecario'], victory: 'b6b_vinto', defeat: 'b_ko' },
+    combat: { enemies: ['bibliotecario'], victory: 'b6b_vinto', defeat: 'b_ko', loot: { gold: 1 } },
   },
 
   b6b: {
@@ -256,7 +304,7 @@ Si muovono male, come chi ha dimenticato il proprio corpo in un cassetto. Ma si 
 L'uomo col segnalibro non si alza. Stringe il suo sole giallo e resta seduto, e forse — forse — vi guarda passare con qualcosa che somiglia a un tifo silenzioso.
 
 **(Non uccideteli: sono persone. Basterà respingerli. Ma i loro abbracci grigi pesano come sonno.)**`,
-    combat: { enemies: ['sonnambulo', 'sonnambulo'], victory: 'b7', defeat: 'b_ko' },
+    combat: { enemies: ['sonnambulo', 'sonnambulo'], victory: 'b7', defeat: 'b_ko', loot: { gold: 1 } },
   },
 
   b6b_vinto: {
@@ -276,11 +324,12 @@ Nessuno finisce la frase. Il libro-cuore batte ancora due volte, poi smette, e l
 
 Là sotto c'era un lettore. Un lettore vero, rilegato vivo nel regolamento. E voi l'avete saputo solo adesso.
 
-**(🎨 +2 Colore, raccolto dalla frana. Ma qualcosa vi dice che vi mancherà, quella voce da due stelle.)**`,
-    gold: 2,
+**(🎨 +1 Colore, raccolto dalla frana. Ma qualcosa vi dice che vi mancherà, quella voce da due stelle.)**`,
+    gold: 1,
     sets: { bibliotecario_morto: true },
     choices: [
       { text: '🚶 Oltre la frana, verso il fondo della biblioteca', next: 'b7' },
+      { text: '📖 Le pagine calde: leggere il titolo inciso, "I CINQUE CHE..."', once: true, next: 'b6_titolo' },
     ],
   },
 
@@ -297,9 +346,9 @@ Vi risvegliate SUGLI scaffali. Distesi, rigidi, incastrati tra un'enciclopedia e
 
 Vi tirate giù l'uno con l'altro, a strattoni, staccandovi di dosso etichette e polvere. Le gambe reggono. L'orgoglio meno. E dal fondo della biblioteca, il fruscìo di qualcosa che riordina — e che può riordinare ANCHE VOI, tutte le volte che vuole.
 
-**(Il gruppo si rialza a piene forze, ma la biblioteca si è presa 2 🎨 di Colore come "tassa di collocazione".)**`,
+**(Il gruppo si rialza a piene forze, ma la biblioteca si è presa 1 🎨 di Colore come "tassa di collocazione".)**`,
     fullHeal: true,
-    goldLoss: 2,
+    goldLoss: 1,
     choices: [
       { text: '⚔️ Giù dagli scaffali e di nuovo addosso: RIVINCITA', next: 'RETRY_COMBAT' },
       { text: '🏃 Basta così: filare verso il fondo della biblioteca, alla svelta', next: 'b7' },
@@ -307,6 +356,120 @@ Vi tirate giù l'uno con l'altro, a strattoni, staccandovi di dosso etichette e 
   },
 
   /* ---------- b7 — LO SCAFFALE PROIBITO ---------- */
+
+
+  b5_segnalibro: {
+    location: 'biblioteca',
+    caption: 'Il segnalibro',
+    text: `Emanuela si avvicina all'uomo col segnalibro come ci si avvicina a un passero: di lato, piano, senza promettere niente.
+
+E lo tocca. Solo il segnalibro — il margine giallo e rosso, sole e casa — non l'uomo.
+
+L'uomo non si muove. Ma la pagina sì: sotto il dito di Emanuela, per un istante, il colore del segnalibro **sanguina nella carta** — un millimetro di giallo che invade il bianco, come inchiostro nell'acqua — e nella riga sbiadita che l'uomo rilegge da anni ricompare UNA parola. Una sola, leggibile:
+
+*"...domenica..."*
+
+L'uomo respira. Diverso: più fondo. Le dita, sulla pagina, si spostano di un centimetro — verso la parola, come piante verso la finestra.
+
+> Emanuela: *(ritirando la mano con una lentezza da sminatore)* "Non possiamo salvarli tutti stanotte. Ma questo qui... questo ha una domenica che lo aspetta da qualche parte. Il colore CHIAMA il colore, avete visto? Una parola gliel'abbiamo riaccesa."
+
+> Natalino: "E quando spacchiamo tutto, le altre tornano da sole. Tenetevela stretta, questa cosa: funziona così anche per Daniele."
+
+**(Il colore chiama il colore. Una parola riaccesa stanotte, un intero libro dopo la vittoria.)**`,
+    sets: { segnalibro_toccato: true },
+    choices: [
+      { text: '🤫 Attraversare la sala, senza svegliare nessun altro', next: 'b7' },
+    ],
+  },
+
+
+  b6_titolo: {
+    location: 'biblioteca',
+    caption: 'I cinque che...',
+    text: `Claudia prende il libro-cuore con due mani e passa il dito sull'incisione a metà. *"I CINQUE CHE..."* — e poi il legno liscio, mai inciso, in attesa da chissà quanto.
+
+> Claudia: "Aspettate. Cinque. Noi siamo in CINQUE."
+
+> Gaetano: "Coincidenza. In tutte le storie sono cinque, o tre, o sette, è statistica narrativa—"
+
+E mentre lo dice, sotto il dito di Claudia, l'incisione **si allunga.** Da sola. Un graffio nuovo, lento, come inciso da una mano invisibile che ha ripreso coraggio: una **V**.
+
+*"I CINQUE CHE V..."*
+
+> Natalino: "V. Vincono? Vendicano? VOMITANO? Perché io sono vicino alla terza."
+
+> Emanuela: *(piano)* "Non l'ha finito perché non SAPEVA come finiva. È un libro che si scrive guardando. E adesso sta guardando NOI."
+
+Il libro batte una volta sola, caldo, come un applauso timido. Claudia lo posa sul leggìo con una cura da madre.
+
+> Claudia: "Allora diamogli un bel finale da guardare. E se stanotte va come deve andare... torniamo a leggere come continua."
+
+**(Da qualche parte nella biblioteca, un libro sta scrivendo la vostra storia in diretta. Non deludetelo.)**`,
+    sets: { titolo_incompiuto_letto: true },
+    choices: [
+      { text: '🚶 Oltre la frana, verso il fondo della biblioteca', next: 'b7' },
+    ],
+  },
+
+
+  mg_corsa_libri: {
+    location: 'biblioteca',
+    caption: 'La traversata di corsa',
+    text: `> Federico: "Teoria: i Lettori Grigi reagiscono al RUMORE LENTO. Passi felpati, fruscii, esitazioni. Ma una cosa VELOCE e decisa? Non fanno in tempo a catalogarla."
+
+> Gaetano: "La tua teoria ha un campione statistico di zero."
+
+> Federico: "La mia teoria ha FIDUCIA IN SE STESSA. Guardate e imparate."
+
+Il corridoio centrale della sala è lungo, dritto, e disseminato di pile di libri che il Grigiore fa scivolare sul pavimento come trappole pigre. Chi corre, corre da solo: gli altri guardano da dietro lo scaffale, pronti a negare di conoscerlo.
+
+*(🎮 MINIGIOCO — La Traversata: un tasto = salto. Superate le pile di libri senza inciampare tre volte, o la sala intera alzerà gli occhi.)*`,
+    minigame: {
+      type: 'corsa', hero: null,
+      success: 'b5_corsa_ok', fail: 'b5_corsa_ko',
+      tag: 'La Traversata dei Lettori — un tasto, tre inciampi massimo',
+      config: { titolo: '📚 La Traversata dei Lettori', tema: 'libri', ostacoli: 9, velocita: 270, cielo: '#171420', suolo: '#241d28' },
+    },
+  },
+
+  b5_corsa_ok: {
+    location: 'biblioteca',
+    caption: 'La teoria di Federico regge',
+    text: `L'ultima pila di libri passa sotto i piedi, e la corsa finisce contro lo scaffale in fondo con un tonfo attutito e trionfale.
+
+I Lettori Grigi... non hanno alzato la testa. NESSUNO. Il Grigiore ha provato a catalogare la cosa veloce che gli attraversava la sala e ha rinunciato a metà pratica.
+
+> Federico: *(ricomponendosi il colletto, senza fiato ma con dignità)* "Campione statistico: UNO. Percentuale di successo: CENTO. La scienza ringrazia."
+
+> Gaetano: "La scienza ti denuncia. Però... segnato: la velocità decisa lo manda in confusione. Può servire di là."
+
+**(🎨 Colore +1: la teoria di Federico ora è un DATO. E correre, in questa casa, si può.)**`,
+    gold: 1,
+    sets: { corsa_lettori_ok: true },
+    choices: [
+      { text: '🚶 Oltre la sala, verso il fondo della biblioteca', next: 'b7' },
+    ],
+  },
+
+  b5_corsa_ko: {
+    location: 'biblioteca',
+    caption: 'La teoria di Federico inciampa',
+    text: `Terzo inciampo. La pila di libri esplode in un ventaglio di pagine, il rumore rimbalza tra i tavoli — e trentasei teste grigie si ALZANO insieme, con il fruscio di un'unica pagina enorme che si volta.
+
+Non attaccano. Fanno di peggio: FISSANO. Lo sguardo collettivo di una sala di lettura disturbata è un'arma che nessuna palestra prepara ad affrontare.
+
+> Federico: *(a terra tra i libri, senza guardare nessuno)* "La teoria va raffinata."
+
+> Emanuela: *(tirandolo su per un braccio)* "La teoria va SEPPELLITA. Cammina e non toccare più niente."
+
+Uscite dalla sala accompagnati da trentasei paia d'occhi, con la dignità sotto le scarpe e un freddo nuovo addosso.
+
+**(−2 PV a chi è inciampato... cioè a tutti, per solidarietà d'imbarazzo.)**`,
+    damage: 2,
+    choices: [
+      { text: '🚶 Fuori dalla sala, in fila, zitti', next: 'b7' },
+    ],
+  },
 
   b7: {
     location: 'biblioteca',
@@ -354,6 +517,31 @@ Nessuno dice niente. Federico tiene il foglietto un secondo di troppo prima di r
     item: 'd20_daniele',
     choices: [
       { text: '📕 Ora la biografia. Strappare la catena di carta', next: 'b8' },
+      { text: '🎲 Lanciare il d20 una volta, per scaramanzia: se esce 20, è un buon segno', once: true, sets: { d20_lanciato: true }, next: 'b7c' },
+    ],
+  },
+
+  b7c: {
+    location: 'biblioteca',
+    caption: 'Il d20 che aspettava',
+    sets: { diciassette_firma: true },
+    text: `Federico lo tira per terra, sul pavimento della biblioteca maledetta, senza cerimonie. Il dado rotola per tre metri, sbatte contro il dorso di un'enciclopedia che si ritrae offesa, e si ferma.
+
+**DICIASSETTE.**
+
+> Federico: "Diciassette. Ma vaffanculo."
+
+> Claudia: "Perché, è brutto?"
+
+> Federico: *(con la faccia di uno preso alle spalle)* "È il diciassette. È il suo compleanno. È il numero che chiama sempre, a qualunque cosa giochi, dalla tombola al fantacalcio — 'perché il diciassette porta sfortuna agli ALTRI'." *(raccoglie il dado e lo stringe in pugno)* "Prima volta che questo dado rotola in vita sua. E fa il numero suo."
+
+> Natalino: *(piano)* "Allora non l'hai tirato tu."
+
+Nessuno risponde. Federico si rimette il d20 in tasca — nella tasca interna, quella dei documenti.
+
+**(Diciassette. Non era un buon segno: era una FIRMA.)**`,
+    choices: [
+      { text: '📕 Ora la biografia. Strappare la catena di carta', next: 'b8' },
     ],
   },
 
@@ -375,6 +563,7 @@ Provate a leggerlo così com'è, e dopo tre righe le lettere rovesciate comincia
 > Gaetano: "Attenzione, però. Va tenuto ferMO, l'angolo giusto, la pagina giusta. Se sbagliamo il verso, quello ci legge lui."`,
     choices: [
       { text: '🪞 Sistemare specchio e libro e leggere il riflesso, con metodo', tag: 'Prova di Intelligenza — CD 12', check: { stat: 'INT', dc: 12, success: 'b9', fail: 'b8b' } },
+      { text: '📖 Sfogliare il libro senza specchio: cercare figure, schemi, qualcosa di leggibile', sets: { biografia_sfogliata: true }, next: 'b11' },
     ],
   },
 
@@ -416,9 +605,9 @@ E in fondo, sottolineato tre volte, l'unica riga scritta nel verso GIUSTO — pe
 
 > Federico: "**Daniele.**" *(un silenzio lunghissimo)* "Quel figlio di puttana ha rubato il nome di mio fratello e non ha nemmeno avuto la fantasia di CAMBIARLO."
 
-**(SEGRETO APPRESO: Eleinad è un riflesso-parassita. Il suo nome vero — "Daniele" — è la sua ferita. 🎨 +2 Colore.)**`,
+**(SEGRETO APPRESO: Eleinad è un riflesso-parassita. Il suo nome vero — "Daniele" — è la sua ferita. 🎨 +1 Colore.)**`,
     sets: { segreto_specchio: true },
-    gold: 2,
+    gold: 1,
     choices: [
       { text: '🗣 Un applauso lento di pagine, dal buio: il Bibliotecario ha ascoltato tutto. Affrontarlo', requires: { notFlag: 'bibliotecario_morto' }, next: 'b10' },
       { text: '🚪 Portare il segreto fuori di qui, verso l\'uscita', next: 'b11' },
@@ -485,10 +674,10 @@ Dentro: il set da GdR di Daniele, mai usato. Schede bianche, matite intatte, un 
 
 > Federico: "È da sfigati." *(si mette il d20 in tasca, piano, come una cosa fragile)* "Ci giochiamo appena esce da qui. E faccio il guerriero."
 
-**(Il Bibliotecario è dei vostri. Ottenete il D20 DI DANIELE. 🎨 +2 Colore.)**`,
+**(Il Bibliotecario è dei vostri. Ottenete il D20 DI DANIELE. 🎨 +1 Colore.)**`,
     item: 'd20_daniele',
     sets: { bibliotecario_amico: true },
-    gold: 2,
+    gold: 1,
     choices: [
       { text: '🚪 Il Bibliotecario vi indica l\'uscita: seguire la sua scia di segnalibri', next: 'b11' },
       { text: '📕 Prima, se non l\'avete ancora letta: la biografia allo scaffale proibito', next: 'b8' },
@@ -513,9 +702,8 @@ Leggerne una pagina scalda come una domenica intera. Ma sotto i vostri occhi, la
 
 > Natalino: "O è lui che sta tenendo in vita NOI. Uno strappo e ce lo portiamo dietro... o lo lasciamo qui, intero, per chi passa dopo."
 
-**(+4 PV a tutti, 🎨 +1 Colore: le cose belle, rilette, curano.)**`,
+**(+4 PV a tutti: le cose belle, rilette, curano.)**`,
     heal: 4,
-    gold: 1,
     sets: { libro_cose_belle: true },
     choices: [
       { text: '📄 Strappare la pagina più bella e portarla via, nel taschino, sul cuore', sets: { pagina_strappata: true }, next: 'b5' },
@@ -546,8 +734,30 @@ Poi un libro solo, piccolo, da qualche parte in alto, fa un fruscìo che — giu
 
 Uscite nel Salotto-Cattedrale con un manuale, un segreto, e i nomi giusti in bocca.
 
-**(🎨 +1 Colore: siete entrati in una biblioteca che legge le paure, e ne uscite più colorati di prima.)**`,
-    gold: 1,
+**(Siete entrati in una biblioteca che legge le paure, e ne uscite più colorati di prima.)**`,
+    choices: [
+      { text: '🏛 Tornare al Salotto-Cattedrale', next: 'h1' },
+      { text: '📖 Un libro è caduto dallo scaffale: la copertina è a COLORI', once: true, sets: { libro_colori: true }, next: 'b11b' },
+    ],
+  },
+
+  b11b: {
+    location: 'biblioteca',
+    caption: 'Il catalogo dei colori',
+    sets: { scorta_di_blu: true },
+    text: `Il libro è caduto aperto, a faccia in su, e la copertina è a COLORI — la prima cosa a colori vista qui dentro dopo lo scaffale D-1994. È un catalogo tipografico di sfumature: rettangolini stampati, uno accanto all'altro, con il nome sotto.
+
+È aperto sulla pagina dei blu. E su un rettangolino, uno solo, c'è un cerchio a penna e una nota a margine nella grafia del gemello:
+
+*"QUESTO. Blu Serapo, ore 19:10, agosto. Se un giorno mi serve un colore da tenere in tasca, è questo."*
+
+> Claudia: *(confronta il rettangolino con la foto di Gaeta sul telefono, e non le serve un secondo)* "È identico. È IDENTICO. Ha trovato il suo mare in un campionario da tipografia e l'ha cerchiato a penna."
+
+> Gaetano: "Si è scelto un colore da tenere in tasca. PRIMA che qualcuno provasse a portargli via tutti gli altri." *(chiude il libro e se lo mette sotto il braccio, senza chiedere il permesso alla biblioteca)* "Questa non è nostalgia. È PREPARAZIONE."
+
+> Federico: "Mio fratello. Che si fa la scorta di blu."
+
+**(Nel catalogo dei colori, un blu cerchiato a penna — Serapo, ore 19:10. Daniele si era fatto la scorta.)**`,
     choices: [
       { text: '🏛 Tornare al Salotto-Cattedrale', next: 'h1' },
     ],
@@ -606,12 +816,12 @@ Sotto il diario, una boccetta piccola col tappo dorato, piena di qualcosa che si
 
 > Claudia: *(foto mentale, occhi lucidi)* "Daniele ha qualcuno che torna, e torna, e torna. Ha NOI. Segnatevi tutto quanto."
 
-**(Ottenete una BOCCATA DI COLORE. 🎨 +1. E un'idea che vale più della boccetta: si può uscire a metà pagina.)**`,
+**(Ottenete una BOCCATA DI COLORE. E un'idea che vale più della boccetta: si può uscire a metà pagina.)**`,
     item: 'boccata_colore',
-    gold: 1,
     sets: { pagina_del_salvato: true },
     choices: [
       { text: '🚶 Tornare alla sala di lettura, col diario di Rosa in mente', next: 'b5' },
+      { text: '📝 Aggiungere una riga al diario di Rosa: "Cinque che tornano, e tornano, e tornano"', once: true, sets: { riga_aggiunta_rosa: true }, next: 'b5' },
     ],
   },
 
@@ -667,14 +877,15 @@ Silenzio. Il giallo ci pensa. Poi le pagine fanno una cosa che nessun libro dovr
 
 Restano lì, i libri finiti: fermi, in pace, in fila sul parquet come sassi al sole. E — dettaglio che non vi lascerà mai più — da ognuno cola un filo sottile di inchiostro nero, dall'ultima pagina, come sangue da una ferita che finalmente si è chiusa. Qui dentro, morire finiti è il lieto fine.
 
-**(🎨 +2 Colore: i finali regalati tornano indietro coi colori addosso.)**
+**(🎨 +1 Colore: i finali regalati tornano indietro coi colori addosso.)**
 
 Poi il pavimento **trema**. In fondo alla sala, una cosa grande come un armadio si solleva: un manoscritto di quattromila pagine, rilegato in corda e unghie. Il Capobranco.
 
 E lui non vuole un finale. Lui vuole VOI.`,
-    gold: 2,
+    gold: 1,
     choices: [
       { text: '🗣 Il Manoscritto-Capobranco vi si para davanti', next: 'b16' },
+      { text: '🖋 Raccogliere l\'inchiostro dei libri finiti: potrebbe servire', once: true, sets: { inchiostro_finale: true }, next: 'b16' },
     ],
   },
 
@@ -701,10 +912,28 @@ E il peggio arriva adesso: dal fondo della sala, svegliato dall'urlo, si alza il
     damage: 2,
     choices: [
       { text: '🗣 Affrontare il Manoscritto-Capobranco', next: 'b16' },
+      { text: '😰 "SCUSATE! Non era il finale vero!" Provare a calmare i libri', tag: 'Prova di Carisma — CD 13', once: true, check: { stat: 'CAR', dc: 13, success: 'b16', fail: 'b14_ko' }, heal: 1 },
     ],
   },
 
   /* ---------- b16 / b16v / b16k — DUELLO DI PAROLE: IL CAPOBRANCO ---------- */
+
+
+  b14_ko: {
+    location: 'biblioteca',
+    caption: 'La tempesta di carta',
+    damage: 2,
+    text: `Le scuse peggiorano tutto: i manoscritti odiano la pietà quasi quanto i finali frettolosi. La sala si alza in un VORTICE di pagine — migliaia di fogli che tagliano l'aria, e la carta, quando vuole, taglia come la latta.
+
+Ne uscite a braccia alzate, con le mani e le guance segnate da una gragnola di tagli sottili, ognuno con una riga di testo stampata al contrario sulla pelle.
+
+> Federico: *(leggendosi il polso)* "'...e vissero'. Mi si è stampato addosso '...e vissero'. Manco FELICI E CONTENTI, solo 'e vissero'."
+
+> Claudia: "Vista la serata, firmerei."`,
+    choices: [
+      { text: '⛓ Al Capobranco, coi segni della carta addosso', next: 'b16' },
+    ],
+  },
 
   b16: {
     location: 'biblioteca',
@@ -776,10 +1005,11 @@ Sull'ultima pagina scritta, davanti ai vostri occhi, compaiono tre parole nuove,
 
 Già. Per Daniele si finisce.
 
-**(🎨 +2 Colore: l'incantesimo della coerenza si spezza — a metà, che è il modo giusto.)**`,
-    gold: 2,
+**(🎨 +1 Colore: l'incantesimo della coerenza si spezza — a metà, che è il modo giusto.)**`,
+    gold: 1,
     choices: [
       { text: '🚶 La sala si riapre: tornare verso la sala di lettura', next: 'b5' },
+      { text: '📖 Le pagine dell\'ultimo capitolo: leggerle prima che sbiadiscano', once: true, next: 'b16_capitolo' },
     ],
   },
 
@@ -833,6 +1063,7 @@ Lo sciame si FERMA. Il topo grande guarda la propria coda. Guarda Natalino. E l'
 Nella tana, tra pagine rosicchiate, il bottino: i topi la carta la mangiano, ma i **taralli** non li sanno apprezzare.`,
     choices: [
       { text: '📚 Rimettersi in marcia: più avanti, tra gli scaffali, qualcosa di GROSSO sta catalogando', next: 'b2' },
+      { text: '✂️ Tenere la treccia recisa: Natalino la intreccia come portafortuna', once: true, sets: { treccia_portafortuna: true }, next: 'b2' },
     ],
   },
 
@@ -860,9 +1091,8 @@ Accanto alla scatola, in equilibrio su una mensola, una **lattina di Coca Zero**
 
 > Emanuela: "La lattina prendetela. È sua. Si restituisce a mano."
 
-**(Ottenete una LATTINA ZERO — fredda, chissà come. 🎨 +1 Colore: il dopo esiste, ed è già ordinato.)**`,
+**(Ottenete una LATTINA ZERO — fredda, chissà come. Il dopo esiste, ed è già ordinato.)**`,
     item: 'lattina_zero',
-    gold: 1,
     choices: [
       { text: '📕 Tornare allo scaffale proibito, alla biografia', next: 'b8' },
       { text: '🚪 Dritti verso l\'uscita, con la lattina in tasca', next: 'b11' },
@@ -892,3 +1122,9 @@ MORTI POSSIBILI: nessuna. Sconfitte in combattimento → b_ko (fullHeal, goldLos
 USCITE DAL BLOCCO: solo h1 (da b11).
 STINGER USATI: jumpscare (b2b, b6b), risata (b2), item (b3, b7b, b10b, b12) — tutti nella lista ammessa.
 ================================================= */
+
+/* ============ BLOCCO C — IL CORRIDOIO DELLE PORTE SBAGLIATE (u*) ============
+   Pista non esclusiva dall'hub h1. Porte su ricordi corrotti del gruppo.
+   Dà: le due metà della FOTO DEI GEMELLI, il SEGRETO 2 (segreto_gemelli),
+   il joy-con sinistro, una MORTE VERA possibile (u6_morte), un Cuore di Colore.
+   Uscite ammesse: SOLO h1.                                                  */

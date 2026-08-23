@@ -451,8 +451,45 @@ const Combat = (() => {
           floatText(e._x + e._size / 2, e._y, `-${dmg}`, res.crit ? 'float-crit' : 'float-dmg');
           checkEnemyDeath(e);
         } else {
-          log(`${h.name} manca ${e.name}. ${res.fumble ? 'Malissimo. Con stile, ma malissimo.' : ''}`, 'log-info');
           floatText(e._x + e._size / 2, e._y, 'MANCATO', 'float-miss');
+          /* IL COLORE COMPRA IL SECONDO TENTATIVO anche qui: colpo a vuoto, e chi ha
+             ancora colore addosso può rimetterci del suo e ritirare. Si paga PRIMA di
+             ritirare e non si torna al menu delle azioni (LESSON #11: nessun bottone
+             deve regalare un'azione in più). I bottoni stanno in #combat-actions —
+             mai una modale, dentro il combattimento. */
+          const ctx = 'scontro:' + (battle.sceneId || G.sceneId || '?');
+          const mancato = () => {
+            log(`${h.name} manca ${e.name}. ${res.fumble ? 'Malissimo. Con stile, ma malissimo.' : ''}`, 'log-info');
+            render();
+            if (opts.after) opts.after(res); else endHeroAction();
+          };
+          if (!battle.over && Engine.puoiRitirare(ctx)) {
+            const costo = Engine.costoRitiroOra(ctx);
+            log(`🎨 Il colpo è andato a vuoto — ma il colore ce l'avete ancora addosso. Ritirare costa <b>${costo} 🎨</b>.`, 'log-info');
+            render();
+            const box = $('combat-actions');
+            box.innerHTML = `<div class="action-title">${h.name} ha mancato. Ci si rimette il colore?</div>`;
+            const mk = (html, fn) => {
+              const b = document.createElement('button');
+              b.className = 'action-btn';
+              b.innerHTML = html;
+              b.onclick = fn;
+              box.appendChild(b);
+              return b;
+            };
+            // ORDINE: "Lascia perdere" per PRIMO (è la scelta prudente, ed è quella che
+            // il bot dei test clicca quando in menu non ci sono attacchi né abilità).
+            mk(`↩ Lascia perdere <span class="action-sub">Il colpo è andato, il turno passa. Il colore vi serve dopo.</span>`, mancato);
+            const b2 = mk(`🎨 Rimetticelo e RITIRA <span class="action-sub">−${costo} 🎨 di Colore (ne avete ${G.gold}) · in questo scontro rincara ogni volta</span>`, () => {
+              if (!Engine.spendiRitiro(ctx)) return mancato();
+              log(`🎨 <b>${h.name} torna a colori</b> per un secondo — e il braccio si ricorda com'era prima del grigio. Si ritira. <span style="opacity:.7">(−${costo} 🎨)</span>`, 'log-crit');
+              Engine.renderPartyBar('combat-party-bar');
+              heroAttack(hIdx, tIdx, opts);
+            });
+            b2.id = 'btn-colore-combat';
+            return;
+          }
+          return mancato();
         }
         render();
         if (opts.after) opts.after(res); else endHeroAction();
@@ -808,7 +845,7 @@ const Combat = (() => {
     for (const h of G.party) if (h.down && !h.morto) { h.down = false; h.hp = 1; }
 
     const loot = battle.def.loot || {};
-    if (loot.gold) { G.gold += loot.gold; log(`🎨 La paura passa, il COLORE torna: <b>+${loot.gold} Colore</b>!`, 'log-heal'); }
+    if (loot.gold) { Engine.guadagnaColore(loot.gold); log(`🎨 La paura passa, il COLORE torna: <b>+${loot.gold} Colore</b>!`, 'log-heal'); }
     if (loot.items) for (const it of loot.items) { G.inventory.push(it); log(`🎁 Trovato: <b>${ITEMS[it].name}</b>!`, 'log-heal'); }
 
     const next = battle.def.victory;
@@ -828,8 +865,37 @@ const Combat = (() => {
     if (typeof Sound !== 'undefined') Sound.play('defeat');
     $('combat-actions').innerHTML = '';
     const next = battle.def.defeat;
+
+    /* SE CADETE TUTTI (richiesta ago 2026).
+       1ª caduta in questo scontro → la scena *_ko scritta: la Casa vi risputa fuori.
+       Dalla 2ª nello stesso punto:
+         a) se avete un CUORE DI COLORE si spacca, si consuma, e lo scontro RIPRENDE
+            con tutti in piedi a metà PV (l'oggetto più raro della Casa paga la morte);
+         b) altrimenti si riparte dall'ULTIMO CHECKPOINT, con lo stato di allora;
+         c) se non c'è nessun checkpoint (cadere prima della prima pista) → *_ko. */
+    const cadute = Engine.registraCaduta(G.lastCombatSceneId || G.sceneId);
+
+    if (cadute > 1 && G.inventory.includes('cuore_colore')) {
+      G.inventory.splice(G.inventory.indexOf('cuore_colore'), 1);
+      for (const h of G.party) {
+        if (h.morto) continue;
+        h.down = false; h.preso = false;
+        h.hp = Math.max(1, Math.round(h.maxHp * 0.5));
+      }
+      battle.over = false;
+      banner.textContent = '💗 IL CUORE SI SPACCA';
+      log(`💗 <b>Il Cuore di Colore si spacca nella borsa.</b> Rosso-arancio-oro dappertutto, caldo, addosso, dentro: un colore che non chiede permesso. Vi rialzate tutti a <b>metà PV</b>, con le mani sporche di qualcosa che era vivo. L'oggetto è finito: quel colore, adesso, non esiste più da nessuna parte.`, 'log-crit');
+      if (typeof Sound !== 'undefined') Sound.play('heal');
+      setTimeout(() => { banner.classList.add('hidden'); nextTurn(); }, 2200);
+      return;
+    }
+
     setTimeout(() => {
       banner.classList.add('hidden');
+      // rete di sicurezza: se la scena di sconfitta non esistesse, il checkpoint
+      // evita il vicolo cieco. Il ritorno VOLONTARIO al checkpoint è invece una
+      // scelta offerta nella scena di sconfitta stessa (engine.js, renderChoices).
+      if (!CAMPAIGN[next] && Engine.riprendiDaCheckpoint()) return;
       Engine.gotoScene(next);
     }, 2000);
   }
