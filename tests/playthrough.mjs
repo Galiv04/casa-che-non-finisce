@@ -1198,7 +1198,7 @@ scenarios.push(scenario(
 scenarios.push(scenario(
   'i due scontri del fallimento: controllo documenti e le teche che si aprono tutte',
   ['gaetano', 'claudia', 'natalino'],
-  {},
+  { k8: 'Gaetano studia il meccanismo' },
   {
     seed: 606001,
     checkOutcomes: { u5: 'fail', k8: 'fail' },
