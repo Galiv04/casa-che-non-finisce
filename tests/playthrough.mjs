@@ -1191,6 +1191,25 @@ scenarios.push(scenario(
     },
   },
 ));
+/* ---- I DUE SCONTRI DIETRO UN TIRO FALLITO: u5c (controllo documenti all'IMBARCO,
+   hostess + manichino) e k8c (l'allarme: le teche si aprono TUTTE, tre sonnambuli).
+   La suite di default fa riuscire quei tiri (HAPPY_CHECKS), quindi due combattimenti
+   interi non venivano mai combattuti. In coda alla lista: i semi sono un contatore. ---- */
+scenarios.push(scenario(
+  'i due scontri del fallimento: controllo documenti e le teche che si aprono tutte',
+  ['gaetano', 'claudia', 'natalino'],
+  {},
+  {
+    seed: 606001,
+    checkOutcomes: { u5: 'fail', k8: 'fail' },
+    sequences: { h1: ['porta fredda', 'porte scolorite', 'suono dello schermo'] },
+    verify: (r, expect) => {
+      expect(r.log.scenes.includes('u5c') || r.log.scenes.includes('k8c'),
+        'nessuno dei due scontri del fallimento è stato raggiunto');
+    },
+  },
+));
+
 
 
 /* ==================== VERIFICA DIRETTA — b4, il nome proibito (Eleinad costa Colore) ====================
