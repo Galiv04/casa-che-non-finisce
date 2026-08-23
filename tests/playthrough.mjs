@@ -1143,7 +1143,10 @@ scenarios.push(scenario(
       k3: ['Accendere i fuochi', 'spigolo', 'spigolo'],
       k4: ['cordata', 'altra via', 'cordata'],
       k4_morte: ['Risalire'],
-      k6: ['manodopera', 'Fregarlo', 'prezzo da colleghi', 'Lasciare il banco'],
+      // 'Le torna l'inventario' è il minigioco del Mercante (mg_inventario), che per mesi
+      // nessuno scenario ha giocato: va DENTRO la sequenza, perché una sequenza su k6
+      // ha la precedenza sulla chiave singola.
+      k6: ['manodopera', 'Le torna l\'inventario', 'Fregarlo', 'prezzo da colleghi', 'Lasciare il banco'],
       k9: ['tenta la sequenza'],
       z6: ['Fare scudo'],
     },
@@ -1170,6 +1173,25 @@ scenarios.push(scenario(
       expect(r.log.gold >= 0, 'Colore negativo dopo la spesa dal Mercante');
     },
   }));
+/* ---- I DUE MINIGIOCHI che nessuno scenario giocava: la Traversata dei Lettori (b5,
+   corsa). L'Inventario del Mercante (k6, calcolo) è coperto dallo scenario della cucina,
+   che è l'unico che arriva sicuro al banco. Erano scritti, tarati e mai eseguiti da un
+   test: i minigiochi sono il posto dove i bug si nascondono meglio
+   (la barra del fiato di Pandataria era invisibile per settimane). ---- */
+scenarios.push(scenario(
+  'la Traversata dei Lettori (minigioco della corsa)',
+  ['gaetano', 'federico'],
+  {
+    b5: 'La sfida di Federico',
+  },
+  {
+    difficulty: 'facile',
+    verify: (r, expect) => {
+      expect(r.log.scenes.includes('mg_corsa_libri'), 'la Traversata dei Lettori non è stata giocata');
+    },
+  },
+));
+
 
 /* ==================== VERIFICA DIRETTA — b4, il nome proibito (Eleinad costa Colore) ====================
    b4 è raggiungibile SOLO scegliendo "Parlaci di ELEINAD" a b2, il che esclude — nella stessa
