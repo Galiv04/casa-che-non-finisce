@@ -802,22 +802,61 @@ const Scenes = (() => {
       skyGradient(ctx, W, H, '#54545a', '#8a8a8e', 10);
       // un sole senza forza dietro il velo
       ctx.fillStyle = 'rgba(200,200,204,.35)'; pixelDisc(ctx, W * 0.72, H * 0.16, 22);
-      // IL MARE FERMO: fasce orizzontali immobili, nessuna onda
       const seaY = H * 0.38, shoreY = H * 0.62;
+      /* IL PROMONTORIO DI GAETA e la MONTAGNA SPACCATA, a destra. Mancavano, e il testo
+         di questa scena dice: «la riconoscete dalla curva della baia, dalla montagna
+         spaccata, dal punto esatto dove piantate l'ombrellone da dieci anni». Cioè il
+         gioco chiedeva al giocatore di riconoscere un posto, e nel quadro non c'era
+         niente da riconoscere: cielo grigio, mare grigio, sabbia. Serapo è chiusa a
+         est da Monte Orlando, e la fenditura che lo taglia in tre è la cosa che rende
+         quella baia diversa da qualunque altra spiaggia d'Italia. Adesso c'è, e la
+         fenditura è l'unica linea nera dell'inquadratura. */
+      {
+        const mcx = W * 0.855, mw = W * 0.34, mh = H * 0.26;
+        for (let dx = -mw / 2; dx < mw / 2 + 3; dx += 3) {
+          const t = dx / (mw / 2);
+          let hh = mh * Math.pow(Math.max(0, 1 - t * t), 0.40);
+          hh *= 0.84 + Math.sin(dx * 0.05) * 0.10 + Math.sin(dx * 0.018) * 0.06;
+          if (hh < 1) continue;
+          ctx.fillStyle = '#494a50';
+          ctx.fillRect(mcx + dx, seaY - hh, 3, hh + 3);
+          ctx.fillStyle = 'rgba(150,150,156,.22)';           // il ciglio, appena
+          ctx.fillRect(mcx + dx, seaY - hh, 3, 1);
+        }
+        // LA FENDITURA: dall'alto fino all'acqua, e si allarga scendendo
+        for (let k = 0; k < 34; k++) {
+          const t = k / 33;
+          const larg = 3 + t * 7;
+          ctx.fillStyle = `rgba(12,12,16,${0.62 - t * 0.16})`;
+          ctx.fillRect(mcx - W * 0.045 - larg / 2 + t * 5, seaY - mh * 0.86 + t * mh * 0.90, larg, 4);
+        }
+      }
+      // IL MARE FERMO: fasce orizzontali immobili, nessuna onda. Più scuro del cielo,
+      // perché prima erano lo stesso grigio e l'orizzonte non esisteva.
       for (let i = 0; i < 6; i++) {
         const t = i / 6;
-        ctx.fillStyle = mix('#5e6468', '#787e82', t);
+        ctx.fillStyle = mix('#4a5054', '#6a7074', t);
         ctx.fillRect(0, seaY + t * (shoreY - seaY), W, (shoreY - seaY) / 6 + 1);
       }
+      ctx.fillStyle = 'rgba(178,178,184,.26)'; ctx.fillRect(0, seaY, W, 1);   // l'orizzonte
       // il riflesso del sole: una colonna spenta, FERMA
       ctx.fillStyle = 'rgba(210,210,214,.12)'; ctx.fillRect(W * 0.69, seaY, W * 0.06, shoreY - seaY);
-      // la linea di riva: profilo irregolare di cenere bagnata, non una banda netta
-      for (let x = 0; x < W; x += 14) {
-        const off = Math.round((r() - 0.5) * 8);
-        ctx.fillStyle = '#6e6a64'; ctx.fillRect(x, shoreY + off, 14, 8);
+      /* LA CURVA DELLA BAIA. La riva era una riga orizzontale con qualche scalino
+         casuale: una spiaggia qualunque. Serapo è un arco, e l'arco è la prima delle
+         tre cose che il testo dice di riconoscere — quindi la riva scende al centro e
+         risale ai lati, e l'acqua entra di più dove la baia è più profonda. */
+      const arco = x => shoreY - Math.pow(Math.abs(x / W - 0.42) * 2.1, 1.7) * H * 0.085 + H * 0.030;
+      for (let x = 0; x < W; x += 3) {
+        const y = Math.round(arco(x) + (r() - 0.5) * 4);
+        ctx.fillStyle = mix('#4a5054', '#6a7074', 1);
+        ctx.fillRect(x, seaY, 3, y - seaY);                  // il mare arriva fino alla riva
+        ctx.fillStyle = 'rgba(198,198,202,.20)'; ctx.fillRect(x, y, 3, 1);
+        ctx.fillStyle = '#6e6a64'; ctx.fillRect(x, y + 1, 3, 9);   // la cenere bagnata
       }
-      // LA SPIAGGIA DI CENERE
-      ground(ctx, W, H, shoreY + 6, '#7a746a', r, 12, 10);
+      // LA SPIAGGIA DI CENERE: parte dall'arco della riva, non da una riga
+      ctx.fillStyle = '#7a746a';
+      for (let x = 0; x < W; x += 3) ctx.fillRect(x, Math.round(arco(x)) + 9, 3, H);
+      ground(ctx, W, H, shoreY + H * 0.045, '#7a746a', r, 12, 10);
       // mucchietti di cenere e qualche conchiglia grigia
       for (let i = 0; i < 8; i++) {
         const px2 = r() * W, py2 = shoreY + 20 + r() * (H - shoreY - 30);
@@ -830,7 +869,9 @@ const Scenes = (() => {
       for (const [fx, tilt] of [[0.30, -0.12], [0.44, 0.12]]) {
         ctx.save(); ctx.translate(W * fx, H * 0.80); ctx.rotate(tilt);
         ctx.fillStyle = '#a86a3a'; ctx.fillRect(-4, -26, 8, 26);            // manico piantato
-        ctx.fillStyle = '#c08448'; pixelDisc(ctx, 0, -44, 20);              // il piatto
+        ctx.fillStyle = '#8a5228'; ctx.fillRect(-5, -24, 10, 9);            // la fasciatura del manico
+        ctx.fillStyle = '#c08448'; pixelEllipse(ctx, 0, -44, 22, 17, 3);    // il piatto, OVALE
+        ctx.fillStyle = '#a86a3a'; ctx.fillRect(-14, -46, 28, 2);           // la venatura del compensato
         ctx.fillStyle = '#a86a3a'; pixelDisc(ctx, 0, -44, 14);
         ctx.restore();
       }
@@ -1394,6 +1435,21 @@ const Scenes = (() => {
         ctx.fillStyle = '#ffd0a0'; ctx.fillRect(W * fx + 10, H * fy - 6, fw2 * 0.6, 8);
       }
       const g = H - 56;
+      /* IL FONDO DELLA STRADA. Qui c'era il buco più imbarazzante di tutti e cinque i
+         giochi: il cielo si fermava a H*0.55, il terreno cominciava a H-56, e in mezzo
+         — cioè esattamente dove la strada va verso il sole che sorge, nell'ULTIMA
+         immagine del gioco, quella dell'epilogo — nessuno dipingeva niente. Nel
+         riquadro si vedeva il nero del fondo: una fascia di 495×105 in mezzo alla
+         schermata che dovrebbe dire «è finita, ed è mattina». Trovato dal controllo
+         nuovo sui fondali, non dall'occhio: l'ho guardata più volte e la fascia scura
+         in fondo alla strada sembrava lontananza.
+         Adesso è foschia: il rosa del cielo che si scalda scendendo, come succede
+         all'alba quando la luce radente attraversa più aria. */
+      for (let y = Math.round(H * 0.55) - 1; y < g + 2; y++) {
+        const t = (y - H * 0.55) / (g - H * 0.55);
+        ctx.fillStyle = mix('#f0907a', '#f8c496', Math.min(1, Math.max(0, t)));
+        ctx.fillRect(0, y, W, 1);
+      }
       // le quinte dei palazzi: FACCIATE COLORATE dal sole — ocra, terracotta, salvia
       const palCols = [['#d8a860', '#b8884a'], ['#c86a52', '#a85440'], ['#8aa878', '#6e8a60']];
       for (const side of [0, 1]) {
