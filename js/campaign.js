@@ -172,6 +172,7 @@ Nella seconda foto, il rettangolo è mezzo passo più vicino alla finestra. Nell
 **(Tre foto che nessun perito vorrà mai periziare. La casa vi ha già visti — e voi avete visto la sua PORTA.)**`,
     sets: { finestra_fotografata: true },
     choices: [
+      { text: '📸 Mandare le tre foto a Daniele. Anche se quel telefono squilla a vuoto da nove giorni', once: true, gold: 1, next: 'a1' },
       { text: '🔔 Al citofono. SUBITO', next: 'a1' },
     ],
   },
@@ -228,6 +229,7 @@ Silenzio nell'androne. Federico prende il pacco della lampada da 10.000 lux e se
 **(Daniele lo sapeva, e stava combattendo a modo suo. Non siete un soccorso. Siete i RINFORZI.)**`,
     sets: { pacchi_controllati: true },
     choices: [
+      { text: '📦 Aprirlo qui sul pianerottolo e portarglielo su ARMATO, non incartato', once: true, gold: 1, heal: 1, next: 'a2' },
       { text: '🪜 Terzo piano. Insieme, con la lampada sottobraccio', next: 'a2' },
     ],
   },
@@ -534,6 +536,7 @@ La gira verso il gruppo. In mezzo alla raggiera, il fondo ha lasciato **un retta
 **(Perfino i fondi del caffè di Daniele lavorano per voi. La porta esiste, e ora sapete che il caffè le va portato FIN LÀ.)**`,
     sets: { fondo_caffe_letto: true },
     choices: [
+      { text: '☕ Farne un\'altra, e stavolta due tazzine: una la portiamo', once: true, gold: 1, next: 'a5' },
       { text: '📺 Al salotto, col caffè in mano come un\'arma', next: 'a5' },
     ],
   },
@@ -552,6 +555,7 @@ Per un istante intero lo specchio smette di fingere: il riflesso vi guarda dritt
 
 Il capogiro arriva subito dopo, gelido, come una mano dentro la nuca: essere GUARDATI da uno specchio costa qualcosa che non ha nome.`,
     choices: [
+      { text: '🛏 Coprire lo specchio con un lenzuolo. Adesso, e senza guardarlo mentre lo fate', once: true, gold: 1, next: 'a5' },
       { text: '📺 Al salotto, e MAI più di traverso agli specchi', next: 'a5' },
     ],
   },
@@ -670,6 +674,7 @@ Silenzio. Poi il muro **rutta**. Non c'è un'altra parola: è un rutto, sordo e 
 **(-2 PV a tutti: lo strattone, lo spavento, e un lutto di ferramenta.)**`,
     damage: 2,
     choices: [
+      { text: '📐 Rimisurare con quello che c\'è: passi, contati ad alta voce, a turno', once: true, gold: 1, next: 'a7' },
       { text: '🚶 Nel corridoio. Lontani dalle pareti.', next: 'a7' },
     ],
   },
@@ -812,6 +817,7 @@ Sotto la luce diretta, il grigio **si apre.** Per un secondo — meno, mezzo —
 **(La scoperta più importante della serata — il Grigiore non distrugge: ACCUMULA. E ciò che è accumulato si può riprendere.)**`,
     sets: { cenere_studiata: true },
     choices: [
+      { text: '🧾 Tenere il biglietto bruciacchiato. È una ricevuta, e le ricevute servono', once: true, gold: 1, next: 's1' },
       { text: '🖼 Avanti, verso le foto alle pareti', next: 's1' },
     ],
   },
@@ -930,6 +936,7 @@ Le luci del salotto — solo quelle — calano e risalgono. Una volta. Come un c
 
 Il muro si spegne. La casa, da qualche parte, digerisce il boccone di attenzione che le avete appena regalato gratis.`,
     choices: [
+      { text: '📵 Il telefono in un cassetto, in un\'altra stanza, e la chiave a Natalino', once: true, heal: 2, next: 's3' },
       { text: '🗣 Da Eleinad, con gli occhi VOSTRI', next: 's3' },
     ],
   },
@@ -1457,6 +1464,7 @@ Vi rialzate diversi. Le parole, adesso, le vedete arrivare.
 
 **("Se conosci il trucco, il trucco non funziona. VALE ANCHE PER QUELLO GRANDE." Adesso lo sapete anche voi.)**`,
     choices: [
+      { text: '📖 Impararselo. Tutto quanto, dalla prima pagina, ad alta voce, a turno', once: true, gold: 2, next: 'b5' },
       { text: '🚶 Verso la sala di lettura, con la frase in testa', next: 'b5' },
     ],
   },
@@ -1511,6 +1519,7 @@ E lì, a metà dell'ultima riga, la grafia cambia. Si fa più larga, più libera
 **(La lezione di pagina 1987 — vivo è ciò che resta a metà. Al demone che vuole CHIUDERE ogni conto, adesso, avete una risposta.)**`,
     sets: { ultimo_capitolo_letto: true },
     choices: [
+      { text: '✍️ Scrivere una riga a pagina 1988. Una sola, e lasciarla a metà di proposito', once: true, gold: 1, next: 'b5' },
       { text: '🚶 La sala si riapre: verso la sala di lettura', next: 'b5' },
     ],
   },
@@ -1676,6 +1685,7 @@ L'uomo respira. Diverso: più fondo. Le dita, sulla pagina, si spostano di un ce
 **(Il colore chiama il colore. Una parola riaccesa stanotte, un intero libro dopo la vittoria.)**`,
     sets: { segnalibro_toccato: true },
     choices: [
+      { text: '🔖 Rimettere il segnalibro dove stava, alla pagina giusta, prima di andare', once: true, gold: 1, heal: 1, next: 'b7' },
       { text: '🤫 Attraversare la sala, senza svegliare nessun altro', next: 'b7' },
     ],
   },
@@ -1768,6 +1778,7 @@ Uscite dalla sala accompagnati da trentasei paia d'occhi, con la dignità sotto 
 **(−2 PV a chi è inciampato... cioè a tutti, per solidarietà d'imbarazzo.)**`,
     damage: 2,
     choices: [
+      { text: '📚 Rimettere i libri a posto uno per uno, sotto trentasei paia d\'occhi', once: true, gold: 2, next: 'b7' },
       { text: '🚶 Fuori dalla sala, in fila, zitti', next: 'b7' },
     ],
   },
@@ -2061,6 +2072,7 @@ Uscite nel Salotto-Cattedrale con un manuale, un segreto, e i nomi giusti in boc
 
 **(Nel catalogo dei colori, un blu cerchiato a penna — Serapo, ore 19:10. Daniele si era fatto la scorta.)**`,
     choices: [
+      { text: '🔖 Strappare la pagina del blu di Serapo e mettersela in tasca', once: true, gold: 1, next: 'h1' },
       { text: '🏛 Tornare al Salotto-Cattedrale', next: 'h1' },
     ],
   },
@@ -2234,6 +2246,7 @@ Ne uscite a braccia alzate, con le mani e le guance segnate da una gragnola di t
 
 > Claudia: "Vista la serata, firmerei."`,
     choices: [
+      { text: '🩹 Leggersi addosso le righe stampate al contrario, tutte, prima che si chiudano', once: true, gold: 1, next: 'b16' },
       { text: '⛓ Al Capobranco, coi segni della carta addosso', next: 'b16' },
     ],
   },
@@ -2456,6 +2469,7 @@ Sulla porta, lo Spirito si volta un'ultima volta. La signora sorride, e il sorri
 **(Si rientra con un gesto GRATIS di chi ti ama. Gli spiriti della casa sono debiti che il demone spera vi scordiate.)**`,
     sets: { consiglio_spiriti: true },
     choices: [
+      { text: '🗣 Ripeterlo a voce alta tutti insieme — SETTANTAQUATTRO ORIZZONTALE — per non scordarselo', once: true, gold: 2, next: 'u1' },
       { text: '🚪 Tornare dagli altri, con la notizia più strana della serata', next: 'u1' },
     ],
   },
@@ -2485,6 +2499,7 @@ Silenzio. La toga, a terra, sembra più piccola di prima. Una taglia da uomo che
 **(L'Avvocato aveva un nome e un record quasi perfetto — e la lezione è cucita nel bavero: è il conteggio che scegli a prenderti o salvarti.)**`,
     sets: { toga_targhetta: true },
     choices: [
+      { text: '🪡 Scucire la targhetta dal bavero e portarsela via: quell\'uomo aveva un nome', once: true, gold: 1, next: 'u1' },
       { text: '🚪 Tornare nel corridoio delle porte', next: 'u1' },
     ],
   },
@@ -2594,6 +2609,7 @@ Trent'anni di litigio vi passano attraverso in dieci secondi. È come farsi attr
 
 > Gaetano: *(coi denti che battono)* "Ok. Ok. La stanza si difende, quindi servono le parole ESATTE — non parole qualunque, o il momento giusto." *(si tira su)* "E allora le troviamo."`,
     choices: [
+      { text: '👂 Ascoltare quel loop fino in fondo, tutto, e trascrivere le parole esatte', once: true, gold: 1, next: 'u3' },
       { text: '🚪 Fuori dalla cameretta, per ora', next: 'u3' },
     ],
   },
@@ -2780,6 +2796,7 @@ La tirano fuori in tre, e la caviglia porta il segno — una fascia pallida, esa
 
 > Emanuela: "Quello che si fa con le zie. Ho promesso che torno."`,
     choices: [
+      { text: '🤝 Restare seduti con lei sulla sabbia grigia finché il colore non torna', once: true, heal: 3, gold: 1, next: 'u4d' },
       { text: '🚪 Via dalla spiaggia, con una promessa da non mantenere', next: 'u4d' },
     ],
   },
@@ -2830,6 +2847,7 @@ Sulla riga ci sono: quattro conchiglie rotte, un pezzo di plastica azzurra levig
 
 **(Sulla battigia c'è un'impronta del quarantaquattro, fresca. Daniele gira ancora la sua Casa.)**`,
     choices: [
+      { text: '👣 Mettere il piede accanto all\'impronta anche gli altri. Tutti e cinque, in fila', once: true, gold: 1, heal: 1, next: 'u1' },
       { text: '🚪 Tornare nel corridoio delle porte', next: 'u1' },
     ],
   },
@@ -2954,6 +2972,7 @@ Sotto, in mezzo al modulo, una colonna di trattini. Migliaia. Uno per giorno, fi
 
 **(Sul 19A c'era già stato qualcuno. Segnava i giorni. Nessuno è venuto a prenderlo. Voi sì.)**`,
     choices: [
+      { text: '✈️ Leggere ad alta voce tutti i giorni segnati sul 19A, uno per uno, prima di uscire', once: true, gold: 2, next: 'u1' },
       { text: '🚪 Fuori, verso il corridoio delle porte', next: 'u1' },
     ],
   },
@@ -3106,6 +3125,7 @@ Lo avvicina. Il Cuore accelera. Il battito si sincronizza, in tre secondi netti,
 **(Il Cuore è una riserva che CERCA un proprietario — e il Grigiore non ha difese contro un RESO.)**`,
     sets: { cuore_studiato: true },
     choices: [
+      { text: '🫀 Tenerlo in mano finché batte contro il palmo, senza dire niente', once: true, heal: 2, next: 'u7' },
       { text: '⚠️ La superficie nera si increspa. Qualcosa si alza', next: 'u7' },
     ],
   },
@@ -3792,6 +3812,7 @@ Sotto il tappeto: una fessura quadrata nel pavimento, i bordi sporchi di ditate.
 
 **(Sotto il tappeto c'è una botola, e Daniele ve l'ha segnata sul retro di un post-it.)**`,
     choices: [
+      { text: '🖊 Scrivere una risposta sul retro del post-it e rimetterlo in tasca a Claudia', once: true, gold: 1, next: 'k3' },
       { text: '🥤 Ora la freccia di lattine. Fino in fondo.', next: 'k3' },
     ],
   },

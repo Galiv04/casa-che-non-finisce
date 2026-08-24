@@ -85,6 +85,7 @@ Nella seconda foto, il rettangolo è mezzo passo più vicino alla finestra. Nell
 **(Tre foto che nessun perito vorrà mai periziare. La casa vi ha già visti — e voi avete visto la sua PORTA.)**`,
     sets: { finestra_fotografata: true },
     choices: [
+      { text: '📸 Mandare le tre foto a Daniele. Anche se quel telefono squilla a vuoto da nove giorni', once: true, gold: 1, next: 'a1' },
       { text: '🔔 Al citofono. SUBITO', next: 'a1' },
     ],
   },
@@ -141,6 +142,7 @@ Silenzio nell'androne. Federico prende il pacco della lampada da 10.000 lux e se
 **(Daniele lo sapeva, e stava combattendo a modo suo. Non siete un soccorso. Siete i RINFORZI.)**`,
     sets: { pacchi_controllati: true },
     choices: [
+      { text: '📦 Aprirlo qui sul pianerottolo e portarglielo su ARMATO, non incartato', once: true, gold: 1, heal: 1, next: 'a2' },
       { text: '🪜 Terzo piano. Insieme, con la lampada sottobraccio', next: 'a2' },
     ],
   },
@@ -447,6 +449,7 @@ La gira verso il gruppo. In mezzo alla raggiera, il fondo ha lasciato **un retta
 **(Perfino i fondi del caffè di Daniele lavorano per voi. La porta esiste, e ora sapete che il caffè le va portato FIN LÀ.)**`,
     sets: { fondo_caffe_letto: true },
     choices: [
+      { text: '☕ Farne un\'altra, e stavolta due tazzine: una la portiamo', once: true, gold: 1, next: 'a5' },
       { text: '📺 Al salotto, col caffè in mano come un\'arma', next: 'a5' },
     ],
   },
@@ -465,6 +468,7 @@ Per un istante intero lo specchio smette di fingere: il riflesso vi guarda dritt
 
 Il capogiro arriva subito dopo, gelido, come una mano dentro la nuca: essere GUARDATI da uno specchio costa qualcosa che non ha nome.`,
     choices: [
+      { text: '🛏 Coprire lo specchio con un lenzuolo. Adesso, e senza guardarlo mentre lo fate', once: true, gold: 1, next: 'a5' },
       { text: '📺 Al salotto, e MAI più di traverso agli specchi', next: 'a5' },
     ],
   },
@@ -583,6 +587,7 @@ Silenzio. Poi il muro **rutta**. Non c'è un'altra parola: è un rutto, sordo e 
 **(-2 PV a tutti: lo strattone, lo spavento, e un lutto di ferramenta.)**`,
     damage: 2,
     choices: [
+      { text: '📐 Rimisurare con quello che c\'è: passi, contati ad alta voce, a turno', once: true, gold: 1, next: 'a7' },
       { text: '🚶 Nel corridoio. Lontani dalle pareti.', next: 'a7' },
     ],
   },
@@ -725,6 +730,7 @@ Sotto la luce diretta, il grigio **si apre.** Per un secondo — meno, mezzo —
 **(La scoperta più importante della serata — il Grigiore non distrugge: ACCUMULA. E ciò che è accumulato si può riprendere.)**`,
     sets: { cenere_studiata: true },
     choices: [
+      { text: '🧾 Tenere il biglietto bruciacchiato. È una ricevuta, e le ricevute servono', once: true, gold: 1, next: 's1' },
       { text: '🖼 Avanti, verso le foto alle pareti', next: 's1' },
     ],
   },
@@ -843,6 +849,7 @@ Le luci del salotto — solo quelle — calano e risalgono. Una volta. Come un c
 
 Il muro si spegne. La casa, da qualche parte, digerisce il boccone di attenzione che le avete appena regalato gratis.`,
     choices: [
+      { text: '📵 Il telefono in un cassetto, in un\'altra stanza, e la chiave a Natalino', once: true, heal: 2, next: 's3' },
       { text: '🗣 Da Eleinad, con gli occhi VOSTRI', next: 's3' },
     ],
   },

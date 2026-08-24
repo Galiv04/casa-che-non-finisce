@@ -160,6 +160,7 @@ Vi rialzate diversi. Le parole, adesso, le vedete arrivare.
 
 **("Se conosci il trucco, il trucco non funziona. VALE ANCHE PER QUELLO GRANDE." Adesso lo sapete anche voi.)**`,
     choices: [
+      { text: '📖 Impararselo. Tutto quanto, dalla prima pagina, ad alta voce, a turno', once: true, gold: 2, next: 'b5' },
       { text: '🚶 Verso la sala di lettura, con la frase in testa', next: 'b5' },
     ],
   },
@@ -214,6 +215,7 @@ E lì, a metà dell'ultima riga, la grafia cambia. Si fa più larga, più libera
 **(La lezione di pagina 1987 — vivo è ciò che resta a metà. Al demone che vuole CHIUDERE ogni conto, adesso, avete una risposta.)**`,
     sets: { ultimo_capitolo_letto: true },
     choices: [
+      { text: '✍️ Scrivere una riga a pagina 1988. Una sola, e lasciarla a metà di proposito', once: true, gold: 1, next: 'b5' },
       { text: '🚶 La sala si riapre: verso la sala di lettura', next: 'b5' },
     ],
   },
@@ -379,6 +381,7 @@ L'uomo respira. Diverso: più fondo. Le dita, sulla pagina, si spostano di un ce
 **(Il colore chiama il colore. Una parola riaccesa stanotte, un intero libro dopo la vittoria.)**`,
     sets: { segnalibro_toccato: true },
     choices: [
+      { text: '🔖 Rimettere il segnalibro dove stava, alla pagina giusta, prima di andare', once: true, gold: 1, heal: 1, next: 'b7' },
       { text: '🤫 Attraversare la sala, senza svegliare nessun altro', next: 'b7' },
     ],
   },
@@ -471,6 +474,7 @@ Uscite dalla sala accompagnati da trentasei paia d'occhi, con la dignità sotto 
 **(−2 PV a chi è inciampato... cioè a tutti, per solidarietà d'imbarazzo.)**`,
     damage: 2,
     choices: [
+      { text: '📚 Rimettere i libri a posto uno per uno, sotto trentasei paia d\'occhi', once: true, gold: 2, next: 'b7' },
       { text: '🚶 Fuori dalla sala, in fila, zitti', next: 'b7' },
     ],
   },
@@ -764,6 +768,7 @@ Uscite nel Salotto-Cattedrale con un manuale, un segreto, e i nomi giusti in boc
 
 **(Nel catalogo dei colori, un blu cerchiato a penna — Serapo, ore 19:10. Daniele si era fatto la scorta.)**`,
     choices: [
+      { text: '🔖 Strappare la pagina del blu di Serapo e mettersela in tasca', once: true, gold: 1, next: 'h1' },
       { text: '🏛 Tornare al Salotto-Cattedrale', next: 'h1' },
     ],
   },
@@ -937,6 +942,7 @@ Ne uscite a braccia alzate, con le mani e le guance segnate da una gragnola di t
 
 > Claudia: "Vista la serata, firmerei."`,
     choices: [
+      { text: '🩹 Leggersi addosso le righe stampate al contrario, tutte, prima che si chiudano', once: true, gold: 1, next: 'b16' },
       { text: '⛓ Al Capobranco, coi segni della carta addosso', next: 'b16' },
     ],
   },

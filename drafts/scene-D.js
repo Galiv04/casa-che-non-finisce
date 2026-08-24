@@ -109,6 +109,7 @@ Sotto il tappeto: una fessura quadrata nel pavimento, i bordi sporchi di ditate.
 
 **(Sotto il tappeto c'è una botola, e Daniele ve l'ha segnata sul retro di un post-it.)**`,
     choices: [
+      { text: '🖊 Scrivere una risposta sul retro del post-it e rimetterlo in tasca a Claudia', once: true, gold: 1, next: 'k3' },
       { text: '🥤 Ora la freccia di lattine. Fino in fondo.', next: 'k3' },
     ],
   },

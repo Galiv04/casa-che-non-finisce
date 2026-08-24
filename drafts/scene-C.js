@@ -21,6 +21,7 @@ Sulla porta, lo Spirito si volta un'ultima volta. La signora sorride, e il sorri
 **(Si rientra con un gesto GRATIS di chi ti ama. Gli spiriti della casa sono debiti che il demone spera vi scordiate.)**`,
     sets: { consiglio_spiriti: true },
     choices: [
+      { text: '🗣 Ripeterlo a voce alta tutti insieme — SETTANTAQUATTRO ORIZZONTALE — per non scordarselo', once: true, gold: 2, next: 'u1' },
       { text: '🚪 Tornare dagli altri, con la notizia più strana della serata', next: 'u1' },
     ],
   },
@@ -50,6 +51,7 @@ Silenzio. La toga, a terra, sembra più piccola di prima. Una taglia da uomo che
 **(L'Avvocato aveva un nome e un record quasi perfetto — e la lezione è cucita nel bavero: è il conteggio che scegli a prenderti o salvarti.)**`,
     sets: { toga_targhetta: true },
     choices: [
+      { text: '🪡 Scucire la targhetta dal bavero e portarsela via: quell\'uomo aveva un nome', once: true, gold: 1, next: 'u1' },
       { text: '🚪 Tornare nel corridoio delle porte', next: 'u1' },
     ],
   },
@@ -159,6 +161,7 @@ Trent'anni di litigio vi passano attraverso in dieci secondi. È come farsi attr
 
 > Gaetano: *(coi denti che battono)* "Ok. Ok. La stanza si difende, quindi servono le parole ESATTE — non parole qualunque, o il momento giusto." *(si tira su)* "E allora le troviamo."`,
     choices: [
+      { text: '👂 Ascoltare quel loop fino in fondo, tutto, e trascrivere le parole esatte', once: true, gold: 1, next: 'u3' },
       { text: '🚪 Fuori dalla cameretta, per ora', next: 'u3' },
     ],
   },
@@ -345,6 +348,7 @@ La tirano fuori in tre, e la caviglia porta il segno — una fascia pallida, esa
 
 > Emanuela: "Quello che si fa con le zie. Ho promesso che torno."`,
     choices: [
+      { text: '🤝 Restare seduti con lei sulla sabbia grigia finché il colore non torna', once: true, heal: 3, gold: 1, next: 'u4d' },
       { text: '🚪 Via dalla spiaggia, con una promessa da non mantenere', next: 'u4d' },
     ],
   },
@@ -395,6 +399,7 @@ Sulla riga ci sono: quattro conchiglie rotte, un pezzo di plastica azzurra levig
 
 **(Sulla battigia c'è un'impronta del quarantaquattro, fresca. Daniele gira ancora la sua Casa.)**`,
     choices: [
+      { text: '👣 Mettere il piede accanto all\'impronta anche gli altri. Tutti e cinque, in fila', once: true, gold: 1, heal: 1, next: 'u1' },
       { text: '🚪 Tornare nel corridoio delle porte', next: 'u1' },
     ],
   },
@@ -519,6 +524,7 @@ Sotto, in mezzo al modulo, una colonna di trattini. Migliaia. Uno per giorno, fi
 
 **(Sul 19A c'era già stato qualcuno. Segnava i giorni. Nessuno è venuto a prenderlo. Voi sì.)**`,
     choices: [
+      { text: '✈️ Leggere ad alta voce tutti i giorni segnati sul 19A, uno per uno, prima di uscire', once: true, gold: 2, next: 'u1' },
       { text: '🚪 Fuori, verso il corridoio delle porte', next: 'u1' },
     ],
   },
@@ -671,6 +677,7 @@ Lo avvicina. Il Cuore accelera. Il battito si sincronizza, in tre secondi netti,
 **(Il Cuore è una riserva che CERCA un proprietario — e il Grigiore non ha difese contro un RESO.)**`,
     sets: { cuore_studiato: true },
     choices: [
+      { text: '🫀 Tenerlo in mano finché batte contro il palmo, senza dire niente', once: true, heal: 2, next: 'u7' },
       { text: '⚠️ La superficie nera si increspa. Qualcosa si alza', next: 'u7' },
     ],
   },
