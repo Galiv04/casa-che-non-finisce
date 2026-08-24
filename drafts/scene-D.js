@@ -240,6 +240,7 @@ Sorride. E si dissolve così, sorridendo, promosso, libero.
 
   k3: {
     location: 'cucina_fredda',
+    stinger: 'item',
     caption: 'La dispensa — le cose care a qualcuno',
     text: `La freccia di lattine finisce contro la porta della dispensa, che si apre su un piccolo miracolo: **scorte vere.** A colori. Pasta con la marca giusta, il barattolo di caffè, l'accendino lungo del barbecue appeso al chiodo, e — Gaetano quasi si commuove — due bottiglie della sua IPA, quella buona, che Daniele teneva in casa SOLO per lui.
 
@@ -458,6 +459,7 @@ Ha smesso di sorridere con generosità eccessiva. Ha rimesso la bilancia in boll
 
   mg_inventario: {
     location: 'mercante',
+    stinger: 'dice',
     caption: 'L\'inventario del Mercante',
     text: `Il Mercante tira fuori un quadernone unto, pieno di colonne che non tornano da anni.
 
@@ -484,6 +486,7 @@ Ha smesso di sorridere con generosità eccessiva. Ha rimesso la bilancia in boll
 
   k6_inv_ok: {
     location: 'mercante',
+    stinger: 'success',
     caption: 'L\'inventario torna',
     text: `Il Mercante ricontrolla, matita tra i denti, e alla fine fa un verso che non gli sentirete mai più fare: un piccolo grugnito di RISPETTO.
 
@@ -499,6 +502,7 @@ Ha smesso di sorridere con generosità eccessiva. Ha rimesso la bilancia in boll
 
   k6_inv_ko: {
     location: 'mercante',
+    stinger: 'fail',
     caption: 'L\'inventario non torna',
     sets: { inventario_sbagliato: true },
     text: `Il Mercante segue le vostre correzioni con la matita, poi si ferma. Ripercorre. Sospira dal profondo del cappotto.
@@ -538,6 +542,7 @@ Vi guardate. Poi qualcuno parla — chi, resta tra voi e il sottoscala — e rac
 
   k7b: {
     location: 'mercante',
+    stinger: 'item',
     caption: 'Il furto — mani d\'estate',
     text: `Claudia si pianta davanti al banco e fa la cosa che le riesce meglio al mondo: **l'occhio assoluto.**
 
@@ -634,6 +639,7 @@ Il sonnambulo, dentro il vetro, ride piano. Di niente.`,
 
   k8_prendi: {
     location: 'galleria',
+    stinger: 'item',
     caption: 'La teca spenta',
     text: `Lo fate. Lo fa Claudia, perché nessun altro ha alzato la mano, e qualcuno doveva.
 
@@ -834,6 +840,7 @@ E da tutta la Galleria, uno dopo l'altro, i risvegliati si voltano verso di voi.
 
   k9c: {
     location: 'galleria',
+    stinger: 'hit',
     caption: 'La scarica — il quadro si difende',
     text: `Tre interruttori giù, due su, il ponte sul contatto marcio — e il contatto marcio **mente.** Sotto la crosta di ossido non c'è rame: c'è una cosa umida che aspettava una mano da stringere.
 
@@ -1214,6 +1221,7 @@ Sul pavimento, tra i resti, le cifre rosse sui fogli si CANCELLANO una a una —
 
   k16c: {
     location: 'sottoscala',
+    stinger: 'hit',
     caption: 'La penna grigia — presa visione',
     text: `Il nome della fallacia esce, e l'Amministratore **sorride.** È il sorriso di chi ha visto respingere il ricorso.
 
@@ -1238,6 +1246,7 @@ La mano di qualcuno — di chi, resta tra voi e il sottoscala — vi afferra il 
 
   k17: {
     location: 'cucina_fredda',
+    stinger: 'heal',
     caption: 'La cucina accesa — lo stendardo',
     text: `L'idea è di Emanuela, ed è un'idea da generale: *"Questa cucina è morta perché nessuno ci cucina. E allora noi adesso CI CUCINIAMO."*
 
@@ -1265,6 +1274,7 @@ Mangiate in piedi, dalle teglie, ustionandovi, ridendo. Non è buona come la sua
 
   k_ko: {
     location: 'sottoscala',
+    stinger: 'fail',
     caption: 'Riscossi e rivenduti',
     text: `Il buio, e nel buio una voce che compila moduli.
 

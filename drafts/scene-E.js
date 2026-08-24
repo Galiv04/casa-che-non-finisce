@@ -375,6 +375,7 @@ Lui la alza. E la faccia gli fa una cosa che nessuno di voi gli aveva mai visto 
 
   m7d: {
     location: 'sala_switch',
+    stinger: 'heal',
     caption: 'Il piatto tenuto da parte',
     heal: 4,
     sets: { regalo_piatto: true },
@@ -768,6 +769,7 @@ E lo schermino, da solo, una lettera alla volta, cambia scritta: **"ADESSO."**
 
   z2_ko: {
     location: 'cattedrale',
+    stinger: 'fail',
     caption: 'Il vuoto guarda indietro',
     damage: 2,
     text: `Le crepe si lasciano mappare — fino a quella centrale. Lì, lo sguardo dello spirito scivola DENTRO, e il vuoto fa quello che il vuoto fa da sempre con chi lo fissa troppo: restituisce lo sguardo.
@@ -928,6 +930,7 @@ Le panche scricchiolano in segno d'assenso. Un televisore applaude.
 
   z3_colpo: {
     location: 'cattedrale',
+    stinger: 'hit',
     caption: 'Il contraccolpo — primo assalto',
     damage: 4,
     text: `Nome sbagliato. E il Grigiore lo SA prima che finiate la frase.
@@ -1014,6 +1017,7 @@ Silenzio. E nel silenzio, Daniele fa un passo avanti. Da solo.
 
   z5_colpo: {
     location: 'cattedrale',
+    stinger: 'hit',
     caption: 'Il contraccolpo — terzo assalto',
     damage: 4,
     text: `Nome sbagliato — e la colpa, non smascherata, vi entra sotto le unghie.
@@ -1101,6 +1105,7 @@ I televisori, tutti insieme, abbassano il volume di un gradino. Nessuno ha tocca
 
   z6b: {
     location: 'cattedrale',
+    stinger: 'hit',
     caption: 'L\'onda passa',
     damage: 4,
     text: `L'urlo vi passa ATTRAVERSO. Trent'anni di frasi peggiori, sparate tutte insieme da tutti i televisori: il venduto del 2009, lo sfigato del matrimonio, i soldi, il divano, chi ha ragione, chi ha ragione, CHI HA RAGIONE — e per un secondo le mani dei gemelli, sulla foto, tirano da due lati opposti.

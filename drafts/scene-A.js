@@ -91,6 +91,7 @@ Nella seconda foto, il rettangolo è mezzo passo più vicino alla finestra. Nell
 
   a1: {
     location: 'palazzo',
+    stinger: 'item',
     caption: 'L\'androne — la cassetta che trabocca',
     text: `Il citofono suona a vuoto. Tre volte, cinque, dieci. Federico tiene il pulsante premuto così a lungo che il ronzio diventa una nota sola, poi molla e tira fuori un mazzo di chiavi.
 
@@ -227,6 +228,7 @@ Uno-due-tre-lampo. Uno-due-tre-lampo.
 
   a4: {
     location: 'appartamento',
+    stinger: 'item',
     caption: 'La cucina — grigio da cartone bagnato',
     text: `La cucina di Daniele è normale. È questa la cosa che non regge: è NORMALE, ma come la fotocopia di una fotocopia. Il piano di lavoro pulito, la moka smontata ad asciugare, i post-it sul frigo — e tutto dello stesso grigio spento, uniforme, da cartone lasciato sotto la pioggia.
 
@@ -303,6 +305,7 @@ Lo mettono da parte con cura. Quando servirà — e servirà — quello sarà il
 
   s6: {
     location: 'appartamento',
+    stinger: 'item',
     caption: 'Il bagno — il mobiletto',
     text: `Il bagno è grigio come il resto, ma il mobiletto sopra il lavandino ha lo sportello socchiuso. Dentro: dentifricio, rasoio, e una **boccetta di vetro scuro** con il contagocce, l'etichetta della farmacia, la ricetta piegata accanto.
 
@@ -451,6 +454,7 @@ La gira verso il gruppo. In mezzo alla raggiera, il fondo ha lasciato **un retta
 
   s7_ko: {
     location: 'salotto',
+    stinger: 'fail',
     caption: 'Lo specchio ricambia',
     damage: 1,
     text: `Il tempismo è quasi giusto. QUASI: un decimo di secondo di ritardo, e invece di cogliere il riflesso a guardare altrove... lo cogliete mentre TORNA. E lui coglie voi.
@@ -636,6 +640,7 @@ Il primo topo apre la bocca. Dentro non c'è lingua: c'è **altro pelo**, fitto,
 
   a7_ko: {
     location: 'corridoio',
+    stinger: 'fail',
     caption: 'A terra — ma non abbastanza',
     text: `Andate giù uno dopo l'altro — chi per i morsi, chi per la stanchezza improvvisa e innaturale che i topi si portano addosso come un odore.
 
@@ -666,6 +671,7 @@ Vi rimettete in piedi. Il grigio, intorno, sembra quasi deluso.
 
   a8: {
     location: 'corridoio',
+    stinger: 'item',
     caption: 'Cenere — e la borsa Kerastase',
     text: `L'ultimo topo cade, e quello che succede dopo è peggio del combattimento.
 
@@ -824,6 +830,7 @@ Le luci del salotto — solo quelle — calano e risalgono. Una volta. Come un c
 
   s8_ko: {
     location: 'salotto',
+    stinger: 'fail',
     caption: 'Lo scroll che scrolla da solo',
     damage: 1,
     text: `Claudia cerca il messaggio nascosto — e la chat comincia a scorrere DA SOLA. Piano, poi più veloce, mese dopo mese, come una pellicola che si riavvolge: e più scorre, più il pollice di Claudia resta incollato allo schermo, e gli occhi le si fanno fissi, comodi, GRIGI ai bordi.
@@ -864,6 +871,7 @@ Sorride. Il sorriso arriva agli occhi con un secondo di ritardo, come un servo c
 
   s3b: {
     location: 'salotto',
+    stinger: 'hit',
     caption: 'La penna — e il sabotaggio',
     text: `Il contratto è scritto in un corsivo che si muove se lo guardi di sbieco. Le clausole sembrano ragionevoli — è questo il loro lavoro. Una mano del gruppo si allunga verso la penna.
 
@@ -1036,6 +1044,7 @@ Niente. Non "niente di spaventoso": NIENTE. Sotto l'espressione non c'è una fac
 
   s3e_ko: {
     location: 'salotto',
+    stinger: 'fail',
     caption: 'Il contrattacco',
     damage: 2,
     text: `Federico rincara — e stavolta il colpo passa DI LÀ. Eleinad smette di barcollare a metà del secondo insulto, si raddrizza, e restituisce con la voce di famiglia:
@@ -1106,6 +1115,7 @@ E intorno a voi succede una cosa che vedrete per sempre: **il grigio arretra**. 
 
   s4c: {
     location: 'salotto',
+    stinger: 'hit',
     caption: 'Il contraccolpo',
     text: `Lo dite — e lo sentite subito, dal silenzio, che avete sbagliato trucco.
 

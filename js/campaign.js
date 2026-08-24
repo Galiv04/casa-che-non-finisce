@@ -178,6 +178,7 @@ Nella seconda foto, il rettangolo è mezzo passo più vicino alla finestra. Nell
 
   a1: {
     location: 'palazzo',
+    stinger: 'item',
     caption: 'L\'androne — la cassetta che trabocca',
     text: `Il citofono suona a vuoto. Tre volte, cinque, dieci. Federico tiene il pulsante premuto così a lungo che il ronzio diventa una nota sola, poi molla e tira fuori un mazzo di chiavi.
 
@@ -314,6 +315,7 @@ Uno-due-tre-lampo. Uno-due-tre-lampo.
 
   a4: {
     location: 'appartamento',
+    stinger: 'item',
     caption: 'La cucina — grigio da cartone bagnato',
     text: `La cucina di Daniele è normale. È questa la cosa che non regge: è NORMALE, ma come la fotocopia di una fotocopia. Il piano di lavoro pulito, la moka smontata ad asciugare, i post-it sul frigo — e tutto dello stesso grigio spento, uniforme, da cartone lasciato sotto la pioggia.
 
@@ -390,6 +392,7 @@ Lo mettono da parte con cura. Quando servirà — e servirà — quello sarà il
 
   s6: {
     location: 'appartamento',
+    stinger: 'item',
     caption: 'Il bagno — il mobiletto',
     text: `Il bagno è grigio come il resto, ma il mobiletto sopra il lavandino ha lo sportello socchiuso. Dentro: dentifricio, rasoio, e una **boccetta di vetro scuro** con il contagocce, l'etichetta della farmacia, la ricetta piegata accanto.
 
@@ -538,6 +541,7 @@ La gira verso il gruppo. In mezzo alla raggiera, il fondo ha lasciato **un retta
 
   s7_ko: {
     location: 'salotto',
+    stinger: 'fail',
     caption: 'Lo specchio ricambia',
     damage: 1,
     text: `Il tempismo è quasi giusto. QUASI: un decimo di secondo di ritardo, e invece di cogliere il riflesso a guardare altrove... lo cogliete mentre TORNA. E lui coglie voi.
@@ -723,6 +727,7 @@ Il primo topo apre la bocca. Dentro non c'è lingua: c'è **altro pelo**, fitto,
 
   a7_ko: {
     location: 'corridoio',
+    stinger: 'fail',
     caption: 'A terra — ma non abbastanza',
     text: `Andate giù uno dopo l'altro — chi per i morsi, chi per la stanchezza improvvisa e innaturale che i topi si portano addosso come un odore.
 
@@ -753,6 +758,7 @@ Vi rimettete in piedi. Il grigio, intorno, sembra quasi deluso.
 
   a8: {
     location: 'corridoio',
+    stinger: 'item',
     caption: 'Cenere — e la borsa Kerastase',
     text: `L'ultimo topo cade, e quello che succede dopo è peggio del combattimento.
 
@@ -911,6 +917,7 @@ Le luci del salotto — solo quelle — calano e risalgono. Una volta. Come un c
 
   s8_ko: {
     location: 'salotto',
+    stinger: 'fail',
     caption: 'Lo scroll che scrolla da solo',
     damage: 1,
     text: `Claudia cerca il messaggio nascosto — e la chat comincia a scorrere DA SOLA. Piano, poi più veloce, mese dopo mese, come una pellicola che si riavvolge: e più scorre, più il pollice di Claudia resta incollato allo schermo, e gli occhi le si fanno fissi, comodi, GRIGI ai bordi.
@@ -951,6 +958,7 @@ Sorride. Il sorriso arriva agli occhi con un secondo di ritardo, come un servo c
 
   s3b: {
     location: 'salotto',
+    stinger: 'hit',
     caption: 'La penna — e il sabotaggio',
     text: `Il contratto è scritto in un corsivo che si muove se lo guardi di sbieco. Le clausole sembrano ragionevoli — è questo il loro lavoro. Una mano del gruppo si allunga verso la penna.
 
@@ -1123,6 +1131,7 @@ Niente. Non "niente di spaventoso": NIENTE. Sotto l'espressione non c'è una fac
 
   s3e_ko: {
     location: 'salotto',
+    stinger: 'fail',
     caption: 'Il contrattacco',
     damage: 2,
     text: `Federico rincara — e stavolta il colpo passa DI LÀ. Eleinad smette di barcollare a metà del secondo insulto, si raddrizza, e restituisce con la voce di famiglia:
@@ -1193,6 +1202,7 @@ E intorno a voi succede una cosa che vedrete per sempre: **il grigio arretra**. 
 
   s4c: {
     location: 'salotto',
+    stinger: 'hit',
     caption: 'Il contraccolpo',
     text: `Lo dite — e lo sentite subito, dal silenzio, che avete sbagliato trucco.
 
@@ -1622,6 +1632,7 @@ Là sotto c'era un lettore. Un lettore vero, rilegato vivo nel regolamento. E vo
 
   b_ko: {
     location: 'biblioteca',
+    stinger: 'fail',
     caption: 'Sconfitta — scaffalati',
     text: `Buio. Poi un fruscìo di pagine, vicinissimo. Poi la cosa peggiore: **la vista dall'alto**.
 
@@ -1701,6 +1712,7 @@ Il libro batte una volta sola, caldo, come un applauso timido. Claudia lo posa s
 
   mg_corsa_libri: {
     location: 'biblioteca',
+    stinger: 'dice',
     caption: 'La traversata di corsa',
     text: `> Federico: "Teoria: i Lettori Grigi reagiscono al RUMORE LENTO. Passi felpati, fruscii, esitazioni. Ma una cosa VELOCE e decisa? Non fanno in tempo a catalogarla."
 
@@ -1721,6 +1733,7 @@ Il corridoio centrale della sala è lungo, dritto, e disseminato di pile di libr
 
   b5_corsa_ok: {
     location: 'biblioteca',
+    stinger: 'success',
     caption: 'La teoria di Federico regge',
     text: `L'ultima pila di libri passa sotto i piedi, e la corsa finisce contro lo scaffale in fondo con un tonfo attutito e trionfale.
 
@@ -1740,6 +1753,7 @@ I Lettori Grigi... non hanno alzato la testa. NESSUNO. Il Grigiore ha provato a 
 
   b5_corsa_ko: {
     location: 'biblioteca',
+    stinger: 'fail',
     caption: 'La teoria di Federico inciampa',
     text: `Terzo inciampo. La pila di libri esplode in un ventaglio di pagine, il rumore rimbalza tra i tavoli — e trentasei teste grigie si ALZANO insieme, con il fruscio di un'unica pagina enorme che si volta.
 
@@ -1927,6 +1941,7 @@ Dov'è il trucco?`,
 
   b10c: {
     location: 'biblioteca',
+    stinger: 'hit',
     caption: 'Il contraccolpo — protocollato',
     text: `Il Bibliotecario non alza la voce. La **protocolla**.
 
@@ -2208,6 +2223,7 @@ E il peggio arriva adesso: dal fondo della sala, svegliato dall'urlo, si alza il
 
   b14_ko: {
     location: 'biblioteca',
+    stinger: 'fail',
     caption: 'La tempesta di carta',
     damage: 2,
     text: `Le scuse peggiorano tutto: i manoscritti odiano la pietà quasi quanto i finali frettolosi. La sala si alza in un VORTICE di pagine — migliaia di fogli che tagliano l'aria, e la carta, quando vuole, taglia come la latta.
@@ -2246,6 +2262,7 @@ Dov'è il trucco?`,
 
   b16k: {
     location: 'biblioteca',
+    stinger: 'hit',
     caption: 'Il contraccolpo — state già leggendo',
     text: `Il colpo rimbalza. Il Capobranco nemmeno si scompone: **annuisce**, con tutta la copertina, come un professore paziente davanti a un errore prevedibile.
 
@@ -2507,6 +2524,7 @@ Da dietro la porta "1994" arrivano due voci di bambini che litigano. Da "GAETA",
 
   u2: {
     location: 'cameretta',
+    stinger: 'item',
     caption: '1994 — La cameretta dei gemelli',
     text: `Letti a castello. Poster di calciatori coi colori sbiaditi nel modo sbagliato: le maglie grigie, i prati grigi, solo i palloni ancora accesi come tizzoni. E per terra, da parete a parete, una striscia di nastro adesivo marrone che divide la stanza ESATTAMENTE a metà.
 
@@ -2534,6 +2552,7 @@ Sul cuscino del letto di sotto c'è mezza fotografia, strappata a metà con rabb
 
   u2b: {
     location: 'cameretta',
+    stinger: 'item',
     caption: '1994 — Il loop che qualcuno mangia',
     text: `Chi di voi ascolta, ascolta DAVVERO — e al quinto giro lo sente: sotto le voci dei bambini c'è un altro suono. Umido. Ritmico. Un suono di bocca.
 
@@ -2566,6 +2585,7 @@ E poi Natalino, che si era chinato a guardare sotto il letto per puro istinto da
 
   u2_ko: {
     location: 'cameretta',
+    stinger: 'fail',
     caption: 'Le parole respinte',
     damage: 1,
     text: `Le parole nuove escono — e la stanza le RIFIUTA. Il loop dei bambini si alza di volume, coprendole, e le voci registrate si fanno più veloci, più strette, come uno spiedo che gira il doppio: la miniera ha sentito che qualcuno provava a chiuderla, e per rappresaglia SERVE UNA PORZIONE DOPPIA.
@@ -2674,6 +2694,7 @@ Da vicino è peggio. La bocca non si chiude MAI, nemmeno tra una parola e l'altr
 
   u4b: {
     location: 'spiaggia_grigia',
+    stinger: 'item',
     caption: 'GAETA — Una onda',
     text: `Il silenzio, quando arriva, è così improvviso che fa MALE alle orecchie — come quando si spegne un frigo che ronzava da anni e capisci solo allora quanto rumore facevi finta di non sentire.
 
@@ -2719,6 +2740,7 @@ Il cerchio arriva all'orizzonte e non torna indietro. Da qualche parte, oltre, p
 
   u4c: {
     location: 'spiaggia_grigia',
+    stinger: 'hit',
     caption: 'GAETA — Il monologo affonda',
     text: `Il protocollo di Emanuela è collaudato in vent'anni di spiagge: non annuire, non fare domande, i mono-sillabi come muro, lo sguardo al mare. Funziona con TUTTI i vibe-killer del Tirreno.
 
@@ -2745,6 +2767,7 @@ Le parole vi entrano SOTTO. Non dalle orecchie: dalla pelle. Ogni frase è una c
 
   u4_ko: {
     location: 'spiaggia_grigia',
+    stinger: 'fail',
     caption: 'L\'onda che afferra',
     damage: 2,
     text: `Emanuela fa il passo — e il mare di vetro fa il suo. L'onda singola che sembrava un regalo si richiude intorno alla caviglia come una mano educata ma FERMA, e tira: non per affogare. Per TRATTENERE. Il Grigiore non è mai stato violento: è insistente.
@@ -2763,6 +2786,7 @@ La tirano fuori in tre, e la caviglia porta il segno — una fascia pallida, esa
 
   u4d: {
     location: 'spiaggia_grigia',
+    stinger: 'item',
     caption: 'GAETA — I racchettoni-lapide',
     text: `Claudia e Gaetano si avvicinano ai racchettoni piantati nella cenere come si va a trovare qualcuno al cimitero. Poi li riconoscono DAVVERO — la crepa riparata col nastro, le iniziali a pennarello sbiadito — e il cimitero finisce lì.
 
@@ -2841,6 +2865,7 @@ La Hostess è ferma tre file più in là, girata verso di voi, e sorride. Non vi
 
   u5b: {
     location: 'cabina',
+    stinger: 'item',
     caption: 'IMBARCO — Le due metà scottano',
     text: `La foto è vostra. La teca si richiude con un sospiro pneumatico e la Hostess non si è mossa: sorride a una fila di manichini, tre file più in là, congratulandosi con loro per aver scelto di non partire.
 
@@ -2986,6 +3011,7 @@ Il Cuore di Colore, in fondo, batte ancora. Adesso sapete anche PER CHI potrebbe
 
   u6b: {
     location: 'stanza_sommersa',
+    stinger: 'item',
     caption: 'NON APRIRE — Il tuffo',
     text: `Chi si immerge lo fa nel modo giusto: veloce, dritto, senza lasciare all'acqua il tempo di pensare.
 
@@ -3011,6 +3037,7 @@ Poi il nero si richiude, ma ormai chi doveva uscire è fuori: in piedi sul pavim
 
   u6c: {
     location: 'stanza_sommersa',
+    stinger: 'item',
     caption: 'NON APRIRE — L\'ingegno da riva',
     text: `> Gaetano: "Nessuno entra. Ragioniamo. Cosa abbiamo che allunga, aggancia e non ha paura?"
 
@@ -3132,6 +3159,7 @@ E sul fondale, sparse come regali dimenticati, conchiglie. VERE. Rigate, rosa de
 
   u_ko: {
     location: 'porte',
+    stinger: 'fail',
     caption: 'Il Corridoio — risputati',
     text: `Il buio non vi uccide. Fa di peggio: vi RESTITUISCE.
 
@@ -3293,6 +3321,7 @@ Trasmette **Daniele**. Su un divano. Che sorride, beve una cola senza marca, vin
 
   u10c: {
     location: 'cabina',
+    stinger: 'hit',
     caption: 'SALA CONTROLLO — Il cliente ha riaperto il ticket',
     text: `Gaetano scrive la risoluzione, preme invio — e il sistema chiede le credenziali. Le mette. Il sistema chiede la verifica in due passaggi. Il codice arriva via SMS. Su QUALE telefono? Su tutti e trentasei, contemporaneamente, ognuno con un codice diverso, e squillano mentre lo fanno.
 
@@ -3344,6 +3373,7 @@ Dietro il bancone, su una mensola tra i liquori grigi, c'è una cosa che non c'e
 
   u11b: {
     location: 'spiaggia_grigia',
+    stinger: 'item',
     caption: 'IBIZA — Il mare vero batte le luci finte',
     text: `Attraversate la pista in formazione, sei sguardi alti — cinque, più quello di Daniele che vi portate dentro — e il Molesto Eterno comincia a sfarfallare come una lampadina che ha capito. Senza i vostri occhi bassi non ha dove stare.
 
@@ -3394,6 +3424,7 @@ Limoncello. Fatto in casa, in una bottiglia di vetro riciclata, tappo di sughero
 
   u11c: {
     location: 'spiaggia_grigia',
+    stinger: 'hit',
     caption: 'IBIZA — Il drink che non avete ordinato',
     text: `L'attraversamento parte bene. Poi Natalino inciampa in un gradino della pista — un gradino che prima non c'era, ci giurerebbe — e abbassa gli occhi mezzo secondo. Mezzo secondo basta.
 
@@ -3473,6 +3504,7 @@ Ma il salone è ancora SBAGLIATO. Gli asciugamani buttati storti. I prodotti fuo
 
   u12c: {
     location: 'cabina',
+    stinger: 'heal',
     caption: 'IL SALONE — La riapertura',
     text: `Quello che succede nei venti minuti seguenti non è pulizia. È LITURGIA.
 
@@ -3597,6 +3629,7 @@ La voce salta come un disco rigato, sempre sulla stessa domanda, perché è l'un
 
   u14c: {
     location: 'porte',
+    stinger: 'hit',
     caption: 'OBIEZIONE — L\'arringa affonda',
     text: `Sbagliato. E lo capite dal silenzio: la toga non ribatte nemmeno. Si limita a girare le maniche vuote verso di voi, una alla volta, come si sfoglia un fascicolo.
 
@@ -3890,6 +3923,7 @@ Sorride. E si dissolve così, sorridendo, promosso, libero.
 
   k3: {
     location: 'cucina_fredda',
+    stinger: 'item',
     caption: 'La dispensa — le cose care a qualcuno',
     text: `La freccia di lattine finisce contro la porta della dispensa, che si apre su un piccolo miracolo: **scorte vere.** A colori. Pasta con la marca giusta, il barattolo di caffè, l'accendino lungo del barbecue appeso al chiodo, e — Gaetano quasi si commuove — due bottiglie della sua IPA, quella buona, che Daniele teneva in casa SOLO per lui.
 
@@ -4108,6 +4142,7 @@ Ha smesso di sorridere con generosità eccessiva. Ha rimesso la bilancia in boll
 
   mg_inventario: {
     location: 'mercante',
+    stinger: 'dice',
     caption: 'L\'inventario del Mercante',
     text: `Il Mercante tira fuori un quadernone unto, pieno di colonne che non tornano da anni.
 
@@ -4134,6 +4169,7 @@ Ha smesso di sorridere con generosità eccessiva. Ha rimesso la bilancia in boll
 
   k6_inv_ok: {
     location: 'mercante',
+    stinger: 'success',
     caption: 'L\'inventario torna',
     text: `Il Mercante ricontrolla, matita tra i denti, e alla fine fa un verso che non gli sentirete mai più fare: un piccolo grugnito di RISPETTO.
 
@@ -4149,6 +4185,7 @@ Ha smesso di sorridere con generosità eccessiva. Ha rimesso la bilancia in boll
 
   k6_inv_ko: {
     location: 'mercante',
+    stinger: 'fail',
     caption: 'L\'inventario non torna',
     sets: { inventario_sbagliato: true },
     text: `Il Mercante segue le vostre correzioni con la matita, poi si ferma. Ripercorre. Sospira dal profondo del cappotto.
@@ -4188,6 +4225,7 @@ Vi guardate. Poi qualcuno parla — chi, resta tra voi e il sottoscala — e rac
 
   k7b: {
     location: 'mercante',
+    stinger: 'item',
     caption: 'Il furto — mani d\'estate',
     text: `Claudia si pianta davanti al banco e fa la cosa che le riesce meglio al mondo: **l'occhio assoluto.**
 
@@ -4284,6 +4322,7 @@ Il sonnambulo, dentro il vetro, ride piano. Di niente.`,
 
   k8_prendi: {
     location: 'galleria',
+    stinger: 'item',
     caption: 'La teca spenta',
     text: `Lo fate. Lo fa Claudia, perché nessun altro ha alzato la mano, e qualcuno doveva.
 
@@ -4484,6 +4523,7 @@ E da tutta la Galleria, uno dopo l'altro, i risvegliati si voltano verso di voi.
 
   k9c: {
     location: 'galleria',
+    stinger: 'hit',
     caption: 'La scarica — il quadro si difende',
     text: `Tre interruttori giù, due su, il ponte sul contatto marcio — e il contatto marcio **mente.** Sotto la crosta di ossido non c'è rame: c'è una cosa umida che aspettava una mano da stringere.
 
@@ -4864,6 +4904,7 @@ Sul pavimento, tra i resti, le cifre rosse sui fogli si CANCELLANO una a una —
 
   k16c: {
     location: 'sottoscala',
+    stinger: 'hit',
     caption: 'La penna grigia — presa visione',
     text: `Il nome della fallacia esce, e l'Amministratore **sorride.** È il sorriso di chi ha visto respingere il ricorso.
 
@@ -4888,6 +4929,7 @@ La mano di qualcuno — di chi, resta tra voi e il sottoscala — vi afferra il 
 
   k17: {
     location: 'cucina_fredda',
+    stinger: 'heal',
     caption: 'La cucina accesa — lo stendardo',
     text: `L'idea è di Emanuela, ed è un'idea da generale: *"Questa cucina è morta perché nessuno ci cucina. E allora noi adesso CI CUCINIAMO."*
 
@@ -4915,6 +4957,7 @@ Mangiate in piedi, dalle teglie, ustionandovi, ridendo. Non è buona come la sua
 
   k_ko: {
     location: 'sottoscala',
+    stinger: 'fail',
     caption: 'Riscossi e rivenduti',
     text: `Il buio, e nel buio una voce che compila moduli.
 
@@ -5350,6 +5393,7 @@ Lui la alza. E la faccia gli fa una cosa che nessuno di voi gli aveva mai visto 
 
   m7d: {
     location: 'sala_switch',
+    stinger: 'heal',
     caption: 'Il piatto tenuto da parte',
     heal: 4,
     sets: { regalo_piatto: true },
@@ -5743,6 +5787,7 @@ E lo schermino, da solo, una lettera alla volta, cambia scritta: **"ADESSO."**
 
   z2_ko: {
     location: 'cattedrale',
+    stinger: 'fail',
     caption: 'Il vuoto guarda indietro',
     damage: 2,
     text: `Le crepe si lasciano mappare — fino a quella centrale. Lì, lo sguardo dello spirito scivola DENTRO, e il vuoto fa quello che il vuoto fa da sempre con chi lo fissa troppo: restituisce lo sguardo.
@@ -5903,6 +5948,7 @@ Le panche scricchiolano in segno d'assenso. Un televisore applaude.
 
   z3_colpo: {
     location: 'cattedrale',
+    stinger: 'hit',
     caption: 'Il contraccolpo — primo assalto',
     damage: 4,
     text: `Nome sbagliato. E il Grigiore lo SA prima che finiate la frase.
@@ -5989,6 +6035,7 @@ Silenzio. E nel silenzio, Daniele fa un passo avanti. Da solo.
 
   z5_colpo: {
     location: 'cattedrale',
+    stinger: 'hit',
     caption: 'Il contraccolpo — terzo assalto',
     damage: 4,
     text: `Nome sbagliato — e la colpa, non smascherata, vi entra sotto le unghie.
@@ -6076,6 +6123,7 @@ I televisori, tutti insieme, abbassano il volume di un gradino. Nessuno ha tocca
 
   z6b: {
     location: 'cattedrale',
+    stinger: 'hit',
     caption: 'L\'onda passa',
     damage: 4,
     text: `L'urlo vi passa ATTRAVERSO. Trent'anni di frasi peggiori, sparate tutte insieme da tutti i televisori: il venduto del 2009, lo sfigato del matrimonio, i soldi, il divano, chi ha ragione, chi ha ragione, CHI HA RAGIONE — e per un secondo le mani dei gemelli, sulla foto, tirano da due lati opposti.
@@ -6399,6 +6447,7 @@ E sopra tutto, da qualche parte oltre il soffitto, un suono bassissimo e continu
 
   h2: {
     location: 'salotto',
+    stinger: 'item',
     caption: 'Il cerchio del tronello',
     heal: 4,
     sets: { fumo_mappa: true },
@@ -6427,6 +6476,7 @@ Corridoi. Stanze. E in alto, sopra tutto, un rettangolo grande con dentro un ret
 
   h3: {
     location: 'salotto',
+    stinger: 'item',
     caption: 'Riscaldamento — stile Gaeta',
     item: 'pallina_racchettoni',
     sets: { racchettoni_pronti: true },

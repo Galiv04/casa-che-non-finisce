@@ -31,6 +31,7 @@ E sopra tutto, da qualche parte oltre il soffitto, un suono bassissimo e continu
 
   h2: {
     location: 'salotto',
+    stinger: 'item',
     caption: 'Il cerchio del tronello',
     heal: 4,
     sets: { fumo_mappa: true },
@@ -59,6 +60,7 @@ Corridoi. Stanze. E in alto, sopra tutto, un rettangolo grande con dentro un ret
 
   h3: {
     location: 'salotto',
+    stinger: 'item',
     caption: 'Riscaldamento — stile Gaeta',
     item: 'pallina_racchettoni',
     sets: { racchettoni_pronti: true },

@@ -335,6 +335,7 @@ Là sotto c'era un lettore. Un lettore vero, rilegato vivo nel regolamento. E vo
 
   b_ko: {
     location: 'biblioteca',
+    stinger: 'fail',
     caption: 'Sconfitta — scaffalati',
     text: `Buio. Poi un fruscìo di pagine, vicinissimo. Poi la cosa peggiore: **la vista dall'alto**.
 
@@ -414,6 +415,7 @@ Il libro batte una volta sola, caldo, come un applauso timido. Claudia lo posa s
 
   mg_corsa_libri: {
     location: 'biblioteca',
+    stinger: 'dice',
     caption: 'La traversata di corsa',
     text: `> Federico: "Teoria: i Lettori Grigi reagiscono al RUMORE LENTO. Passi felpati, fruscii, esitazioni. Ma una cosa VELOCE e decisa? Non fanno in tempo a catalogarla."
 
@@ -434,6 +436,7 @@ Il corridoio centrale della sala è lungo, dritto, e disseminato di pile di libr
 
   b5_corsa_ok: {
     location: 'biblioteca',
+    stinger: 'success',
     caption: 'La teoria di Federico regge',
     text: `L'ultima pila di libri passa sotto i piedi, e la corsa finisce contro lo scaffale in fondo con un tonfo attutito e trionfale.
 
@@ -453,6 +456,7 @@ I Lettori Grigi... non hanno alzato la testa. NESSUNO. Il Grigiore ha provato a 
 
   b5_corsa_ko: {
     location: 'biblioteca',
+    stinger: 'fail',
     caption: 'La teoria di Federico inciampa',
     text: `Terzo inciampo. La pila di libri esplode in un ventaglio di pagine, il rumore rimbalza tra i tavoli — e trentasei teste grigie si ALZANO insieme, con il fruscio di un'unica pagina enorme che si volta.
 
@@ -640,6 +644,7 @@ Dov'è il trucco?`,
 
   b10c: {
     location: 'biblioteca',
+    stinger: 'hit',
     caption: 'Il contraccolpo — protocollato',
     text: `Il Bibliotecario non alza la voce. La **protocolla**.
 
@@ -921,6 +926,7 @@ E il peggio arriva adesso: dal fondo della sala, svegliato dall'urlo, si alza il
 
   b14_ko: {
     location: 'biblioteca',
+    stinger: 'fail',
     caption: 'La tempesta di carta',
     damage: 2,
     text: `Le scuse peggiorano tutto: i manoscritti odiano la pietà quasi quanto i finali frettolosi. La sala si alza in un VORTICE di pagine — migliaia di fogli che tagliano l'aria, e la carta, quando vuole, taglia come la latta.
@@ -959,6 +965,7 @@ Dov'è il trucco?`,
 
   b16k: {
     location: 'biblioteca',
+    stinger: 'hit',
     caption: 'Il contraccolpo — state già leggendo',
     text: `Il colpo rimbalza. Il Capobranco nemmeno si scompone: **annuisce**, con tutta la copertina, come un professore paziente davanti a un errore prevedibile.
 

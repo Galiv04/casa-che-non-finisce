@@ -89,6 +89,7 @@ Da dietro la porta "1994" arrivano due voci di bambini che litigano. Da "GAETA",
 
   u2: {
     location: 'cameretta',
+    stinger: 'item',
     caption: '1994 — La cameretta dei gemelli',
     text: `Letti a castello. Poster di calciatori coi colori sbiaditi nel modo sbagliato: le maglie grigie, i prati grigi, solo i palloni ancora accesi come tizzoni. E per terra, da parete a parete, una striscia di nastro adesivo marrone che divide la stanza ESATTAMENTE a metà.
 
@@ -116,6 +117,7 @@ Sul cuscino del letto di sotto c'è mezza fotografia, strappata a metà con rabb
 
   u2b: {
     location: 'cameretta',
+    stinger: 'item',
     caption: '1994 — Il loop che qualcuno mangia',
     text: `Chi di voi ascolta, ascolta DAVVERO — e al quinto giro lo sente: sotto le voci dei bambini c'è un altro suono. Umido. Ritmico. Un suono di bocca.
 
@@ -148,6 +150,7 @@ E poi Natalino, che si era chinato a guardare sotto il letto per puro istinto da
 
   u2_ko: {
     location: 'cameretta',
+    stinger: 'fail',
     caption: 'Le parole respinte',
     damage: 1,
     text: `Le parole nuove escono — e la stanza le RIFIUTA. Il loop dei bambini si alza di volume, coprendole, e le voci registrate si fanno più veloci, più strette, come uno spiedo che gira il doppio: la miniera ha sentito che qualcuno provava a chiuderla, e per rappresaglia SERVE UNA PORZIONE DOPPIA.
@@ -256,6 +259,7 @@ Da vicino è peggio. La bocca non si chiude MAI, nemmeno tra una parola e l'altr
 
   u4b: {
     location: 'spiaggia_grigia',
+    stinger: 'item',
     caption: 'GAETA — Una onda',
     text: `Il silenzio, quando arriva, è così improvviso che fa MALE alle orecchie — come quando si spegne un frigo che ronzava da anni e capisci solo allora quanto rumore facevi finta di non sentire.
 
@@ -301,6 +305,7 @@ Il cerchio arriva all'orizzonte e non torna indietro. Da qualche parte, oltre, p
 
   u4c: {
     location: 'spiaggia_grigia',
+    stinger: 'hit',
     caption: 'GAETA — Il monologo affonda',
     text: `Il protocollo di Emanuela è collaudato in vent'anni di spiagge: non annuire, non fare domande, i mono-sillabi come muro, lo sguardo al mare. Funziona con TUTTI i vibe-killer del Tirreno.
 
@@ -327,6 +332,7 @@ Le parole vi entrano SOTTO. Non dalle orecchie: dalla pelle. Ogni frase è una c
 
   u4_ko: {
     location: 'spiaggia_grigia',
+    stinger: 'fail',
     caption: 'L\'onda che afferra',
     damage: 2,
     text: `Emanuela fa il passo — e il mare di vetro fa il suo. L'onda singola che sembrava un regalo si richiude intorno alla caviglia come una mano educata ma FERMA, e tira: non per affogare. Per TRATTENERE. Il Grigiore non è mai stato violento: è insistente.
@@ -345,6 +351,7 @@ La tirano fuori in tre, e la caviglia porta il segno — una fascia pallida, esa
 
   u4d: {
     location: 'spiaggia_grigia',
+    stinger: 'item',
     caption: 'GAETA — I racchettoni-lapide',
     text: `Claudia e Gaetano si avvicinano ai racchettoni piantati nella cenere come si va a trovare qualcuno al cimitero. Poi li riconoscono DAVVERO — la crepa riparata col nastro, le iniziali a pennarello sbiadito — e il cimitero finisce lì.
 
@@ -423,6 +430,7 @@ La Hostess è ferma tre file più in là, girata verso di voi, e sorride. Non vi
 
   u5b: {
     location: 'cabina',
+    stinger: 'item',
     caption: 'IMBARCO — Le due metà scottano',
     text: `La foto è vostra. La teca si richiude con un sospiro pneumatico e la Hostess non si è mossa: sorride a una fila di manichini, tre file più in là, congratulandosi con loro per aver scelto di non partire.
 
@@ -568,6 +576,7 @@ Il Cuore di Colore, in fondo, batte ancora. Adesso sapete anche PER CHI potrebbe
 
   u6b: {
     location: 'stanza_sommersa',
+    stinger: 'item',
     caption: 'NON APRIRE — Il tuffo',
     text: `Chi si immerge lo fa nel modo giusto: veloce, dritto, senza lasciare all'acqua il tempo di pensare.
 
@@ -593,6 +602,7 @@ Poi il nero si richiude, ma ormai chi doveva uscire è fuori: in piedi sul pavim
 
   u6c: {
     location: 'stanza_sommersa',
+    stinger: 'item',
     caption: 'NON APRIRE — L\'ingegno da riva',
     text: `> Gaetano: "Nessuno entra. Ragioniamo. Cosa abbiamo che allunga, aggancia e non ha paura?"
 
@@ -714,6 +724,7 @@ E sul fondale, sparse come regali dimenticati, conchiglie. VERE. Rigate, rosa de
 
   u_ko: {
     location: 'porte',
+    stinger: 'fail',
     caption: 'Il Corridoio — risputati',
     text: `Il buio non vi uccide. Fa di peggio: vi RESTITUISCE.
 
@@ -875,6 +886,7 @@ Trasmette **Daniele**. Su un divano. Che sorride, beve una cola senza marca, vin
 
   u10c: {
     location: 'cabina',
+    stinger: 'hit',
     caption: 'SALA CONTROLLO — Il cliente ha riaperto il ticket',
     text: `Gaetano scrive la risoluzione, preme invio — e il sistema chiede le credenziali. Le mette. Il sistema chiede la verifica in due passaggi. Il codice arriva via SMS. Su QUALE telefono? Su tutti e trentasei, contemporaneamente, ognuno con un codice diverso, e squillano mentre lo fanno.
 
@@ -926,6 +938,7 @@ Dietro il bancone, su una mensola tra i liquori grigi, c'è una cosa che non c'e
 
   u11b: {
     location: 'spiaggia_grigia',
+    stinger: 'item',
     caption: 'IBIZA — Il mare vero batte le luci finte',
     text: `Attraversate la pista in formazione, sei sguardi alti — cinque, più quello di Daniele che vi portate dentro — e il Molesto Eterno comincia a sfarfallare come una lampadina che ha capito. Senza i vostri occhi bassi non ha dove stare.
 
@@ -976,6 +989,7 @@ Limoncello. Fatto in casa, in una bottiglia di vetro riciclata, tappo di sughero
 
   u11c: {
     location: 'spiaggia_grigia',
+    stinger: 'hit',
     caption: 'IBIZA — Il drink che non avete ordinato',
     text: `L'attraversamento parte bene. Poi Natalino inciampa in un gradino della pista — un gradino che prima non c'era, ci giurerebbe — e abbassa gli occhi mezzo secondo. Mezzo secondo basta.
 
@@ -1055,6 +1069,7 @@ Ma il salone è ancora SBAGLIATO. Gli asciugamani buttati storti. I prodotti fuo
 
   u12c: {
     location: 'cabina',
+    stinger: 'heal',
     caption: 'IL SALONE — La riapertura',
     text: `Quello che succede nei venti minuti seguenti non è pulizia. È LITURGIA.
 
@@ -1179,6 +1194,7 @@ La voce salta come un disco rigato, sempre sulla stessa domanda, perché è l'un
 
   u14c: {
     location: 'porte',
+    stinger: 'hit',
     caption: 'OBIEZIONE — L\'arringa affonda',
     text: `Sbagliato. E lo capite dal silenzio: la toga non ribatte nemmeno. Si limita a girare le maniche vuote verso di voi, una alla volta, come si sfoglia un fascicolo.
 
