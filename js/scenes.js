@@ -305,6 +305,26 @@ const Scenes = (() => {
     ctx.fillStyle = '#f0f0f2'; ctx.fillRect(x + 1, y + 4, 5, 2);
   }
 
+  /* Teglia da forno vista di fronte, per i ripiani del frigo della Cucina Fredda.
+     Una pirofila si riconosce da tre cose e non da una: il BORDO che sporge in
+     alto (il filo che prende luce), il MANICO che sporge di lato, e le fette
+     dentro, che sono più scure del bordo perché stanno in ombra. Senza queste
+     tre cose un rettangolo grigio su un ripiano resta un rettangolo grigio — ed
+     è esattamente quello che c'era prima: cinque rettangolini su un pannello
+     bianco, mentre k1 dice «pieno di CENA, impilate con cura maniacale su ogni
+     ripiano». La cura maniacale non si disegna: si ottiene allineando. */
+  function teglia(ctx, x, y, w, h, base) {
+    ctx.fillStyle = shade(base, 0.62); ctx.fillRect(x - 3, y + h - 1, w + 6, 2);   // l'ombra sul ripiano
+    ctx.fillStyle = shade(base, 0.86); ctx.fillRect(x, y, w, h);                   // il corpo
+    ctx.fillStyle = shade(base, 1.24); ctx.fillRect(x, y, w, 2);                   // il bordo che prende luce
+    ctx.fillStyle = shade(base, 0.70); ctx.fillRect(x + 4, y + 3, w - 8, h - 5);   // il contenuto, in ombra
+    ctx.fillStyle = shade(base, 0.80);                                             // le fette / gli strati
+    for (let ly = y + 6; ly < y + h - 2; ly += 4) ctx.fillRect(x + 4, ly, w - 8, 1);
+    ctx.fillStyle = shade(base, 1.06);                                             // i due manici
+    ctx.fillRect(x - 3, y + 2, 3, Math.max(2, Math.round(h * 0.35)));
+    ctx.fillRect(x + w, y + 2, 3, Math.max(2, Math.round(h * 0.35)));
+  }
+
   function heroesRow(ctx, W, groundY, partySpriteKeys, scale = 4) {
     const n = partySpriteKeys.length;
     const totalW = n * 20 * scale;
@@ -841,34 +861,121 @@ const Scenes = (() => {
       blocks(ctx, 0, 0, W, H, '#3e3c42', 16, r, 0.08);
       const floorY = H - 68;
       blocks(ctx, 0, floorY, W, H - floorY, '#565048', 12, r, 0.10);
-      // IL NASTRO ADESIVO che divide il pavimento (e sale sul muro): il confine dei gemelli
-      ctx.fillStyle = '#8a8578';
-      ctx.fillRect(W * 0.5 - 3, floorY, 6, H - floorY);
-      ctx.fillRect(W * 0.5 - 3, H * 0.10, 6, floorY - H * 0.10);
-      ctx.fillStyle = 'rgba(0,0,0,.14)';
-      for (let y = H * 0.12; y < H; y += 18) ctx.fillRect(W * 0.5 - 3, y, 6, 4);
-      // LETTO A CASTELLO a sinistra
-      const bx = W * 0.06, bw = W * 0.30;
-      ctx.fillStyle = '#4a4238';
-      ctx.fillRect(bx, floorY - 108, 7, 108); ctx.fillRect(bx + bw - 7, floorY - 108, 7, 108); // montanti a terra
-      blocks(ctx, bx + 4, floorY - 96, bw - 8, 14, '#57544e', 8, r, 0.08);  // materasso sopra
-      blocks(ctx, bx + 4, floorY - 40, bw - 8, 14, '#57544e', 8, r, 0.08);  // materasso sotto
-      ctx.fillStyle = '#6a6a72'; ctx.fillRect(bx + 8, floorY - 100, 22, 8); ctx.fillRect(bx + 8, floorY - 44, 22, 8); // cuscini
-      ctx.fillStyle = '#4a4238'; ctx.fillRect(bx + 4, floorY - 82, bw - 8, 4); ctx.fillRect(bx + 4, floorY - 26, bw - 8, 4); // sponde
-      // la scaletta del castello, appoggiata a terra
-      ctx.fillStyle = '#4a4238';
-      ctx.fillRect(bx + bw + 2, floorY - 96, 4, 96); ctx.fillRect(bx + bw + 16, floorY - 96, 4, 96);
-      for (let i = 0; i < 6; i++) ctx.fillRect(bx + bw + 2, floorY - 88 + i * 16, 18, 3);
-      // POSTER SBIADITI sopra i letti e a destra
-      for (const [px2, pw2, ph2] of [[0.10, 0.10, 34], [0.24, 0.08, 28], [0.60, 0.11, 38], [0.76, 0.09, 30]]) {
-        ctx.fillStyle = '#55555a'; ctx.fillRect(W * px2 - 2, H * 0.12 - 2, W * pw2 + 4, ph2 + 4);
-        ctx.fillStyle = '#66666c'; ctx.fillRect(W * px2, H * 0.12, W * pw2, ph2);
-        ctx.fillStyle = '#78787e';
-        ctx.fillRect(W * px2 + 4, H * 0.12 + 5, W * pw2 - 8, 6); // titolo scolorito
-        ctx.fillRect(W * px2 + 6, H * 0.12 + 16, W * pw2 * 0.5, ph2 - 22);
-        // un angolo scollato
-        ctx.fillStyle = '#4a4a50'; ctx.fillRect(W * px2 + W * pw2 - 6, H * 0.12, 6, 6);
+      /* IL NASTRO ADESIVO. u2 dice «per terra, da parete a parete, una striscia
+         di nastro adesivo MARRONE che divide la stanza esattamente a metà», e
+         u3 ci torna sopra: la faccia del Gemello Sbagliato è cucita «col nastro
+         adesivo marrone. Quello del pavimento». Era grigio, e saliva anche sul
+         muro, dove il testo non lo mette: qui la stanza si vede di fronte,
+         quindi «da parete a parete» è la striscia che viene verso di noi
+         attraversando tutta la fascia del pavimento. */
+      ctx.fillStyle = '#7d6340';
+      ctx.fillRect(W * 0.5 - 5, floorY, 9, H - floorY);
+      ctx.fillStyle = 'rgba(0,0,0,.22)'; ctx.fillRect(W * 0.5 + 4, floorY, 3, H - floorY);
+      ctx.fillStyle = 'rgba(228,214,186,.16)'; ctx.fillRect(W * 0.5 - 5, floorY, 2, H - floorY);
+      for (let y = floorY + 6; y < H; y += 21) { ctx.fillStyle = 'rgba(0,0,0,.16)'; ctx.fillRect(W * 0.5 - 5, y, 9, 3); }
+
+      /* IL LETTO A CASTELLO, che è il soggetto della stanza. Prima era lungo
+         288 px e alto 108 — due montanti, due materassi e due sponde sottili —
+         e leggeva come una SCAFFALATURA, perché non aveva nessuno dei tratti
+         che distinguono un letto da un ripiano. Le quote vengono dal letto
+         vero: 200 cm di lunghezza per 165 di altezza, materasso basso a 40 cm,
+         materasso alto a 115, sponda a 150. Qui 1 cm = 1,25 px, e da quella
+         sola cifra vengono tutte le altre. I tratti che mancavano e che adesso
+         ci sono: testata e pediera PIENE sui due lati corti, la coperta che
+         ricade oltre il materasso, e la sponda del piano di sopra, che corre
+         per due terzi della lunghezza e lascia il varco per salire. */
+      const PC = 1.25, bx = 40, bl = Math.round(200 * PC), bTop = floorY - Math.round(165 * PC);
+      const yMatBas = floorY - Math.round(40 * PC), yMatAlt = floorY - Math.round(115 * PC);
+      const ySponda = floorY - Math.round(150 * PC), inX = bx + 20, inW = bl - 40;
+      // testata e pediera: pannelli pieni, non montanti
+      blocks(ctx, bx, bTop, 20, floorY - bTop, '#544a3a', 7, r, 0.10);
+      blocks(ctx, bx + bl - 20, bTop, 20, floorY - bTop, '#4c4232', 7, r, 0.10);
+      ctx.fillStyle = '#6a5e48'; ctx.fillRect(bx, bTop, 20, 3); ctx.fillRect(bx + bl - 20, bTop, 20, 3);
+      ctx.fillStyle = '#3e3628';                          // la fuga fra le due tavole del pannello
+      ctx.fillRect(bx + 9, bTop + 6, 2, floorY - bTop - 6);
+      ctx.fillRect(bx + bl - 11, bTop + 6, 2, floorY - bTop - 6);
+      // la sponda del piano alto: due terzi della lunghezza, poi il varco
+      const spW = Math.round(inW * 0.66);
+      blocks(ctx, inX, ySponda, spW, 13, '#544a3a', 7, r, 0.08);
+      ctx.fillStyle = '#4c4232';
+      ctx.fillRect(inX + 6, ySponda + 13, 5, yMatAlt - ySponda - 13);
+      ctx.fillRect(inX + spW - 11, ySponda + 13, 5, yMatAlt - ySponda - 13);
+      // i due materassi, il cuscino a capo del letto e la coperta che RICADE
+      /* Il LENZUOLO chiaro e la COPERTA scura sopra, e la differenza fra i due
+         toni è quello che fa la lettura: al primo tentativo materasso e coperta
+         erano due grigi a due punti di distanza, e il letto tornava a leggere
+         come un ripiano con delle cose sopra. Un letto si riconosce dal
+         contrasto lenzuolo-coperta prima che dalla sagoma. */
+      for (const [yMat, cop] of [[yMatAlt, '#5c5346'], [yMatBas, '#544c40']]) {
+        blocks(ctx, inX, yMat, inW, 20, '#8a8680', 8, r, 0.07);           // materasso col lenzuolo
+        ctx.fillStyle = '#a8a6a2'; ctx.fillRect(inX, yMat, inW, 2);
+        ctx.fillStyle = '#9c9a96'; ctx.fillRect(inX + 5, yMat - 12, 52, 14); // cuscino
+        ctx.fillStyle = '#b4b2ae'; ctx.fillRect(inX + 5, yMat - 12, 52, 3);
+        ctx.fillStyle = '#7c7a76'; ctx.fillRect(inX + 5, yMat - 3, 52, 3);
+        blocks(ctx, inX + 58, yMat - 2, inW - 58, 22, cop, 8, r, 0.07);    // la coperta sul lenzuolo
+        ctx.fillStyle = shade(cop, 1.18); ctx.fillRect(inX + 58, yMat - 2, inW - 58, 2);
+        // la ricaduta oltre il bordo, col lembo che non è mai dritto
+        // a passo largo: a sei pixel il lembo veniva una frangia, non una piega
+        for (let x = inX + 58; x < inX + inW; x += 14) {
+          const dip = 13 + Math.round(r() * 5);
+          ctx.fillStyle = shade(cop, 0.86); ctx.fillRect(x, yMat + 20, 14, dip);
+          ctx.fillStyle = shade(cop, 0.66); ctx.fillRect(x, yMat + 20 + dip - 2, 14, 2);
+        }
+        ctx.fillStyle = '#443c30'; ctx.fillRect(inX, yMat + 20, 58, 6);    // la traversa del telaio
       }
+      // la scaletta, appoggiata al fianco della pediera e a terra
+      ctx.fillStyle = '#4c4232';
+      ctx.fillRect(bx + bl + 4, ySponda, 5, floorY - ySponda);
+      ctx.fillRect(bx + bl + 24, ySponda, 5, floorY - ySponda);
+      for (let y = ySponda + 12; y < floorY - 6; y += 20) ctx.fillRect(bx + bl + 4, y, 25, 4);
+
+      /* I POSTER. u2 promette una cosa sola a colori in tutta la stanza: «le
+         maglie grigie, i prati grigi, solo i palloni ancora accesi come
+         tizzoni». Nel quadro c'erano quattro rettangoli grigi vuoti con una
+         barra al posto del titolo: niente calciatore, niente pallone, e quindi
+         niente di quello che il gioco chiede al giocatore di notare (lezione
+         62). Erano anche larghi tre volte l'altezza: un poster stampato è 68x98
+         cm, cioè LARGO 0,70 VOLTE L'ALTEZZA — verticale, non orizzontale, ed è
+         il verso che lascia il posto a una figura in piedi. */
+      const poster = (px, py, pw, ph) => {
+        ctx.fillStyle = '#33333a'; ctx.fillRect(px + 3, py + 3, pw, ph);      // l'ombra sul muro
+        ctx.fillStyle = '#6c6c74'; ctx.fillRect(px, py, pw, ph);              // il cielo grigio
+        ctx.fillStyle = '#5c605a'; ctx.fillRect(px, py + ph * 0.58, pw, ph * 0.42); // il prato grigio
+        ctx.fillStyle = '#6e726c'; ctx.fillRect(px, py + Math.round(ph * 0.74), pw, 1); // la riga del campo
+        const fh = ph * 0.62, cx = px + pw * 0.44, feet = py + ph * 0.90;
+        ctx.fillStyle = '#7e7a76';                                            // gambe
+        ctx.fillRect(cx - fh * 0.13, feet - fh * 0.30, fh * 0.10, fh * 0.30);
+        ctx.fillRect(cx + fh * 0.05, feet - fh * 0.34, fh * 0.10, fh * 0.34);
+        ctx.fillStyle = '#63636a';                                            // pantaloncini
+        ctx.fillRect(cx - fh * 0.15, feet - fh * 0.46, fh * 0.30, fh * 0.16);
+        /* Le braccia scendono LUNGO IL CORPO. Al primo tentativo sporgevano in
+           orizzontale dalle spalle e la figura leggeva come uno spaventapasseri:
+           una croce, non un uomo. Un braccio che pende è più corto da disegnare
+           e dice «persona in piedi» al primo sguardo. */
+        ctx.fillStyle = '#7a7a81';
+        ctx.fillRect(cx - fh * 0.23, feet - fh * 0.74, fh * 0.07, fh * 0.26);
+        ctx.fillRect(cx + fh * 0.16, feet - fh * 0.74, fh * 0.07, fh * 0.26);
+        ctx.fillStyle = '#8c8c93';                                            // maglia
+        ctx.fillRect(cx - fh * 0.17, feet - fh * 0.78, fh * 0.34, fh * 0.33);
+        ctx.fillStyle = '#76767d';                                            // il numero, sbiadito
+        ctx.fillRect(cx - fh * 0.05, feet - fh * 0.70, fh * 0.10, fh * 0.14);
+        ctx.fillStyle = '#7c7c83';                                            // il collo della maglia
+        ctx.fillRect(cx - fh * 0.07, feet - fh * 0.78, fh * 0.14, fh * 0.04);
+        ctx.fillStyle = '#7e7a76'; pixelDisc(ctx, cx, feet - fh * 0.87, fh * 0.10, 2); // testa
+        // IL PALLONE: l'unica cosa accesa del quadro, e sta a terra, ai piedi
+        const bcx = cx + fh * 0.34, bcy = feet - 4;
+        glow(ctx, bcx, bcy, 11, 11, '226,124,40');
+        ctx.fillStyle = '#e07a24'; pixelDisc(ctx, bcx, bcy, 4, 2);
+        ctx.fillStyle = '#f2b064'; ctx.fillRect(bcx - 3, bcy - 3, 3, 2);
+        ctx.fillStyle = '#3a3a40'; ctx.fillRect(px, py, pw, 1); ctx.fillRect(px, py, 1, ph);
+        ctx.fillStyle = '#4a4a50'; ctx.fillRect(px + pw - 7, py, 7, 7);       // l'angolo scollato
+        ctx.fillStyle = 'rgba(214,204,178,.30)'; ctx.fillRect(px + pw * 0.5 - 6, py - 2, 12, 4); // il pezzo di scotch
+      };
+      poster(360, 56, 68, 97);      // il lato di Federico, oltre la scaletta
+      poster(520, 44, 76, 108);
+      poster(624, 52, 68, 97);      // il lato di Daniele, oltre il nastro
+      poster(716, 48, 72, 103);
+
       // scrivania a destra con la lampada e il vecchio joypad
       blocks(ctx, W * 0.58, floorY - 36, W * 0.28, 10, '#4a4238', 8, r, 0.08);
       ctx.fillStyle = '#3a342c';
@@ -876,9 +983,12 @@ const Scenes = (() => {
       ctx.fillStyle = '#3a3a40'; ctx.fillRect(W * 0.60, floorY - 52, 3, 16);
       ctx.fillRect(W * 0.595, floorY - 55, 14, 5);
       glow(ctx, W * 0.605, floorY - 52, 16, 12, '210,196,158');
-      // il joypad grigio col filo
+      /* Il joypad resta grigio: il bottone rosso da 3x3 px che faceva da
+         colore-firma non si vedeva (sotto i sessanta pixel un oggetto dice solo
+         che c'è, e a tre pixel non dice nemmeno quello) e adesso rubava il posto
+         ai palloni, che sono la cosa a colori che il testo promette. Un tocco
+         acceso per painter: qui sono loro. */
       ctx.fillStyle = '#7a7a80'; ctx.fillRect(W * 0.70, floorY - 42, 20, 9);
-      ctx.fillStyle = '#c0242e'; ctx.fillRect(W * 0.715, floorY - 40, 3, 3); // il bottone ROSSO: il colore-firma
       ctx.fillStyle = '#55555a'; ctx.fillRect(W * 0.70 - 14, floorY - 37, 14, 2);
       // tappetino da gioco a destra del nastro
       blocks(ctx, W * 0.56, floorY + 8, W * 0.30, H - floorY - 14, '#4e4a42', 8, r, 0.10);
@@ -1233,39 +1343,17 @@ const Scenes = (() => {
         glow(ctx, W * fx + W * 0.08, 18, W * 0.14, 14, '190,206,216');
         ctx.fillStyle = '#becbd6'; ctx.fillRect(W * fx + 4, 14, W * 0.16 - 8, 3);
       }
-      // IL FRIGO ENORME, aperto, con la luce grigia che cola fuori
-      const fx2 = W * 0.66, fw2 = W * 0.24, fh2 = H * 0.66;
-      blocks(ctx, fx2, floorY - fh2, fw2, fh2, '#7e848a', 8, r, 0.06);
-      // l'anta aperta
-      ctx.fillStyle = '#8a9096';
-      ctx.save(); ctx.translate(fx2, floorY - fh2); ctx.rotate(-0.06);
-      ctx.fillRect(-fw2 * 0.55, 0, fw2 * 0.52, fh2 * 0.98); ctx.restore();
-      ctx.fillStyle = '#6a7076'; ctx.fillRect(fx2 - fw2 * 0.52, floorY - fh2 + 10, 5, 24); // maniglia
-      // l'interno: ripiani e LUCE GRIGIA (non calda: sbagliata)
-      glow(ctx, fx2 + fw2 / 2, floorY - fh2 / 2, fw2 * 1.2, fh2 * 0.8, '176,182,190');
-      ctx.fillStyle = '#b0b6be'; ctx.fillRect(fx2 + 6, floorY - fh2 + 6, fw2 - 12, fh2 - 12);
-      ctx.fillStyle = '#8e949c';
-      for (let i = 1; i < 4; i++) ctx.fillRect(fx2 + 6, floorY - fh2 + i * fh2 / 4, fw2 - 12, 4);
-      // cibo GRIGIO sui ripiani: forme giuste, colore morto
-      ctx.fillStyle = '#9aa0a8';
-      ctx.fillRect(fx2 + 12, floorY - fh2 + 14, 14, 12); ctx.fillRect(fx2 + 32, floorY - fh2 + 18, 10, 8);
-      ctx.fillStyle = '#878d95';
-      ctx.fillRect(fx2 + 14, floorY - fh2 + fh2 / 4 + 8, 20, 10); ctx.fillRect(fx2 + 40, floorY - fh2 + fh2 / 4 + 12, 8, 6);
-      ctx.fillStyle = '#a4aab2';
-      ctx.fillRect(fx2 + 12, floorY - fh2 + fh2 / 2 + 10, 12, 14);
-      // il PIANO D'ACCIAIO al centro
-      blocks(ctx, W * 0.10, floorY - 40, W * 0.44, 12, '#8e949a', 8, r, 0.06);
+      // il PIANO D'ACCIAIO, accorciato: il posto a destra serve all'anta che si apre
+      blocks(ctx, W * 0.10, floorY - 40, W * 0.30, 12, '#8e949a', 8, r, 0.06);
       ctx.fillStyle = '#5a5e64';
-      ctx.fillRect(W * 0.12, floorY - 28, 8, 28); ctx.fillRect(W * 0.50, floorY - 28, 8, 28);
-      ctx.fillStyle = 'rgba(230,236,240,.20)'; ctx.fillRect(W * 0.10, floorY - 40, W * 0.44, 2);
-      // LE LATTINE ROSSE A FRECCIA sul piano: il segnale di Daniele (il colore-firma!)
-      const ax = W * 0.20, ay = floorY - 52;
-      const arrow = [[0, 0], [1, 0], [2, 0], [3, 0], [2.4, -0.9], [2.4, 0.9], [3, 0]];
-      for (const [dx2, dy2] of arrow) lattina(ctx, ax + dx2 * 22, ay + dy2 * 14);
-      glow(ctx, ax + 33, ay + 5, 90, 30, '192,36,46');
+      ctx.fillRect(W * 0.12, floorY - 28, 8, 28); ctx.fillRect(W * 0.36, floorY - 28, 8, 28);
+      ctx.fillStyle = 'rgba(230,236,240,.20)'; ctx.fillRect(W * 0.10, floorY - 40, W * 0.30, 2);
+      // due teglie grigie fuori dal frigo: la cena catalogata come reperti
+      teglia(ctx, W * 0.14, floorY - 60, 62, 20, '#9aa0a8');
+      teglia(ctx, W * 0.26, floorY - 60, 62, 20, '#949aa2');
       // cappa e pentole appese (alla barra della cappa, non a mezz'aria)
-      ctx.fillStyle = '#4a4e54'; ctx.fillRect(W * 0.14, H * 0.14, W * 0.36, 16);
-      ctx.fillStyle = '#3a3e44'; ctx.fillRect(W * 0.16, H * 0.14 + 16, W * 0.32, 4);
+      ctx.fillStyle = '#4a4e54'; ctx.fillRect(W * 0.14, H * 0.14, W * 0.32, 16);
+      ctx.fillStyle = '#3a3e44'; ctx.fillRect(W * 0.16, H * 0.14 + 16, W * 0.28, 4);
       for (let i = 0; i < 4; i++) {
         const px2 = W * 0.19 + i * W * 0.08;
         ctx.fillStyle = '#5e646a'; ctx.fillRect(px2, H * 0.14 + 20, 3, 8);
@@ -1276,6 +1364,108 @@ const Scenes = (() => {
       ctx.fillStyle = '#8e949a'; ctx.fillRect(W * 0.045, floorY - 48, 4, 14);
       ctx.fillRect(W * 0.045, floorY - 48, 14, 4);
       ctx.fillStyle = '#c8d4dc'; ctx.fillRect(W * 0.055 + 6, floorY - 40, 3, 4);
+
+      /* ============ IL FRIGO, che è la scena ============
+         k1 lo descrive in tre battute e il quadro ne smentiva tutte e tre: «un
+         frigo industriale a DOPPIA ANTA» e ne aveva una; «pieno di CENA,
+         lasagne, parmigiana, pasta al forno, impilate con cura maniacale su
+         ogni ripiano» e dentro aveva cinque rettangolini; «dodici lattine di
+         Coca Zero sul ripiano centrale, le uniche cose a colori» e le lattine
+         stavano sul bancone d'acciaio, dieci metri più in là. Ed era anche la
+         superficie più chiara dell'inquadratura — 218x226 di un solo grigio
+         chiaro — quindi l'occhio ci andava per primo e ci trovava il vuoto: la
+         scena si apre mostrando il contrario di quello che il testo fa notare.
+         Adesso il frigo è il SOGGETTO (278 px su 960, alto due terzi del
+         quadro, disegnato per ultimo perché è la cosa più vicina) e il vano ha
+         i tre piani che gli mancavano: il fondo che prende la luce della
+         lampadina, i due fianchi in ombra, il cielo e il pavimento del vano, e
+         il FRONTE di ogni ripiano. La cura maniacale non si disegna: si ottiene
+         allineando le teglie alla stessa x su tutti i ripiani. */
+      const fw2 = Math.round(W * 0.29), fh2 = Math.round(H * 0.72);
+      const fx2 = Math.round(W * 0.62), fty = floorY - fh2;
+      // la luce che cola fuori PRIMA della carcassa, o gli lava sopra
+      glow(ctx, fx2 + fw2 / 2, fty + fh2 / 2, fw2 * 1.15, fh2 * 0.8, '176,182,190');
+      blocks(ctx, fx2, fty, fw2, fh2, '#7e848a', 8, r, 0.06);
+      // IL VANO. d = la profondità apparente: da lì vengono i quattro fianchi.
+      const ix = fx2 + 10, iy = fty + 10, iw = fw2 - 20, ih = fh2 - 20, d = 20;
+      ctx.fillStyle = '#b6bcc4'; ctx.fillRect(ix, iy, iw, ih);          // il fondo, il più chiaro
+      /* I quattro fianchi sono quadrilateri che si incastrano sulle diagonali
+         degli angoli (t = min dei due lati): senza il min si sovrappongono e
+         negli angoli resta un dente. Il fianco sinistro è il più scuro perché
+         la luce della cucina entra dall'anta di destra. */
+      for (let y = iy; y < iy + ih; y++) {
+        const g = Math.round(d * Math.min(1, (y - iy) / d, (iy + ih - 1 - y) / d));
+        ctx.fillStyle = '#767c85'; ctx.fillRect(ix, y, g, 1);
+        ctx.fillStyle = '#8e949d'; ctx.fillRect(ix + iw - g, y, g, 1);
+      }
+      for (let x = ix; x < ix + iw; x++) {
+        const g = Math.round(d * Math.min(1, (x - ix) / d, (ix + iw - 1 - x) / d));
+        ctx.fillStyle = '#a4aab3'; ctx.fillRect(x, iy, 1, g);
+        ctx.fillStyle = '#888e97'; ctx.fillRect(x, iy + ih - g, 1, g);
+      }
+      // IL CASSETTO DELLE VERDURE in basso: quello che Natalino richiude di scatto
+      const draH = 34, draY = iy + ih - draH;
+      ctx.fillStyle = '#9ea4ac'; ctx.fillRect(ix + 4, draY, iw - 8, draH - 2);
+      ctx.fillStyle = '#c0c6ce'; ctx.fillRect(ix + 4, draY, iw - 8, 2);
+      ctx.fillStyle = '#1a1c20'; ctx.fillRect(ix + 4, draY + 4, iw - 8, 4);  // la fessura. Respira.
+      ctx.fillStyle = '#767c84'; ctx.fillRect(ix + iw / 2 - 22, draY + 14, 44, 5);
+      /* QUATTRO RIPIANI. Su tre ci sono le teglie, due per pila, tre pile per
+         ripiano, tutte alla stessa x: è l'allineamento che dice «catalogato».
+         Il secondo dall'alto è il RIPIANO CENTRALE del testo, e lì ci stanno le
+         lattine — quindi resta libero, altrimenti il rosso non si vede. */
+      const compH = (ih - draH) / 4, tgW = 74, tgGap = (iw - 3 * tgW) / 4;
+      // l'alone rosso sul fondo del vano, PRIMA delle teglie: se lo si disegna
+      // dentro il ciclo lava di rosa anche il ripiano di sopra
+      const midBot = Math.round(iy + 2 * compH);
+      glow(ctx, ix + 60, midBot - 26, 92, 30, '192,36,46');
+      for (let k = 0; k < 4; k++) {
+        const cBot = Math.round(iy + (k + 1) * compH);
+        if (k === 1) {
+          /* LE DODICI LATTINE A FRECCIA, sul ripiano centrale, la punta a
+             sinistra: verso il resto della cucina, dove k1 manda a cercare la
+             dispensa. Cinque file a 8 px di passo su lattine alte 11, disegnate
+             dal fondo in avanti: si sovrappongono di tre pixel, e la
+             sovrapposizione È la profondità del ripiano. Con tre file sole i
+             due bracci della punta finivano incolonnati e la freccia leggeva
+             come una T; il braccio deve salire in DIAGONALE, una lattina per
+             fila, o non è una punta. */
+          const s3 = 8, base3 = cBot - 11, tipX = ix + 14;
+          lattina(ctx, tipX + 26, base3 - 4 * s3);
+          lattina(ctx, tipX + 13, base3 - 3 * s3);
+          for (let i = 0; i < 8; i++) lattina(ctx, tipX + i * 13, base3 - 2 * s3);
+          lattina(ctx, tipX + 13, base3 - s3);
+          lattina(ctx, tipX + 26, base3);
+        } else {
+          for (let j = 0; j < 3; j++) {
+            const tx4 = Math.round(ix + tgGap + j * (tgW + tgGap));
+            teglia(ctx, tx4, cBot - 21, tgW, 20, k === 0 ? '#a2a8b0' : '#989ea6');
+            teglia(ctx, tx4, cBot - 43, tgW, 20, k === 0 ? '#9aa0a8' : '#9098a0');
+          }
+        }
+        // il FRONTE del ripiano: il filo chiaro che prende luce, e l'ombra sotto
+        ctx.fillStyle = '#ccd2da'; ctx.fillRect(ix, cBot, iw, 4);
+        ctx.fillStyle = '#5e646c'; ctx.fillRect(ix, cBot + 4, iw, 2);
+      }
+      /* LE DUE ANTE, aperte una per lato, quella di destra tagliata dal bordo
+         dell'inquadratura. Lamiera secondo la convenzione di trent'anni fa
+         (lezione 58): tre fasce di tono — in alto ci si riflette il neon, in
+         basso il pavimento — più UN pixel chiaro sul filo libero, che è quello
+         che trasforma un cartone in acciaio. */
+      const lw2 = Math.round(fw2 * 0.47), lh2 = Math.round(fh2 * 0.98);
+      for (const dir of [-1, 1]) {
+        ctx.save();
+        ctx.translate(dir < 0 ? fx2 : fx2 + fw2, fty);
+        ctx.rotate(dir * 0.05);
+        const x0 = dir < 0 ? -lw2 : 0;
+        ctx.fillStyle = '#8e949c'; ctx.fillRect(x0, 0, lw2, lh2);
+        ctx.fillStyle = '#9ca2aa'; ctx.fillRect(x0, 0, lw2, lh2 * 0.30);
+        ctx.fillStyle = '#7a8086'; ctx.fillRect(x0, lh2 * 0.72, lw2, lh2 * 0.28);
+        const free = dir < 0 ? x0 : x0 + lw2 - 2;
+        ctx.fillStyle = '#c2c8d0'; ctx.fillRect(free, 0, 2, lh2);
+        ctx.fillStyle = '#6a7076'; ctx.fillRect(dir < 0 ? x0 + 8 : x0 + lw2 - 13, lh2 * 0.30, 5, 74);
+        ctx.fillStyle = '#a8aeb6'; ctx.fillRect(dir < 0 ? x0 + 8 : x0 + lw2 - 13, lh2 * 0.30, 5, 2);
+        ctx.restore();
+      }
     },
 
     sottoscala(ctx, W, H) {

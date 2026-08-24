@@ -176,7 +176,14 @@ function makeDocument() {
 
 const scriptCache = SOURCES.map(s => ({ name: s.name, script: new vm.Script(s.code, { filename: s.name }) }));
 const scriptGetG = new vm.Script('(typeof G !== "undefined" ? G : null)');
-const scriptGetApi = new vm.Script('({Engine, Combat, Dice, HEROES, BESTIARY, ITEMS, CAMPAIGN, CAMPAIGN_START, CHAPTERS, WORLD_MAP, Luoghi})');
+/* Ogni modulo del gioco si dichiara con `const Nome = (() => {...})()`, e un
+   `const` NON diventa una proprietà dell'oggetto globale: quindi
+   `context.Dialoghi` è undefined anche quando dialoghi.js è caricato benissimo.
+   L'unico modo di arrivarci è valutare un'espressione DENTRO il contesto, che è
+   quello che fa questa riga — e per questo Dialoghi va elencato qui e non letto
+   da `game.context`. La prova delle finestre di conferma faceva la seconda cosa
+   e falliva sempre: un test che non guardava quello che credeva di guardare. */
+const scriptGetApi = new vm.Script('({Engine, Combat, Dice, HEROES, BESTIARY, ITEMS, CAMPAIGN, CAMPAIGN_START, CHAPTERS, WORLD_MAP, Luoghi, Dialoghi})');
 
 function makeTimers() {
   let seq = 0;
@@ -1837,7 +1844,7 @@ section('Copertura totale della campagna');
 (function testFinestreDiConferma() {
   section('Le finestre di conferma si aprono e rispondono');
   const game = buildGame(515151);
-  const D = game.context.Dialoghi;
+  const D = game.api.Dialoghi;
   if (!D) { fail('Dialoghi non è caricato nel banco di prova'); return; }
   let aperte = 0;
   const prove = [
