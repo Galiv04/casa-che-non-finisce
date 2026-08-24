@@ -94,6 +94,7 @@ const IMPRESE = [
   { flag: 'divorente_distrutto',    icon: '🛋', title: 'Tre Posti e Nessuna Pietà',   desc: 'Il divano di Daniele — quello vero, quello dei libri e della pizza — aveva i denti. Li avete tolti tutti.' },
   { flag: 'bollette_incenerite',    icon: '📬', title: 'Debito Estinto a Pugni',      desc: 'Le bollette del Grigiore non avevano scadenza. Adesso hanno una data: stanotte.' },
   { flag: 'eleinad_distrutto',     icon: '💥', title: 'Colpisce Sempre il Primo',     desc: 'Il Guscio Blu di Daniele sul nemico più forte, per rispetto della tradizione. Il finale dei Colori.' },
+  { flag: 'solo',                  icon: '🚪', title: 'Uno Solo Sul Pianerottolo',   desc: 'Ha suonato quel citofono da solo. Nessuno che tenesse il pulsante, nessuno a cui dire «apro?».' },
   { flag: 'finale_scambio',        icon: '🕯', title: 'Il Posto Apparecchiato',       desc: 'Qualcuno è rimasto sul Divano perché Daniele uscisse. Il gruppo non ha finito: si torna.' },
 ];
 
@@ -106,6 +107,11 @@ const CRONACA = [
   { flag: 'finale_parola',     text: 'Il giovedì sera, dall\'appartamento di Daniele, si sente ridere in sei. I vicini all\'inizio si preoccupavano — da quella porta non usciva un suono da mesi. Adesso, quando passano sul pianerottolo, rallentano apposta.' },
   { flag: 'finale_gemelli',    text: 'Un fotografo di quartiere ha ricevuto una foto strappata e ricomposta, da restaurare. Ha rifiutato il lavoro: "Lo scotch è la parte migliore." I due gemelli hanno pagato lo stesso, il doppio, e l\'hanno incorniciata com\'era.' },
   { flag: 'finale_colori',     text: 'Il condominio di Daniele ha votato di ridipingere le scale. Nessuno ricorda chi l\'abbia proposto, ma la delibera è passata all\'unanimità, con una sola prescrizione a verbale: "Qualsiasi colore, purché un colore."' },
+  /* IL FINALE GRIGIO era l'unico dei cinque senza riga di epilogo: l'unico in cui la Casa
+     vince, cioe' quello che ha piu' bisogno di una riga. Regola del gioco: il Grigiore si
+     racconta solo per metafora, mai coi termini clinici e mai con l'autolesionismo — e la
+     porta resta aperta, perche' e' tutto il punto di questa storia. */
+  { flag: 'finale_grigio',     text: 'Al secondo piano c\'è una porta a cui i vicini hanno smesso di suonare. Non per cattiveria: la prima volta che suoni e non risponde nessuno è una cosa, la ventesima è un\'abitudine, e le abitudini non le decide nessuno. Il giovedì sera, però, sul pianerottolo davanti a quella porta ha cominciato a comparire una busta della spesa. Nessuno l\'ha mai vista arrivare. Non è come aprire, e non è niente: è una busta della spesa, ogni giovedì, e chi la porta non ha smesso.' },
   { flag: 'finale_scambio',    text: 'Ogni primo venerdì del mese, davanti a un portone di città, un gruppo di amici si presenta con uno zaino a testa. Il portone non si apre. Loro tornano il mese dopo. Il Grigiore, che ha tutto il tempo del mondo, comincia a sospettare che loro ne abbiano di più.' },
   { flag: 'bibliotecario_amico', text: 'Nella biblioteca comunale del quartiere è comparso uno scaffale nuovo: "Libri che vi vogliono bene". Consigli scritti a mano, calligrafia d\'altri tempi, mai firmati. Il bibliotecario umano lascia fare: le raccomandazioni sono SEMPRE giuste.' },
   { flag: 'sonnambulo_salvato', text: 'In un\'altra città, una famiglia ha riaperto la porta a qualcuno che mancava da mesi senza che nessuno sapesse dire dov\'era. Alla domanda "dove sei stato?" ha risposto solo: "Seduto. Poi degli amici che non conosco mi hanno svegliato."' },

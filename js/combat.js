@@ -782,7 +782,6 @@ const Combat = (() => {
     const h = G.party[tIdx];
 
     let atkBonus = e.attack.bonus;
-    if (G.inventory.includes('ombrellone_gaeta')) atkBonus -= 1;
     if (battle.isBoss && G.flags.eleinad_vacilla && battle.round <= 2) atkBonus -= 1;
     if (G.difficulty !== 'facile' && e.special === 'mirror') atkBonus = Math.max(atkBonus, (h.attack.bonus || 0) + 2);
     const desperate = G.difficulty === 'incubo' && e.hp <= Math.floor(e.maxHp * 0.25);
