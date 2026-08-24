@@ -1,0 +1,13 @@
+{
+  "_perche": "Deroghe e soglie di ../dnd-motore/tools/soggetto.mjs, ognuna con la sua ragione scritta.",
+
+  "_soglie": {
+    "nero": 0.60,
+    "perche": "la Casa e' un interno senza una luce che funzioni: il Grigiore ha bevuto il colore e quasi tutte le stanze hanno una sorgente sola — la TV nel salotto, gli obló nel sottoscala, una lampadina nel corridoio. La soglia sta al 60%: sopra, meno di due quinti del quadro porta informazione, e allora non c'e' piu' un primo piano. Sotto, il buio e' il tono del gioco e non un difetto."
+  },
+
+  "titolo": {
+    "nero": "e' la schermata del titolo: il palazzo di notte con una finestra accesa. Il nome del gioco lo scrive il DOM sopra la tela.",
+    "oggetti": "un titolo con due oggetti sopra i cento pixel sarebbe una scena, non un titolo."
+  }
+}

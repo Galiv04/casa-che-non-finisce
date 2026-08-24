@@ -1191,12 +1191,21 @@ const Scenes = (() => {
           ctx.fillStyle = 'rgba(150,150,156,.22)';           // il ciglio, appena
           ctx.fillRect(mcx + dx, seaY - hh, 3, 1);
         }
-        // LA FENDITURA: dall'alto fino all'acqua, e si allarga scendendo
+        /* LA FENDITURA, e prima cominciava a `seaY - mh*0.86` — un'altezza
+           FISSA, mentre il profilo del monte in quel punto arriva solo a
+           `mh*0.80`: i primi sei segmenti stavano quindi IN CIELO, sopra la
+           cresta, e leggevano come uno spuntone nero piantato sulla montagna.
+           Una fenditura comincia dove comincia la roccia: la quota di partenza
+           la deve dare il profilo, non un numero. */
+        const fdx = -W * 0.045;
+        const tf = fdx / (mw / 2);
+        let cresta = mh * Math.pow(Math.max(0, 1 - tf * tf), 0.40);
+        cresta *= 0.84 + Math.sin(fdx * 0.05) * 0.10 + Math.sin(fdx * 0.018) * 0.06;
         for (let k = 0; k < 34; k++) {
           const t = k / 33;
           const larg = 3 + t * 7;
           ctx.fillStyle = `rgba(12,12,16,${0.62 - t * 0.16})`;
-          ctx.fillRect(mcx - W * 0.045 - larg / 2 + t * 5, seaY - mh * 0.86 + t * mh * 0.90, larg, 4);
+          ctx.fillRect(mcx + fdx - larg / 2 + t * 5, seaY - cresta + 2 + t * (cresta - 2), larg, 4);
         }
       }
       // IL MARE FERMO: fasce orizzontali immobili, nessuna onda. Più scuro del cielo,
@@ -1207,8 +1216,14 @@ const Scenes = (() => {
         ctx.fillRect(0, seaY + t * (shoreY - seaY), W, (shoreY - seaY) / 6 + 1);
       }
       ctx.fillStyle = 'rgba(178,178,184,.26)'; ctx.fillRect(0, seaY, W, 1);   // l'orizzonte
-      // il riflesso del sole: una colonna spenta, FERMA
-      ctx.fillStyle = 'rgba(210,210,214,.12)'; ctx.fillRect(W * 0.69, seaY, W * 0.06, shoreY - seaY);
+      /* NESSUN RIFLESSO. Qui c'era «il riflesso del sole: una colonna spenta»,
+         e il testo della scena dice l'esatto contrario: «una lastra di vetro
+         sporco fino all'orizzonte, senza una ruga, SENZA UN RIFLESSO. Un mare a
+         cui hanno staccato la spina.» Una colonna di luce sull'acqua è la cosa
+         che dice «questo mare è vivo»: e quel mare non lo è. Al suo posto, il
+         segno che il vetro sporco lascia davvero — una velatura opaca, ferma,
+         che non arriva alla riva. */
+      ctx.fillStyle = 'rgba(120,124,128,.16)'; ctx.fillRect(0, seaY + 6, W, 10);
       /* LA CURVA DELLA BAIA. La riva era una riga orizzontale con qualche scalino
          casuale: una spiaggia qualunque. Serapo è un arco, e l'arco è la prima delle
          tre cose che il testo dice di riconoscere — quindi la riva scende al centro e
@@ -1267,29 +1282,109 @@ const Scenes = (() => {
       const ux = W * 0.62, uy = H * 0.93;
       ctx.save(); ctx.translate(ux, uy); ctx.rotate(-0.09);
       ctx.fillStyle = '#2e2c28'; ctx.fillRect(-14, -5, 30, 5);              // l'ombra alla base
-      ctx.fillStyle = '#6a645c'; ctx.fillRect(-4, -252, 8, 252);           // il palo
-      ctx.fillStyle = '#847e76'; ctx.fillRect(-4, -252, 3, 252);           // il filo di luce sul palo
+      /* IL PALO era #6a645c su una cenere #7a746a: luminanza 100 contro 116,
+         cioe' SEDICI punti di salto — sotto la soglia dei venti a cui l'occhio
+         separa due superfici. Nella metà bassa, quella contro la sabbia, il
+         palo semplicemente non c'era. Terza volta che trovo lo stesso difetto
+         in questa passata (il divano del salotto, le gambe del treppiede della
+         soffitta, questo): un oggetto dipinto dello stesso valore del suo
+         fondo. Un palo d'acciaio in controluce e' SCURO. */
+      ctx.fillStyle = '#484239'; ctx.fillRect(-4, -252, 8, 252);           // il palo
+      ctx.fillStyle = '#7e786e'; ctx.fillRect(-4, -252, 3, 252);           // il filo di luce sul palo
+      ctx.fillStyle = 'rgba(20,18,15,.40)'; ctx.fillRect(-9, -8, 20, 8);   // e l'ombra di contatto
       ctx.fillStyle = '#55524c'; ctx.fillRect(-8, -166, 16, 6);            // lo snodo, rotto
-      // la mezza calotta ANCORA SU: un cono che scende verso sinistra
-      for (let i = 0; i <= 34; i++) {
-        const xx = -i * 3, yTop = -252 + i * 0.4, yBot = -252 + i * 1.9;
-        ctx.fillStyle = i % 6 < 3 ? '#8e8a84' : '#7c7872';
-        ctx.fillRect(xx - 3, yTop, 4, yBot - yTop);
-        if (i % 6 === 0) { ctx.fillStyle = '#5c5952'; ctx.fillRect(xx - 3, yTop, 4, 2); }  // le stecche sotto
+      /* LA CALOTTA. Era disegnata a STRISCE VERTICALI di larghezza costante,
+         alte quanto la distanza fra due parabole: sullo schermo veniva un
+         VENTAGLIO di doghe, cioè una staccionata, ed era l'oggetto più grande
+         del quadro. Una calotta di ombrellone, vista di fianco, è un GUSCIO
+         SOTTILE curvo — sei pixel di spessore su una parabola — con le stecche
+         che si vedono SOTTO, radiali. Lo spessore costante è quello che la fa
+         leggere come telo e non come tavola. */
+      const prof = t => Math.pow(t, 1.55) * 62;             // il profilo della calotta
+      for (let i2 = 0; i2 <= 118; i2++) {                    // la meta' ancora su, a sinistra
+        const t = i2 / 118, xx = -i2;
+        const yy = -252 + prof(t);
+        ctx.fillStyle = (i2 % 22 < 11) ? '#918d87' : '#7e7a74';
+        ctx.fillRect(xx, yy, 1, 7);
+        ctx.fillStyle = 'rgba(226,222,216,.22)'; ctx.fillRect(xx, yy, 1, 2);
+        ctx.fillStyle = 'rgba(30,28,26,.30)'; ctx.fillRect(xx, yy + 7, 1, 2);   // il sottotelo
       }
-      // le STECCHE NUDE dalla parte rotta, che scendono sempre più giù
+      ctx.fillStyle = '#5c5952';                             // il bordo di gronda, che pende
+      for (let i2 = 96; i2 <= 118; i2++) ctx.fillRect(-i2, -252 + prof(i2 / 118) + 7, 1, 6);
+      ctx.fillStyle = '#4e4b45';                             // e le stecche sotto, radiali
+      for (const q of [0.28, 0.56, 0.86]) {
+        for (let i2 = 0; i2 <= 118 * q; i2 += 2) ctx.fillRect(-i2, -252 + prof(i2 / 118) + 6, 3, 2);
+      }
+      /* LA PARTE ROTTA: tre STECCHE NUDE che scendono a destra, e fra le ultime
+         due un festone di telo che pende in catenaria e TOCCA la cenere. Una
+         catenaria e' l'unica curva che un telo appeso per due punti fa. */
       for (let sb = 0; sb < 3; sb++) {
-        const len = 66 + sb * 14, pend = 0.85 + sb * 0.28;
+        const len = 62 + sb * 18, pend = 0.80 + sb * 0.30;
         ctx.fillStyle = '#55524c';
-        for (let i = 0; i < len; i += 3) ctx.fillRect(i, -252 + i * pend, 4, 3);
+        for (let i2 = 0; i2 < len; i2 += 2) ctx.fillRect(i2, -252 + i2 * pend, 3, 3);
+        ctx.fillStyle = '#6e6a62';
+        for (let i2 = 0; i2 < len; i2 += 2) ctx.fillRect(i2, -252 + i2 * pend, 1, 1);
       }
-      // e la TELA CROLLATA che pende dalle stecche e TOCCA la cenere
-      for (let i = 0; i < 66; i += 3) {
-        const xx = 24 + i, yTop = -252 + xx * 1.02;
-        ctx.fillStyle = (i % 12 < 6) ? '#7c7872' : '#6a665f';
-        ctx.fillRect(xx, yTop, 4, -yTop - 4);
+      {
+        const x0 = 62 * 0.8 + 4, x1 = 116;                   // fra la prima e l'ultima stecca
+        for (let xx = 8; xx < x1; xx++) {
+          const u = (xx - 8) / (x1 - 8);
+          const yTop = -252 + xx * (0.80 + u * 0.70);
+          const catena = 34 * Math.sin(u * Math.PI);         // il festone
+          ctx.fillStyle = (xx % 16 < 8) ? '#7c7872' : '#6a665f';
+          ctx.fillRect(xx, yTop, 1, Math.min(-yTop - 4, catena + 10));
+          ctx.fillStyle = 'rgba(28,26,24,.26)'; ctx.fillRect(xx, yTop + Math.min(-yTop - 6, catena + 8), 1, 2);
+        }
       }
+      /* LA SDRAIO DEL MONOLOGANTE, con LA POLO floscia sulla spalliera e GLI
+         OCCHIALI A SPECCHIO sulla seduta: sono le due cose che restano quando
+         lui non c'e' piu' («Resta la polo, floscia sulla sdraio, e gli occhiali
+         a specchio in cui adesso, finalmente, si specchia qualcosa»). Non
+         c'erano, e sono l'unico oggetto UMANO di questa spiaggia. */
       ctx.restore();
+      {
+        /* e la sdraio va MESSA DOVE STA DENTRO: a W*0.735 finiva sotto il
+           festone dell'ombrellone, e a H*0.90 la V della gamba davanti
+           arrivava a y=390 su una tela alta 360 — le gambe erano tagliate dal
+           bordo, ed e' per questo che leggeva come una panchina senza gambe. */
+        const sdx = W * 0.815, sdy = H * 0.80;
+        ctx.fillStyle = 'rgba(24,22,20,.34)'; ctx.fillRect(sdx - 42, sdy + 2, 96, 7);
+        /* La sdraio, e al primo colpo leggeva come una PANCHINA: la spalliera
+           era una scaletta di segmenti obliqui e la seduta una barra
+           orizzontale su due gambe. Una sdraio e' una cosa sola: il TELO
+           teso fra due correnti, inclinato di quaranta gradi, con la V della
+           gamba davanti e il puntone dietro. Il telo pieno e a righe e' quello
+           che la fa leggere; i segmenti staccati no. */
+        const p0 = [sdx - 46, sdy - 62], p1 = [sdx + 22, sdy - 16];       // il telo, da su a giu'
+        for (let k = 0; k <= 70; k++) {
+          const t = k / 70;
+          const xx = p0[0] + (p1[0] - p0[0]) * t, yy = p0[1] + (p1[1] - p0[1]) * t;
+          ctx.fillStyle = (k % 14 < 7) ? '#5c6870' : '#46525a';
+          ctx.fillRect(xx, yy, 1, 26);
+          ctx.fillStyle = 'rgba(200,214,222,.16)'; ctx.fillRect(xx, yy, 1, 3);
+        }
+        ctx.fillStyle = '#333c43';                                        // i due correnti
+        for (let k = 0; k <= 70; k++) {
+          const t = k / 70;
+          const xx = p0[0] + (p1[0] - p0[0]) * t, yy = p0[1] + (p1[1] - p0[1]) * t;
+          ctx.fillRect(xx, yy - 3, 1, 4); ctx.fillRect(xx, yy + 25, 1, 4);
+        }
+        ctx.fillStyle = '#3f4a52';                                        // la V della gamba davanti
+        for (let k = 0; k < 34; k++) { ctx.fillRect(p1[0] + k * 0.5, p1[1] + 26 + k, 4, 2); ctx.fillRect(p1[0] - k * 0.7, p1[1] + 26 + k, 4, 2); }
+        for (let k = 0; k < 40; k++) ctx.fillRect(p0[0] + 10 + k * 0.30, p0[1] + 26 + k, 4, 2);   // il puntone dietro
+        // LA POLO, floscia: buttata sulla spalliera, con le maniche che pendono
+        ctx.fillStyle = '#9a4a52'; ctx.fillRect(sdx - 34, sdy - 44, 40, 26);
+        ctx.fillStyle = '#b25a62'; ctx.fillRect(sdx - 34, sdy - 44, 40, 3);
+        ctx.fillStyle = '#8a4048'; ctx.fillRect(sdx - 38, sdy - 34, 8, 22);            // la manica che pende
+        ctx.fillStyle = '#c8747c'; ctx.fillRect(sdx - 20, sdy - 44, 12, 8);            // il collo aperto
+        ctx.fillStyle = '#6a2e36'; ctx.fillRect(sdx - 16, sdy - 38, 3, 9);             // i due bottoni
+        // GLI OCCHIALI A SPECCHIO, sulla seduta: e nelle lenti si specchia qualcosa
+        ctx.fillStyle = '#2a2a30'; ctx.fillRect(sdx + 14, sdy - 17, 30, 6);
+        ctx.fillStyle = '#8ad0e0'; ctx.fillRect(sdx + 15, sdy - 16, 12, 4);
+        ctx.fillStyle = '#8ad0e0'; ctx.fillRect(sdx + 31, sdy - 16, 12, 4);
+        ctx.fillStyle = '#e8f8ff'; ctx.fillRect(sdx + 16, sdy - 16, 4, 2); ctx.fillRect(sdx + 32, sdy - 16, 4, 2);
+        glow(ctx, sdx + 29, sdy - 14, 16, 5, '138,208,224');
+      }
       // orme che vanno verso il mare e SI FERMANO
       ctx.fillStyle = 'rgba(0,0,0,.20)';
       for (let i = 0; i < 6; i++) ctx.fillRect(W * 0.54 + i * 12, H * 0.92 - i * ((H * 0.92 - shoreY - 12) / 6), 7, 4);
@@ -1633,59 +1728,207 @@ const Scenes = (() => {
     },
 
     sottoscala(ctx, W, H) {
-      // intercapedine infernale: tubi che pulsano, scala a pioli, buio denso
+      /* IL SOTTOSCALA, quattordici scene, e il testo lo descrive oggetto per
+         oggetto — mentre il quadro era un reticolo di quattro tubi sottili su
+         un fondo nero al 94%:
+           «pareti di mattoni VIVI che si stringono e si allargano a perdita
+            d'occhio, e in mezzo, A CANNE D'ORGANO, le tubature — centinaia,
+            migliaia — che PULSANO. Non come tubi. Come VENE. Dentro ci passa
+            qualcosa di denso, e dove un giunto perde, la parete intorno ha
+            fatto LA CROSTA.»
+           «incastrate tra i tubi come cibo tra i denti: LE COSE DIMENTICATE.
+            Un TRICICLO con la ruggine a forma di dita. DENTIERE in fila su una
+            mensola, che masticano piano nel sonno.»
+           «Ogni LAVATRICE conteneva un giorno intero... la scrivania col
+            post-it URGENTE. Il divano con l'incavo a forma di persona. La
+            sveglia puntata alle 7:15... Ma nell'ultimo OBLÒ c'è un CALENDARIO
+            da tavolo, e ha una PAGINA STRAPPATA: il 17 non c'è più.»
+         Nel quadro c'erano quattro tubi, una scala e quattro puntini rossi.
+         Centinaia di canne d'organo sono la cosa che rende questo posto quello
+         che è, e gli oblò sono la sua unica luce: tondi, freddi, in mezzo a
+         ottanta verticali. Scala: 150 px per metro. */
       const r = rng(2087);
-      blocks(ctx, 0, 0, W, H, '#17151a', 16, r, 0.18);
+      const M = 150;
       const floorY = H - 46;
-      blocks(ctx, 0, floorY, W, H - floorY, '#100e12', 12, r, 0.16);
-      // le due pareti strette dell'intercapedine
-      blocks(ctx, 0, 0, W * 0.14, H, '#221f26', 10, r, 0.14);
-      blocks(ctx, W * 0.86, 0, W * 0.14, H, '#221f26', 10, r, 0.14);
-      // TUBI verticali e orizzontali, ancorati alle pareti con staffe
-      const pipeCols = ['#3a333c', '#443a40', '#332e38'];
-      for (const [fx, pw2] of [[0.17, 10], [0.25, 7], [0.78, 12], [0.70, 6]]) {
-        ctx.fillStyle = pipeCols[Math.floor(r() * 3)];
-        ctx.fillRect(W * fx, 0, pw2, H);
-        ctx.fillStyle = '#55505a'; // staffe
-        for (let y = 30; y < H; y += 70) ctx.fillRect(W * fx - 3, y, pw2 + 6, 5);
+
+      /* I MATTONI VIVI: caldi, e che si stringono e si allargano. Il respiro
+         delle pareti si disegna col profilo, non col colore: il bordo interno
+         di ogni parete ondeggia. */
+      blocks(ctx, 0, 0, W, H, '#2a1a18', 16, r, 0.16);
+      for (let y = 0; y < H; y += 3) {
+        const on = Math.sin(y * 0.031) * 26 + Math.sin(y * 0.011) * 18;
+        blocks(ctx, 0, y, W * 0.13 + on, 3, '#4a2a24', 9, r, 0.16);
+        blocks(ctx, W * 0.87 - on, y, W * 0.13 + on, 3, '#43261f', 9, r, 0.16);
+        ctx.fillStyle = 'rgba(12,7,6,.42)';
+        ctx.fillRect(W * 0.13 + on, y, 4, 3); ctx.fillRect(W * 0.87 - on - 4, y, 4, 3);
       }
-      for (const fy of [0.16, 0.52]) {
-        ctx.fillStyle = pipeCols[1]; ctx.fillRect(W * 0.14, H * fy, W * 0.72, 9);
-        ctx.fillStyle = '#55505a';
-        ctx.fillRect(W * 0.30, H * fy - 2, 6, 13); ctx.fillRect(W * 0.62, H * fy - 2, 6, 13);
+      blocks(ctx, 0, floorY, W, H - floorY, '#1d1412', 12, r, 0.14);
+      ctx.fillStyle = 'rgba(8,5,4,.5)'; ctx.fillRect(0, floorY, W, 4);
+
+      /* LE CANNE D'ORGANO: ottanta tubi verticali di diametro diverso, dal
+         soffitto al pavimento, ognuno col suo colpo di luce sul cilindro. E
+         alcuni GONFI — la pancia dove passa qualcosa di denso. */
+      const canne = [];
+      /* ...ma LE CANNE STANNO IN MEZZO: il testo dice «pareti di mattoni vivi
+         [...] e IN MEZZO, a canne d'organo, le tubature». Coprendo tutta la
+         larghezza, le pareti che si stringono e si allargano non si vedevano
+         piu' — e sono l'altra meta' di quello che questo posto e'. */
+      for (let x = W * 0.115; x < W * 0.885;) {
+        const d = 5 + (r() * 17 | 0);
+        const gonfia = r() > 0.84;
+        canne.push({ x, d, gonfia, fase: r() * 6.28 });
+        x += d + 2 + (r() * 5 | 0);
       }
-      // i tubi PULSANO: giunture che spandono un rosso sordo (l'unico colore)
-      for (const [px2, py2] of [[W * 0.19, H * 0.30], [W * 0.80, H * 0.62], [W * 0.46, H * 0.52 + 4], [W * 0.28, H * 0.74]]) {
-        glow(ctx, px2, py2, 30, 26, '150,40,44');
-        ctx.fillStyle = '#96282c'; ctx.fillRect(px2 - 5, py2 - 5, 10, 10);
-        ctx.fillStyle = '#c0453e'; ctx.fillRect(px2 - 2, py2 - 2, 4, 4);
+      for (const c of canne) {
+        const base = ['#5c4a44', '#4e3e3a', '#665048', '#453734'][(c.x * 7) % 4];
+        for (let y = 0; y < floorY; y++) {
+          // la pancia: si gonfia a metà altezza, come una vena piena
+          const g = c.gonfia ? Math.round(6 * Math.exp(-Math.pow((y - H * 0.44) / 46, 2))) : 0;
+          const d = c.d + g * 2;
+          const x0 = c.x - g;
+          ctx.fillStyle = base;
+          ctx.fillRect(x0, y, d, 1);
+          ctx.fillStyle = 'rgba(178,158,146,.20)'; ctx.fillRect(x0 + 1, y, 2, 1);   // il colpo di luce
+          ctx.fillStyle = 'rgba(10,6,5,.40)'; ctx.fillRect(x0 + d - 2, y, 2, 1);    // il lato in ombra
+        }
+        // le staffe, e il collarino di giunzione a un'altezza diversa per ognuno
+        ctx.fillStyle = '#6e5a52';
+        for (let y = 18 + ((c.x * 13) % 40); y < floorY; y += 86) ctx.fillRect(c.x - 3, y, c.d + 6, 5);
       }
-      // LA SCALA A PIOLI, dritta, dal pavimento su nel buio
-      const lx2 = W * 0.48;
-      ctx.fillStyle = '#4a4238';
-      ctx.fillRect(lx2 - 12, 0, 5, floorY + 6); ctx.fillRect(lx2 + 8, 0, 5, floorY + 6);
-      ctx.fillStyle = '#5a5044';
-      for (let y = 14; y < floorY; y += 20) ctx.fillRect(lx2 - 12, y, 25, 4);
-      // il buio DENSO in alto: la scala ci sparisce dentro
-      for (let i = 0; i < 5; i++) {
-        ctx.fillStyle = `rgba(6,5,8,${0.18 + i * 0.13})`;
-        ctx.fillRect(0, 0, W, H * 0.30 - i * H * 0.05);
+
+      /* I GIUNTI CHE PERDONO, e LA CROSTA che la parete ci ha fatto intorno:
+         un anello di minerale chiaro, e la colata scura che scende. È l'unica
+         cosa calda del quadro, e pulsa. */
+      for (const [cx2, cy2] of [[W * 0.155, H * 0.32], [W * 0.405, H * 0.58], [W * 0.72, H * 0.26], [W * 0.845, H * 0.66]]) {
+        for (let k = 0; k < 22; k++) {                       // la colata, giù dalla perdita
+          const t = k / 21;
+          ctx.fillStyle = `rgba(58,30,22,${(0.44 * (1 - t)).toFixed(3)})`;
+          ctx.fillRect(cx2 - 9 + t * 4, cy2 + 8 + k * 5, 18 - t * 8, 5);
+        }
+        for (let k = 0; k < 9; k++) {                         // la crosta, un anello grumoso
+          const a2 = k * 0.70, rr = 13 + (k % 3) * 4;
+          ctx.fillStyle = ['#b8a884', '#9c8c68', '#cbbd98'][k % 3];
+          ctx.fillRect(cx2 + Math.cos(a2) * rr - 3, cy2 + Math.sin(a2) * rr * 0.7 - 3, 7, 6);
+        }
+        glow(ctx, cx2, cy2, 13, 11, '176,58,46');
+        ctx.fillStyle = '#a8302c'; pixelDisc(ctx, cx2, cy2, 7, 2);
+        ctx.fillStyle = '#d8564a'; pixelDisc(ctx, cx2, cy2, 3, 2);
       }
-      // in basso: il passaggio strisciante verso il banco del Mercante, con un lume lontano
-      ctx.fillStyle = '#0a090c'; ctx.fillRect(W * 0.30, floorY - 34, W * 0.13, 34);
-      glow(ctx, W * 0.365, floorY - 16, 18, 14, '224,178,96');
-      ctx.fillStyle = '#e0b260'; ctx.fillRect(W * 0.36, floorY - 18, 4, 4);
-      // cavi che corrono lungo la parete, fissati con clip
-      ctx.fillStyle = '#26232a';
-      for (let i = 0; i < 3; i++) {
-        const cy2 = H * 0.82 + i * 5;
-        ctx.fillRect(W * 0.14, cy2, W * 0.72, 2);
+
+      /* LE COSE DIMENTICATE, incastrate fra i tubi come cibo fra i denti.
+         IL TRICICLO: due ruote dietro, una davanti, il manubrio, il sellino —
+         e la ruggine «a forma di dita», cioè quattro strisce parallele. */
+      {
+        /* IL TRICICLO. A settantotto pixel per cinquanta, incastrato in mezzo
+           ai tubi e con le ruote scure su un fondo scuro, leggeva come un
+           BANCONE. Un triciclo da bambino e' lungo settanta centimetri e alto
+           sessanta: a 150 px/m fa 105 per 90, e va messo in PRIMO PIANO, sul
+           pavimento davanti alle canne, con i cerchioni chiari — sono i
+           cerchioni che fanno vedere che una ruota e' una ruota. */
+        const tx2 = W * 0.155, ty2 = floorY - 40;
+        ctx.fillStyle = 'rgba(6,4,3,.55)'; ctx.fillRect(tx2 - 48, ty2 + 36, 104, 9);
+        ctx.fillStyle = '#8a4230'; ctx.fillRect(tx2 - 34, ty2 + 8, 70, 9);          // il telaio
+        ctx.fillRect(tx2 + 28, ty2 - 30, 9, 40);                                    // il piantone
+        ctx.fillStyle = '#9c5038'; ctx.fillRect(tx2 + 10, ty2 - 36, 44, 8);         // il manubrio
+        ctx.fillStyle = '#6a3020'; ctx.fillRect(tx2 + 10, ty2 - 36, 8, 8); ctx.fillRect(tx2 + 46, ty2 - 36, 8, 8);
+        ctx.fillStyle = '#42291f'; ctx.fillRect(tx2 - 42, ty2 - 8, 30, 15);         // il sellino
+        ctx.fillStyle = '#5a3a2a'; ctx.fillRect(tx2 - 42, ty2 - 8, 30, 3);
+        for (const [wx2, rr] of [[tx2 + 32, 21], [tx2 - 32, 15], [tx2 - 10, 15]]) { // le tre ruote
+          ctx.fillStyle = '#1e1614'; pixelDisc(ctx, wx2, ty2 + 22, rr, 3);
+          ctx.fillStyle = '#8a7a68'; pixelDisc(ctx, wx2, ty2 + 22, Math.round(rr * 0.62), 3);
+          ctx.fillStyle = '#2e2622'; pixelDisc(ctx, wx2, ty2 + 22, Math.round(rr * 0.30), 3);
+          ctx.fillStyle = '#a89684'; pixelDisc(ctx, wx2, ty2 + 22, 3, 2);           // il mozzo
+        }
+        ctx.fillStyle = 'rgba(188,104,58,.66)';                                     // la ruggine a dita
+        for (let k = 0; k < 4; k++) ctx.fillRect(tx2 - 26 + k * 12, ty2 + 8, 5, 16);
       }
-      ctx.fillStyle = '#3a3640';
-      for (let x = W * 0.2; x < W * 0.86; x += W * 0.16) ctx.fillRect(x, H * 0.81, 4, 12);
-      // condensa che luccica
-      ctx.fillStyle = 'rgba(150,160,180,.10)';
-      for (let i = 0; i < 8; i++) ctx.fillRect(W * 0.14 + r() * W * 0.72, r() * H, 2, 6);
+      /* LE DENTIERE IN FILA SU UNA MENSOLA, che masticano piano nel sonno:
+         sette U pallide, e una socchiusa. */
+      {
+        const mx = W * 0.615, my = H * 0.30;
+        ctx.fillStyle = '#4a3a30'; ctx.fillRect(mx, my + 15, 138, 6);
+        ctx.fillStyle = '#5e4a3c'; ctx.fillRect(mx, my + 15, 138, 2);
+        ctx.fillStyle = '#33281f'; ctx.fillRect(mx + 8, my + 21, 5, 9); ctx.fillRect(mx + 124, my + 21, 5, 9);
+        for (let k = 0; k < 7; k++) {
+          const dx2 = mx + 6 + k * 19, ap = (k === 3) ? 4 : 0;     // una socchiusa
+          ctx.fillStyle = '#ded6c4';
+          ctx.fillRect(dx2, my + 4 - ap, 15, 4);                    // l'arcata di sopra
+          ctx.fillRect(dx2 + 1, my + 9, 13, 4);                     // e quella di sotto
+          ctx.fillStyle = '#b8368a'; ctx.fillRect(dx2 + 1, my + 8 - ap, 13, 2);
+          ctx.fillStyle = 'rgba(255,252,242,.55)'; ctx.fillRect(dx2, my + 4 - ap, 15, 1);
+        }
+        glow(ctx, mx + 68, my + 8, 36, 10, '210,204,188');
+      }
+
+      /* LE LAVATRICI CON GLI OBLÒ: quattro, in fila bassa. Sono l'unica luce
+         del quadro, sono le sole forme TONDE in mezzo a ottanta verticali, e
+         dentro ognuna c'è un giorno — la scrivania col post-it, il divano con
+         l'incavo, la sveglia alle 7:15 — e nell'ULTIMA il calendario a spirale
+         con la pagina strappata. */
+      const lw = Math.round(0.60 * M), lh = Math.round(0.85 * M);
+      for (let k = 0; k < 4; k++) {
+        const lx2 = Math.round(W * 0.285) + k * (lw + 10), ly2 = floorY - lh;
+        blocks(ctx, lx2, ly2, lw, lh, '#6e6a66', 8, r, 0.06);
+        ctx.fillStyle = '#828080'; ctx.fillRect(lx2, ly2, lw, 3);
+        ctx.fillStyle = '#4a4744'; ctx.fillRect(lx2 + 6, ly2 + 8, lw - 12, 14);      // il cassetto
+        ctx.fillStyle = '#3a3836'; ctx.fillRect(lx2 + lw - 24, ly2 + 12, 12, 5);
+        ctx.fillStyle = 'rgba(6,5,4,.55)'; ctx.fillRect(lx2 - 3, floorY - 4, lw + 6, 6);
+        const ocx = lx2 + lw / 2, ocy = ly2 + lh * 0.56, R = Math.round(lw * 0.33);
+        ctx.fillStyle = '#3e3c3a'; pixelDisc(ctx, ocx, ocy, R + 6, 2);               // la ghiera
+        ctx.fillStyle = '#0d1418'; pixelDisc(ctx, ocx, ocy, R, 2);
+        glow(ctx, ocx, ocy, R * 0.9, R * 0.9, '120,164,178');
+        ctx.fillStyle = '#26424a'; pixelDisc(ctx, ocx, ocy, R - 3, 2);               // il vetro
+        // e dentro, il carico: un giorno per oblò
+        if (k === 0) {                                                              // la scrivania col post-it
+          ctx.fillStyle = '#7a6242'; ctx.fillRect(ocx - 15, ocy + 2, 30, 5);
+          ctx.fillStyle = '#5a4830'; ctx.fillRect(ocx - 12, ocy + 7, 4, 10); ctx.fillRect(ocx + 8, ocy + 7, 4, 10);
+          ctx.fillStyle = '#e8e246'; ctx.fillRect(ocx - 6, ocy - 6, 11, 9);
+          ctx.fillStyle = '#8a8420'; ctx.fillRect(ocx - 4, ocy - 3, 7, 1);
+        } else if (k === 1) {                                                       // il divano con l'incavo
+          ctx.fillStyle = '#5a4a58'; ctx.fillRect(ocx - 18, ocy - 2, 36, 13);
+          ctx.fillStyle = '#4a3c48'; ctx.fillRect(ocx - 18, ocy - 10, 36, 9);
+          ctx.fillStyle = 'rgba(10,8,12,.60)'; pixelDisc(ctx, ocx + 1, ocy + 2, 7, 2);
+        } else if (k === 2) {                                                       // la sveglia alle 7:15
+          ctx.fillStyle = '#a83636'; pixelDisc(ctx, ocx, ocy + 1, 12, 2);
+          ctx.fillStyle = '#e8e2d0'; pixelDisc(ctx, ocx, ocy + 1, 8, 2);
+          ctx.fillStyle = '#2a2018'; ctx.fillRect(ocx - 1, ocy - 5, 2, 7);          // le sette
+          ctx.fillRect(ocx, ocy, 6, 2);                                             // e un quarto
+          ctx.fillStyle = '#a83636'; ctx.fillRect(ocx - 10, ocy - 10, 5, 4); ctx.fillRect(ocx + 6, ocy - 10, 5, 4);
+        } else {                                                                    // IL CALENDARIO, e il 17 strappato
+          ctx.fillStyle = '#e4dfd0'; ctx.fillRect(ocx - 15, ocy - 8, 31, 24);
+          ctx.fillStyle = '#a89c88'; ctx.fillRect(ocx - 15, ocy - 8, 31, 4);
+          ctx.fillStyle = '#8a8478';                                                // la spirale
+          for (let q = 0; q < 6; q++) ctx.fillRect(ocx - 13 + q * 5, ocy - 11, 3, 4);
+          ctx.fillStyle = '#5a5448';
+          for (let q = 0; q < 3; q++) ctx.fillRect(ocx - 11, ocy - 1 + q * 5, 23, 2);
+          // LA PAGINA STRAPPATA: il bordo dentellato e il vuoto
+          ctx.fillStyle = '#26424a'; ctx.fillRect(ocx - 15, ocy + 6, 31, 10);
+          ctx.fillStyle = '#c8c2b0';
+          for (let q = 0; q < 10; q++) ctx.fillRect(ocx - 15 + q * 3, ocy + 6 - (q % 2), 3, 2);
+        }
+        ctx.fillStyle = 'rgba(200,230,240,.10)'; pixelDisc(ctx, ocx - R * 0.35, ocy - R * 0.4, Math.round(R * 0.3), 2);
+      }
+
+      /* LA BOTOLA in alto, e la cordata di tovaglie annodate che ne scende:
+         è da lì che si è scesi, ed è lì che il nodo «si è aperto con
+         gentilezza, come slacciato da dita pazienti». */
+      const bxx = W * 0.185;
+      ctx.fillStyle = '#0a0806'; ctx.fillRect(bxx - 46, 0, 92, 16);
+      ctx.fillStyle = '#4a3a30'; ctx.fillRect(bxx - 50, 14, 100, 6);
+      ctx.fillStyle = '#5e4a3c'; ctx.fillRect(bxx - 50, 14, 100, 2);
+      for (let k = 0; k < 9; k++) {                                                 // le tovaglie annodate
+        const yy = 18 + k * 15, ww = k % 2 ? 11 : 9;
+        ctx.fillStyle = ['#c8c2b0', '#b8b2a0', '#d0caba'][k % 3];
+        ctx.fillRect(bxx - 4 + Math.sin(k * 1.3) * 5, yy, ww, 15);
+        ctx.fillStyle = 'rgba(60,54,46,.34)';
+        ctx.fillRect(bxx - 6 + Math.sin(k * 1.3) * 5, yy + 11, ww + 5, 5);          // il nodo
+      }
+      // e il tepore da corpo, dal basso: l'unica cosa che questo posto ha di caldo
+      for (let y = H; y > floorY - 60; y--) {
+        const t = (H - y) / 100;
+        ctx.fillStyle = `rgba(176,96,64,${(0.045 * (1 - t)).toFixed(3)})`;
+        ctx.fillRect(0, y, W, 1);
+      }
     },
 
     mercante(ctx, W, H) {
