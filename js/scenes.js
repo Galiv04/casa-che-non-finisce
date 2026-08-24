@@ -718,55 +718,201 @@ const Scenes = (() => {
     },
 
     salotto(ctx, W, H) {
-      // il Salotto-Cattedrale: soffitto altissimo nel buio, divano enorme, TV come vetrata
+      /* IL SALOTTO — il fondale più visto del gioco: ventisette scene.
+         Era disegnato come «il Salotto-Cattedrale»: soffitto che si perde nel
+         buio, quattro pilastri, la TV come una VETRATA verticale con le
+         piombature e i riquadri «come scene di santi», il divano di spalle e
+         cinque lattine allineate come lumini votivi. Bella idea, e in
+         contraddizione diretta col testo che quel fondale deve servire:
+         «Il salotto vi accoglie con la scena più normale del mondo, ed è
+         questo a farla atroce.»
+         Una cattedrale non è la scena più normale del mondo. E le tre cose che
+         il testo nomina — «il divano di Daniele, con l'INCAVO DEL SUO CORPO
+         ancora stampato nei cuscini», «la TV accesa su una tempesta di static
+         che pulsa», «sul mobiletto la Switch in pausa, Mario Kart, e MANCA IL
+         JOY-CON SINISTRO» — nel quadro non c'erano: l'incavo era un rettangolo
+         nero al 28%, la Switch non esisteva, e la TV era una vetrata.
+         Della cattedrale resta l'unica cosa che non litiga col testo: la luce
+         della TV è l'unica luce della stanza, e taglia il buio come la luce di
+         una finestra.
+         E LA SCALA: 145 px per metro, non 120. A centoventi il divano — che è
+         il soggetto, ed è quello che ha stampato dentro l'incavo di Daniele —
+         faceva 276 px su 960, cioè il 29% del lato: sotto il terzo che la
+         regola chiede. A centoquarantacinque ne fa 348, il 36%, e soprattutto
+         l'incavo passa da 82 px di larghezza a 103, che è la differenza fra
+         «c'è un'ombra sul cuscino» e «lì si è seduto qualcuno». */
       const r = rng(2017);
-      blocks(ctx, 0, 0, W, H, '#1a1a20', 16, r, 0.14);
-      const floorY = H - 66;
-      blocks(ctx, 0, floorY, W, H - floorY, '#3a3833', 12, r, 0.12);
-      // colonne di "muro" che salgono e si perdono nel buio in alto
-      for (const fx of [0.06, 0.28, 0.72, 0.94]) {
-        blocks(ctx, W * fx - 12, 0, 26, floorY, '#26262c', 10, r, 0.12);
-        ctx.fillStyle = 'rgba(10,10,14,.5)'; ctx.fillRect(W * fx - 12, 0, 26, H * 0.30);
+      const M = 145;
+      const floorY = H - 96;
+      blocks(ctx, 0, 0, W, floorY, '#22222a', 16, r, 0.12);
+      // il buio del soffitto, e la fascia dello zoccolo: senza, la parete e'
+      // una campitura unica alta 264 pixel
+      for (let i = 0; i < 4; i++) {
+        ctx.fillStyle = `rgba(8,8,12,${(0.10 + i * 0.07).toFixed(2)})`;
+        ctx.fillRect(0, 0, W, H * 0.22 - i * H * 0.045);
       }
-      // il buio del soffitto: fasce che si spengono salendo
-      for (let i = 0; i < 5; i++) {
-        ctx.fillStyle = `rgba(8,8,12,${0.14 + i * 0.10})`;
-        ctx.fillRect(0, 0, W, H * 0.28 - i * H * 0.05);
+      ctx.fillStyle = 'rgba(120,124,140,.05)'; ctx.fillRect(0, floorY - 46, W, 2);
+      blocks(ctx, 0, floorY - 20, W, 20, '#2b2b33', 10, r, 0.09);
+      ctx.fillStyle = 'rgba(140,144,158,.07)'; ctx.fillRect(0, floorY - 20, W, 2);
+      pavimento(ctx, W, H, floorY, r, '#3a3833', 38);
+      // il tappeto consumato, sotto il divano
+      blocks(ctx, W * 0.26, floorY + 12, W * 0.52, H - floorY - 18, '#443f38', 10, r, 0.12);
+      ctx.fillStyle = 'rgba(120,112,98,.10)'; ctx.fillRect(W * 0.26, floorY + 12, W * 0.52, 2);
+
+      /* LA TV ACCESA SULLA TEMPESTA DI STATIC, e il static PULSA — il testo
+         scandisce «uno-due-tre-lampo», quindi c'è una banda più chiara che
+         attraversa lo schermo. È l'unica luce della stanza. */
+      const mux = 40, muw = Math.round(1.35 * M), muh = Math.round(0.42 * M);
+      blocks(ctx, mux, floorY - muh, muw, muh, '#33302a', 8, r, 0.09);          // il mobiletto
+      ctx.fillStyle = '#403c34'; ctx.fillRect(mux, floorY - muh, muw, 3);
+      ctx.fillStyle = '#232019'; ctx.fillRect(mux + 8, floorY - muh + 10, muw - 16, muh - 18);
+      const tvw = Math.round(1.05 * M), tvh = Math.round(0.62 * M);
+      const tvx = mux + (muw - tvw) / 2, tvy = floorY - muh - tvh - 10;
+      /* glow() finito e' 4 VOLTE la w che gli passi (lezione sul suo alone):
+         tvw*1.5 faceva 216 di nucleo, cioe' 864 px di alone su un quadro da
+         960 — quegli archi concentrici sulla parete erano quello. */
+      glow(ctx, tvx + tvw / 2, tvy + tvh / 2, tvw * 0.40, tvh * 0.46, '150,176,196');
+      ctx.fillStyle = '#0e0e12'; ctx.fillRect(tvx - 5, tvy - 5, tvw + 10, tvh + 10);
+      // lo static: righe di rumore, e una banda piu' chiara che pulsa
+      for (let y = 0; y < tvh; y++) {
+        const base = 96 + (r() * 84 | 0);
+        const puls = Math.max(0, 1 - Math.abs(y - tvh * 0.36) / (tvh * 0.16)) * 70;
+        const v = Math.min(255, base + puls) | 0;
+        ctx.fillStyle = `rgb(${v},${(v * 1.04) | 0},${(v * 1.12) | 0})`;
+        ctx.fillRect(tvx, tvy + y, tvw, 1);
+        // e i trattini orizzontali che il rumore analogico fa
+        for (let k = 0; k < 3; k++) {
+          const w2 = 4 + (r() * 26 | 0), x2 = tvx + (r() * (tvw - w2) | 0);
+          const d = (r() > 0.5 ? 40 : -40);
+          const w3 = Math.max(0, Math.min(255, v + d)) | 0;
+          ctx.fillStyle = `rgb(${w3},${w3},${(w3 * 1.08) | 0})`;
+          ctx.fillRect(x2, tvy + y, w2, 1);
+        }
       }
-      // LA TV-VETRATA: enorme, verticale, luce grigio-azzurra da cattedrale
-      const tx = W * 0.40, tw = W * 0.20, ty = H * 0.10, th = floorY - ty - 30;
-      glow(ctx, tx + tw / 2, ty + th / 2, tw * 1.3, th * 0.9, '138,168,190');
-      ctx.fillStyle = '#17171c'; ctx.fillRect(tx - 8, ty - 8, tw + 16, th + 16);
-      ctx.fillStyle = '#7a94a8'; ctx.fillRect(tx, ty, tw, th);
-      // "piombature" da vetrata sopra lo schermo
-      ctx.fillStyle = '#2a2a32';
-      ctx.fillRect(tx, ty + th * 0.33, tw, 4); ctx.fillRect(tx, ty + th * 0.66, tw, 4);
-      ctx.fillRect(tx + tw * 0.5 - 2, ty, 4, th);
-      // riquadri con toni diversi, come scene di santi
-      ctx.fillStyle = '#94aec0'; ctx.fillRect(tx + 4, ty + 4, tw * 0.5 - 8, th * 0.33 - 8);
-      ctx.fillStyle = '#5a7486'; ctx.fillRect(tx + tw * 0.5 + 4, ty + th * 0.33 + 6, tw * 0.5 - 8, th * 0.33 - 10);
-      ctx.fillStyle = '#a8bcc8'; ctx.fillRect(tx + 4, ty + th * 0.66 + 6, tw * 0.5 - 8, th * 0.33 - 12);
-      // il mobile TV sotto: lo schermo POGGIA, non fluttua
-      blocks(ctx, tx - 14, floorY - 30, tw + 28, 30, '#3a362f', 8, r, 0.10);
-      // IL DIVANO ENORME, di spalle, davanti alla vetrata
-      const sx = W * 0.22, sw = W * 0.56, sy2 = floorY - 12;
-      blocks(ctx, sx, sy2 - 44, sw, 44, '#4e4e56', 10, r, 0.10);
-      blocks(ctx, sx, sy2 - 64, sw, 24, '#46464e', 10, r, 0.08);
-      ctx.fillStyle = '#3e3e46';
-      ctx.fillRect(sx - 14, sy2 - 54, 18, 54); ctx.fillRect(sx + sw - 4, sy2 - 54, 18, 54);
-      ctx.fillStyle = '#585860';
-      for (let i = 0; i < 4; i++) ctx.fillRect(sx + 16 + i * sw / 4, sy2 - 60, sw / 4 - 20, 18);
-      // l'impronta di CHI ci si è seduto per anni: l'incavo al centro
-      ctx.fillStyle = 'rgba(0,0,0,.28)'; ctx.fillRect(sx + sw * 0.42, sy2 - 58, sw * 0.16, 40);
-      // candele? no: lattine-lumino ai piedi della vetrata, UNA rossa vera
-      for (let i = 0; i < 5; i++) {
-        const lx2 = tx - 10 + i * (tw + 20) / 4;
-        ctx.fillStyle = '#55555c'; ctx.fillRect(lx2, floorY - 11, 6, 10);
+      ctx.fillStyle = '#2a2a32'; ctx.fillRect(tvx + tvw / 2 - 4, floorY - muh - 10, 9, 10);   // il piedino
+      ctx.fillStyle = '#1a1a20'; ctx.fillRect(tvx + tvw / 2 - 22, floorY - muh - 3, 45, 4);
+
+      /* LA SWITCH IN PAUSA sul mobiletto, con MARIO KART congelato a metà
+         curva — e il joy-con SINISTRO che manca: al suo posto la guida vuota.
+         È la battuta di Federico, quindi è la cosa che si deve poter contare. */
+      const swx = mux + 16, swy = floorY - muh - 26;
+      ctx.fillStyle = '#15151a'; ctx.fillRect(swx, swy, 62, 26);               // il corpo
+      ctx.fillStyle = '#0b0b0e'; ctx.fillRect(swx + 10, swy + 3, 40, 20);      // lo schermo
+      // la schermata di gara congelata: pista, cielo, e due macchie di colore
+      ctx.fillStyle = '#3a6a9a'; ctx.fillRect(swx + 10, swy + 3, 40, 7);
+      ctx.fillStyle = '#6a5a3a'; ctx.fillRect(swx + 10, swy + 10, 40, 13);
+      ctx.fillStyle = '#8a8a92'; ctx.fillRect(swx + 14, swy + 13, 32, 6);      // l'asfalto in curva
+      ctx.fillStyle = '#c83030'; ctx.fillRect(swx + 22, swy + 14, 5, 4);
+      ctx.fillStyle = '#3050c8'; ctx.fillRect(swx + 33, swy + 15, 5, 4);
+      ctx.fillStyle = '#2a5a3a'; ctx.fillRect(swx + 50, swy, 12, 26);          // il joy-con DESTRO, attaccato
+      ctx.fillStyle = '#3a7a4a'; ctx.fillRect(swx + 50, swy, 12, 3);
+      ctx.fillStyle = '#2e2e36'; ctx.fillRect(swx - 1, swy, 11, 26);           // e a sinistra la GUIDA VUOTA
+      ctx.fillStyle = '#0d0d10'; ctx.fillRect(swx + 1, swy + 3, 7, 20);
+      ctx.fillStyle = 'rgba(200,60,60,.5)'; ctx.fillRect(swx + 2, swy + 10, 5, 6);
+
+      /* IL DIVANO DI DANIELE, di tre quarti, e L'INCAVO DEL SUO CORPO nel
+         cuscino di mezzo: non un rettangolo nero, ma una CONCA — il cuscino
+         schiacciato al centro, i bordi che si alzano intorno, e l'ombra dentro.
+         Due metri e trenta di divano fanno 276 px; la spalliera a 85 cm ne fa
+         102, la seduta a 42 ne fa 50. */
+      const sx = W * 0.30, sw = Math.round(2.4 * M), base = floorY + 40;
+      ctx.fillStyle = 'rgba(6,6,9,.40)'; ctx.fillRect(sx - 10, base - 6, sw + 34, 14);
+      const spal = base - Math.round(0.85 * M), sedu = base - Math.round(0.42 * M);
+      /* IL CONTORNO. Il misuratore dei soggetti non riusciva a vedere il
+         divano come un oggetto solo, e aveva ragione: la sagoma contro la
+         parete faceva un salto di luminanza di trentasei punti (appena sopra
+         la soglia), e le cuciture fra i cuscini ne facevano OTTO, cioè zero.
+         Un divano grigio in una stanza grigia ha bisogno di due cose: la riga
+         di stacco intorno (l'ombra di contatto, che è quello che separa un
+         oggetto dal fondo nel pixel art) e le cuciture vere. */
+      ctx.fillStyle = 'rgba(6,6,10,.38)';        // uno stacco, non un contorno nero
+      ctx.fillRect(sx - 17, spal - 2, sw + 38, 3);
+      ctx.fillRect(sx - 17, spal - 2, 3, base - spal); ctx.fillRect(sx + sw + 18, spal - 2, 3, base - spal);
+      blocks(ctx, sx, spal, sw, sedu - spal + 8, '#464650', 10, r, 0.08);      // la spalliera
+      ctx.fillStyle = '#525260'; ctx.fillRect(sx, spal, sw, 3);
+      ctx.fillStyle = 'rgba(10,10,16,.70)';                                    // i tre cuscini di spalliera
+      ctx.fillRect(sx + Math.round(sw / 3), spal + 4, 3, sedu - spal);
+      ctx.fillRect(sx + Math.round(sw * 2 / 3), spal + 4, 3, sedu - spal);
+      ctx.fillStyle = 'rgba(146,150,170,.16)';                                  // e il labbro in luce accanto
+      ctx.fillRect(sx + Math.round(sw / 3) + 3, spal + 4, 2, sedu - spal);
+      ctx.fillRect(sx + Math.round(sw * 2 / 3) + 3, spal + 4, 2, sedu - spal);
+      blocks(ctx, sx, sedu, sw, base - sedu - 8, '#4e4e58', 10, r, 0.08);      // la seduta
+      ctx.fillStyle = '#5c5c68'; ctx.fillRect(sx, sedu, sw, 3);
+      ctx.fillStyle = 'rgba(10,10,16,.72)';
+      ctx.fillRect(sx + Math.round(sw / 3), sedu, 3, base - sedu - 8);
+      ctx.fillRect(sx + Math.round(sw * 2 / 3), sedu, 3, base - sedu - 8);
+      ctx.fillStyle = 'rgba(150,154,174,.16)';
+      ctx.fillRect(sx + Math.round(sw / 3) + 3, sedu, 2, base - sedu - 8);
+      ctx.fillRect(sx + Math.round(sw * 2 / 3) + 3, sedu, 2, base - sedu - 8);
+      // L'INCAVO, nel cuscino di mezzo: una conca, coi bordi che si rialzano
+      {
+        const ix = sx + sw / 2, iw = sw / 3 - 10;
+        for (let x = -iw / 2; x < iw / 2; x++) {
+          const u = x / (iw / 2);
+          const g = Math.round(11 * (1 - u * u));            // quanto affonda
+          // l'ombra dell'incavo: sfuma verso i bordi, altrimenti la conca
+          // legge come una lente scura — un occhio in mezzo al divano
+          ctx.fillStyle = `rgba(12,12,18,${(0.26 * (1 - Math.abs(u) * 0.85)).toFixed(3)})`;
+          ctx.fillRect(ix + x, sedu + 3, 1, g + 3);
+          ctx.fillStyle = 'rgba(120,122,138,.10)';           // il bordo che si alza
+          if (Math.abs(u) > 0.82) ctx.fillRect(ix + x, sedu - 2, 1, 3);
+        }
+        for (let x = -iw / 2; x < iw / 2; x++) {             // e la conca nella spalliera dietro
+          const u = x / (iw / 2);
+          ctx.fillStyle = `rgba(8,8,12,${(0.20 * (1 - Math.abs(u) * 0.8)).toFixed(3)})`;
+          ctx.fillRect(ix + x, sedu - Math.round(28 * (1 - u * u)) - 2, 1, Math.round(28 * (1 - u * u)));
+        }
       }
-      lattina(ctx, tx + tw / 2 - 3, floorY - 12);
-      glow(ctx, tx + tw / 2, floorY - 7, 12, 10, '192,36,46');
-      // tappeto consumato davanti al divano
-      blocks(ctx, W * 0.30, floorY + 6, W * 0.40, H - floorY - 10, '#443f38', 10, r, 0.12);
+      ctx.fillStyle = '#3c3c46';                                               // i braccioli
+      ctx.fillRect(sx - 14, base - Math.round(0.62 * M), 22, Math.round(0.62 * M) - 6);
+      ctx.fillRect(sx + sw - 8, base - Math.round(0.62 * M), 22, Math.round(0.62 * M) - 6);
+      ctx.fillStyle = '#4a4a56';
+      ctx.fillRect(sx - 14, base - Math.round(0.62 * M), 22, 3);
+      ctx.fillRect(sx + sw - 8, base - Math.round(0.62 * M), 22, 3);
+      ctx.fillStyle = '#22222a';                                              // i piedini
+      ctx.fillRect(sx + 8, base - 8, 11, 9); ctx.fillRect(sx + sw - 18, base - 8, 11, 9);
+      // e la luce della TV che prende il divano dal fianco sinistro
+      for (let x = 0; x < sw * 0.4; x++) {
+        const a = 0.16 * (1 - x / (sw * 0.4));
+        ctx.fillStyle = `rgba(168,192,212,${a.toFixed(3)})`;
+        ctx.fillRect(sx + x, spal, 1, base - spal - 8);
+      }
+
+      /* LO SPECCHIO, a destra: quello che «si APPANNA dal suo lato, come da un
+         fiato». Dentro, il riflesso della stanza è più buio del vero — e la
+         chiazza appannata sta in basso, all'altezza di una faccia. */
+      const spx = W * 0.845, spy = floorY - 208, spw = Math.round(0.66 * M), sph = Math.round(1.06 * M);
+      blocks(ctx, spx - 8, spy - 8, spw + 16, sph + 16, '#3a3028', 8, r, 0.10);
+      ctx.fillStyle = '#1c1c24'; ctx.fillRect(spx, spy, spw, sph);
+      ctx.fillStyle = '#242430'; ctx.fillRect(spx + 4, spy + 4, spw - 8, sph - 8);
+      // il riflesso: la TV di rimando, in fondo a sinistra, e una sagoma
+      ctx.fillStyle = 'rgba(140,168,190,.20)'; ctx.fillRect(spx + 10, spy + 54, 30, 20);
+      ctx.fillStyle = 'rgba(70,70,84,.5)'; ctx.fillRect(spx + 52, spy + 66, 44, 84);
+      ctx.fillStyle = 'rgba(255,255,255,.05)'; ctx.fillRect(spx + 4, spy + 4, spw - 8, 3);
+      // LA CHIAZZA APPANNATA, all'altezza di una faccia, dal lato di dentro
+      for (let y = 0; y < 62; y++) {
+        for (let x = 0; x < 74; x += 2) {
+          const d = Math.hypot((x - 37) / 37, (y - 31) / 31);
+          if (d >= 1) continue;
+          ctx.fillStyle = `rgba(206,214,226,${(0.20 * Math.pow(1 - d, 1.4)).toFixed(3)})`;
+          ctx.fillRect(spx + 30 + x, spy + 74 + y, 2, 1);
+        }
+      }
+      // la pozza fredda della TV sul pavimento, fra mobiletto e divano
+      for (let y = floorY; y < H; y += 1) {
+        const t = (y - floorY) / (H - floorY);
+        const cx2 = tvx + tvw / 2 + t * 90, rx2 = tvw * (0.7 + t * 1.1);
+        for (let x = cx2 - rx2; x < cx2 + rx2; x += 3) {
+          const d = Math.abs(x - cx2) / rx2;
+          const a = 0.13 * (1 - t * 0.6) * Math.pow(1 - d, 1.6);
+          if (a <= 0.004) continue;
+          ctx.fillStyle = `rgba(158,184,206,${a.toFixed(3)})`;
+          ctx.fillRect(x, y, 3, 1);
+        }
+      }
+      // la lattina rossa: l'unica cosa a colori della stanza, per terra
+      lattina(ctx, W * 0.245, floorY + 52);
+      glow(ctx, W * 0.245 + 3, floorY + 58, 7, 6, '192,36,46');
     },
 
     biblioteca(ctx, W, H) {
