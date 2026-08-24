@@ -127,6 +127,27 @@ const Scenes = (() => {
 
   /* ---------- helper di terreno ---------- */
 
+  // Un PIANO ORIZZONTALE in scorcio, portato dall'Effetto Zoom (balconyFloor).
+  // I corsi trasversali si allargano venendo avanti (step *= 1.55) e i giunti
+  // longitudinali convergono al punto principale: è la sola cosa che distingue
+  // un pavimento da una parete sdraiata. In questa casa i pavimenti erano
+  // disegnati a passo fisso, cioè come muri messi giù.
+  function pavimento(ctx, W, H, topY, r, tile, passo = 34) {
+    blocks(ctx, 0, topY, W, H - topY, tile, 10, r, 0.09);
+    let y = topY + 5, step = 6;
+    const rows = [];
+    while (y < H) { rows.push(Math.round(y)); y += step; step *= 1.55; }
+    ctx.fillStyle = shade(tile, 0.76);
+    rows.forEach(ry => ctx.fillRect(0, ry, W, 2));
+    ctx.fillStyle = shade(tile, 0.60);
+    for (let i = -9; i <= 9; i++) {
+      for (let yy = topY + 2; yy < H; yy++) {
+        const t = (yy - topY) / (H - topY);
+        ctx.fillRect(Math.round(W / 2 + i * passo * (1 + t * 1.7)), yy, 2, 1);
+      }
+    }
+  }
+
   // Profilo di terreno irregolare: niente bande orizzontali nette
   function ground(ctx, W, H, topY, color, rand, blockSize = 12, jag = 8) {
     for (let x = 0; x < W; x += blockSize) {
@@ -550,10 +571,9 @@ const Scenes = (() => {
       const r = rng(2011);
       blocks(ctx, 0, 0, W, H, '#3a3a3e', 16, r, 0.08);
       const floorY = H - 72;
-      // parquet sbiadito a doghe
-      blocks(ctx, 0, floorY, W, H - floorY, '#55504a', 12, r, 0.10);
-      ctx.fillStyle = 'rgba(0,0,0,.16)';
-      for (let y = floorY + 10; y < H; y += 12) for (let x = ((y / 12) % 2) * 30; x < W; x += 60) ctx.fillRect(x, y, 56, 2);
+      // parquet sbiadito a doghe, in scorcio: le doghe corrono via dalla
+      // macchina, non di traverso a passo fisso
+      pavimento(ctx, W, H, floorY, r, '#55504a', 30);
       // finestra sulla città notturna
       ctx.fillStyle = '#4a4a50'; ctx.fillRect(W * 0.70, 30, 116, 96);
       ctx.fillStyle = '#121218'; ctx.fillRect(W * 0.70 + 7, 37, 102, 82);
@@ -1332,11 +1352,9 @@ const Scenes = (() => {
       const r = rng(2081);
       blocks(ctx, 0, 0, W, H, '#3a3e42', 16, r, 0.08);
       const floorY = H - 66;
-      // piastrelle grandi da cucina industriale
-      blocks(ctx, 0, floorY, W, H - floorY, '#4a4e52', 14, r, 0.08);
-      ctx.fillStyle = 'rgba(0,0,0,.18)';
-      for (let y = floorY; y < H; y += 14) ctx.fillRect(0, y, W, 2);
-      for (let x = 0; x < W; x += 26) ctx.fillRect(x, floorY, 2, H - floorY);
+      // piastrelle grandi da cucina industriale, in scorcio: i giunti dritti
+      // convergono e i corsi si allargano venendo avanti
+      pavimento(ctx, W, H, floorY, r, '#4a4e52', 44);
       // neon freddi a soffitto
       for (const fx of [0.22, 0.60]) {
         ctx.fillStyle = '#33363a'; ctx.fillRect(W * fx, 10, W * 0.16, 6);
