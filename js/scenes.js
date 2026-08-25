@@ -2384,7 +2384,7 @@ const Scenes = (() => {
       skyGradient(ctx, W, H * 0.30, '#5a6ab8', '#8a7ac2', 6);
       ctx.fillStyle = 'rgba(255,196,120,.30)'; ctx.fillRect(0, H * 0.34, W, H * 0.20);
       // IL SOLE che sale in fondo alla strada
-      glow(ctx, W * 0.5, H * 0.46, 120, 90, '255,200,110');
+      glow(ctx, W * 0.5, H * 0.46, 58, 44, '255,200,110');   // 120 = 480 px di alone su 960
       ctx.fillStyle = '#ffd878'; pixelDisc(ctx, W * 0.5, H * 0.47, 30);
       ctx.fillStyle = '#fff0b8'; pixelDisc(ctx, W * 0.5, H * 0.47, 18);
       // nuvole accese di rosa e oro
